@@ -291,7 +291,7 @@
         <thead><tr>
           <th style="text-align:left;padding-left:12px;">Game</th>
           <th>Date / Opponent</th><th>Result</th><th>Score</th>
-          <th>H</th><th>PO</th><th>⭐ POTG</th><th></th>
+          <th>H</th><th>PO</th><th>⭐ POTG</th><th>📹 Video</th><th></th>
         </tr></thead>
         <tbody id="resultsBody"></tbody>
       </table>
@@ -521,6 +521,7 @@
         <div class="form-group"><label>Opponent</label><input type="text" id="gr-opp" placeholder="vs. Team"></div>
         <div class="form-group"><label>Our Score</label><input type="number" id="gr-us" min="0" value="0"></div>
         <div class="form-group"><label>Their Score</label><input type="number" id="gr-them" min="0" value="0"></div>
+        <div class="form-group" style="grid-column:span 2"><label>YouTube Link (optional)</label><input type="url" id="gr-yturl" placeholder="https://youtube.com/watch?v=..."></div>
       </div>
       <div class="form-divider">Inning-by-Inning (Our Team)</div>
       <div class="inning-grid">
@@ -653,6 +654,7 @@
         <div class="form-group"><label>Opponent</label><input type="text" id="er-opp"></div>
         <div class="form-group"><label>Our Score</label><input type="number" id="er-us" min="0"></div>
         <div class="form-group"><label>Their Score</label><input type="number" id="er-them" min="0"></div>
+        <div class="form-group" style="grid-column:span 2"><label>YouTube Link (optional)</label><input type="url" id="er-yturl" placeholder="https://youtube.com/watch?v=..."></div>
       </div>
       <div class="form-divider">Our Runs by Inning</div>
       <div class="inning-grid">
@@ -967,6 +969,7 @@ function renderTeamStats(){
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date} · vs ${g.opp}</td>
       <td><span class="${rcls}">${res}</span></td><td>${g.us}–${g.them}</td>
       <td>${hits}</td><td>${po}</td>${potgCell}
+      <td>${g.ytUrl?`<a href="${g.ytUrl}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;background:#ff0000;color:white;font-family:'Oswald',sans-serif;font-size:.72rem;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-decoration:none;font-weight:700;">▶ Watch</a>`:'<span style="color:#aaa;font-size:.8rem;">—</span>'}</td>
       <td><button class="edit-row" onclick="event.stopPropagation();openEditResult('${g._id}')">✏️ Edit</button>
           <span class="delete-row" onclick="event.stopPropagation();delResult('${g._id}')">🗑</span></td>`;
     body.appendChild(tr);
@@ -1188,11 +1191,12 @@ window.addGameResult=async function(){
   const oppInnings=[1,2,3,4,5].map(i=>+document.getElementById(`opp-${i}`).value||0);
   const potgIds=Array.from(document.getElementById('gr-potg').selectedOptions).map(o=>parseInt(o.value));
   const potgDescs={}; potgIds.forEach(id=>{const el=document.getElementById('gr-potg-desc-'+id);if(el)potgDescs[id]=el.value.trim();});
+  const ytUrl=document.getElementById('gr-yturl').value.trim();
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_game_results'),{gameNum,date,opp,us,them,innings,oppInnings,potgIds,potgDescs});
+    await addDoc(collection(db,'lw_game_results'),{gameNum,date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl});
     document.getElementById('gr-descs').innerHTML='';
-    ['gr-opp'].forEach(id=>document.getElementById(id).value='');
+    ['gr-opp','gr-yturl'].forEach(id=>document.getElementById(id).value='');
     ['gr-us','gr-them','gr-num'].forEach(id=>document.getElementById(id).value=0);
     [1,2,3,4,5].forEach(i=>{document.getElementById(`inn-${i}`).value=0;document.getElementById(`opp-${i}`).value=0;});
     Array.from(document.getElementById('gr-potg').options).forEach(o=>o.selected=false);
@@ -1347,6 +1351,7 @@ window.openEditResult=function(docId){
   document.getElementById('er-opp').value=g.opp;
   document.getElementById('er-us').value=g.us;
   document.getElementById('er-them').value=g.them;
+  document.getElementById('er-yturl').value=g.ytUrl||'';
   const inn=g.innings||[0,0,0,0,0], oppInn=g.oppInnings||[0,0,0,0,0];
   [1,2,3,4,5].forEach(i=>{document.getElementById(`er-i${i}`).value=inn[i-1]||0;document.getElementById(`er-o${i}`).value=oppInn[i-1]||0;});
   Array.from(potgSel.options).forEach(o=>{o.selected=(g.potgIds||[]).includes(parseInt(o.value));});
@@ -1361,8 +1366,9 @@ window.saveEditResult=async function(){
   const oppInnings=[1,2,3,4,5].map(i=>+document.getElementById(`er-o${i}`).value||0);
   const potgIds=Array.from(document.getElementById('er-potg').selectedOptions).map(o=>parseInt(o.value));
   const potgDescs={}; potgIds.forEach(id=>{const el=document.getElementById('er-potg-desc-'+id);if(el)potgDescs[id]=el.value.trim();});
+  const ytUrl=document.getElementById('er-yturl').value.trim();
   setSync('syncing','Saving...');
-  try{await updateDoc(doc(db,'lw_game_results',docId),{date,opp,us,them,innings,oppInnings,potgIds,potgDescs});setSync('connected','Live — synced');closeEditResult();}
+  try{await updateDoc(doc(db,'lw_game_results',docId),{date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl});setSync('connected','Live — synced');closeEditResult();}
   catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
 window.closeEditResult=()=>document.getElementById('editResultModal').classList.remove('active');
