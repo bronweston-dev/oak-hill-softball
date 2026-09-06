@@ -1331,7 +1331,7 @@ function renderLeagueLeaders(){
     if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,...s});
   });
 
-  function leaderList(arr, key, asc=false, limit=10){
+  function leaderList(arr, key, asc=false, limit=20){
     const sorted=[...arr].filter(x=>x[key]!==null&&x[key]!==undefined&&!isNaN(x[key]));
     sorted.sort((a,b)=>asc?(a[key]-b[key]):(b[key]-a[key]));
     return sorted.slice(0,limit).map((x,i)=>{
