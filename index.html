@@ -1,11 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=base-chasers-stats.html">
-  <title>Base Chasers</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oak Hill Softball</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:#1a4fa0; --blue-dark:#0f2d5e; --blue-light:#2563c4;
+    --gold:#f5c518; --gold-dark:#c9a000;
+    --green:#1a3a6b; --green-light:#5bb8e8;
+    --white:#fff; --gray:#c8d4e8; --text:#0a1a3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Roboto Condensed',sans-serif;background:var(--blue-dark);background-image:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,0.015) 40px,rgba(255,255,255,0.015) 80px);color:var(--white);min-height:100vh;display:flex;flex-direction:column;}
+
+  /* HEADER */
+  header{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue) 60%,var(--blue-dark) 100%);border-bottom:4px solid var(--gold);padding:28px 24px;text-align:center;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 8px,rgba(245,197,24,0.04) 8px,rgba(245,197,24,0.04) 16px);}
+  .header-inner{position:relative;z-index:1;}
+  .header-inner h1{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--gold);letter-spacing:4px;line-height:1;text-shadow:3px 3px 0 var(--blue-dark),0 0 30px rgba(245,197,24,0.4);}
+  .header-inner p{font-family:'Oswald',sans-serif;color:var(--gray);font-size:1rem;letter-spacing:4px;text-transform:uppercase;margin-top:6px;}
+
+  /* MAIN */
+  main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+  .choose-label{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:4px;color:var(--gray);text-transform:uppercase;margin-bottom:32px;text-align:center;}
+
+  /* TEAM CARDS */
+  .teams{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;max-width:900px;width:100%;}
+  .team-card{flex:1;min-width:260px;max-width:380px;background:rgba(255,255,255,0.06);border-radius:20px;border:2px solid rgba(255,255,255,0.1);padding:32px 24px;text-align:center;cursor:pointer;transition:all .25s;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;overflow:hidden;}
+  .team-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;}
+  .team-card.blue::before{background:linear-gradient(135deg,rgba(26,79,160,0.3),rgba(37,99,196,0.2));}
+  .team-card.green::before{background:linear-gradient(135deg,rgba(26,58,107,0.3),rgba(91,184,232,0.2));}
+  .team-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.3);box-shadow:0 20px 50px rgba(0,0,0,0.4);}
+  .team-card.blue:hover{border-color:var(--gold);box-shadow:0 20px 50px rgba(245,197,24,0.2);}
+  .team-card.green:hover{border-color:var(--green-light);box-shadow:0 20px 50px rgba(91,184,232,0.25);}
+  .team-card:hover::before{opacity:1;}
+
+  .team-logo{width:140px;height:140px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));position:relative;z-index:1;transition:transform .25s;}
+  .team-card:hover .team-logo{transform:scale(1.05);}
+  .team-logo-placeholder{width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;z-index:1;}
+  .team-logo-placeholder.blue-bg{background:linear-gradient(135deg,var(--blue),var(--blue-light));}
+  .team-logo-placeholder.green-bg{background:linear-gradient(135deg,#1a3a6b,#5bb8e8);}
+
+  .team-info{position:relative;z-index:1;}
+  .team-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;line-height:1;margin-bottom:4px;}
+  .team-card.blue .team-name{color:var(--gold);}
+  .team-card.green .team-name{color:#5bb8e8;}
+  .team-season{font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:3px;color:var(--gray);text-transform:uppercase;margin-bottom:12px;}
+  .team-badge{display:inline-block;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;padding:5px 16px;border-radius:20px;text-transform:uppercase;}
+  .team-card.blue .team-badge{background:var(--gold);color:var(--blue-dark);font-weight:700;}
+  .team-card.green .team-badge{background:#5bb8e8;color:#1a3a6b;font-weight:700;}
+
+  /* FOOTER */
+  footer{text-align:center;padding:20px;color:rgba(200,212,232,0.35);font-size:.75rem;letter-spacing:2px;font-family:'Oswald',sans-serif;}
+
+  @media(max-width:600px){
+    .header-inner h1{font-size:2.5rem;}
+    .teams{flex-direction:column;align-items:center;}
+    .team-card{max-width:100%;}
+  }
+</style>
 </head>
 <body>
-  <p>Redirecting to Base Chasers stats...</p>
+
+<header>
+  <div class="header-inner">
+    <h1>Oak Hill Softball</h1>
+    <p>OYSA · Season Stats &amp; Box Scores</p>
+  </div>
+</header>
+
+<main>
+  <div class="choose-label">Select a team to view stats</div>
+  <div class="teams">
+
+    <!-- BASE CHASERS -->
+    <a class="team-card blue" href="base-chasers-stats.html">
+      <img class="team-logo"
+           src="ChatGPT_Image_Feb_18__2026__09_45_51_PM.png"
+           alt="Base Chasers"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="team-logo-placeholder blue-bg" style="display:none;">⚾</div>
+      <div class="team-info">
+        <div class="team-name">Base Chasers</div>
+        <div class="team-season">Spring 2026 · 6U</div>
+        <div class="team-badge">View Stats →</div>
+      </div>
+    </a>
+
+    <!-- LITTLE WOMBATS -->
+    <a class="team-card green" href="little-wombats.html">
+      <img class="team-logo"
+           src="little-wombats-logo.png"
+           alt="Little Wombats"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="team-logo-placeholder green-bg" style="display:none;">🦘</div>
+      <div class="team-info">
+        <div class="team-name">Little Wombats</div>
+        <div class="team-season">Fall 2026 · 6U</div>
+        <div class="team-badge">View Stats →</div>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<footer>OAK HILL · OYSA · 2026</footer>
+
 </body>
 </html>
