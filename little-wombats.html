@@ -262,6 +262,7 @@
   <button class="nav-btn" onclick="showPage('players')">👧 Players</button>
   <button class="nav-btn" onclick="showPage('boxscore')">📋 Box Scores</button>
   <button class="nav-btn" onclick="showPage('opponents')">⚔️ Opponents</button>
+  <button class="nav-btn" onclick="showPage('standings')">📊 Standings</button>
   <button class="nav-btn" onclick="showPage('leaders')">🏅 League Leaders</button>
   <button class="nav-btn" onclick="showPage('log')">⚾ Log Stats</button>
 </nav>
@@ -384,6 +385,13 @@
     <div class="panel-body">
       <div class="form-row">
         <div class="form-group"><label>Team Name</label><input type="text" id="opp-team-name" placeholder="e.g. Tigers"></div>
+        <div class="form-group">
+          <label>Team Type</label>
+          <select id="opp-team-league">
+            <option value="league">League Team</option>
+            <option value="nonleague">Non-League Team</option>
+          </select>
+        </div>
         <div class="form-group" style="align-self:end"><button class="btn btn-primary" onclick="addOpponentTeam()">+ Add Team</button></div>
       </div>
       <div id="oppTeamList" style="margin-top:10px;"></div>
@@ -395,22 +403,42 @@
     <div class="panel-header" onclick="togglePanel(this)">📋 Log Opponent Game (Box Score) <span class="toggle-icon">▼</span></div>
     <div class="panel-body">
       <div id="opp-no-teams-msg" style="display:none;background:#fff3cd;border:2px solid var(--gold-dark);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--green-dark);">
-        ⚠️ Add an opponent team first before logging their stats.
+        ⚠️ Add opponent teams first before logging games.
       </div>
       <div class="form-row">
         <div class="form-group"><label>Game #</label><input type="number" id="og-num" min="1" placeholder="e.g. 1"></div>
         <div class="form-group"><label>Date</label><input type="date" id="og-date"></div>
-        <div class="form-group"><label>Opponent Team</label><select id="og-team"><option value="">-- Select Team --</option></select></div>
-        <div class="form-group"><label>Their Score</label><input type="number" id="og-them" min="0" value="0"></div>
-        <div class="form-group"><label>Our Score</label><input type="number" id="og-us" min="0" value="0"></div>
       </div>
-      <div class="form-divider">Their Runs by Inning</div>
-      <div class="inning-grid">
-        <div class="inning-box"><label>Inn 1</label><input type="number" id="og-i1" min="0" value="0"></div>
-        <div class="inning-box"><label>Inn 2</label><input type="number" id="og-i2" min="0" value="0"></div>
-        <div class="inning-box"><label>Inn 3</label><input type="number" id="og-i3" min="0" value="0"></div>
-        <div class="inning-box"><label>Inn 4</label><input type="number" id="og-i4" min="0" value="0"></div>
-        <div class="inning-box"><label>Extra</label><input type="number" id="og-i5" min="0" value="0"></div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:12px;">
+        <div>
+          <div class="form-divider">Team A</div>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group"><label>Team</label><select id="og-team-a"><option value="">-- Select --</option></select></div>
+            <div class="form-group"><label>Score</label><input type="number" id="og-score-a" min="0" value="0"></div>
+          </div>
+          <div class="inning-grid">
+            <div class="inning-box"><label>Inn 1</label><input type="number" id="og-a1" min="0" value="0"></div>
+            <div class="inning-box"><label>Inn 2</label><input type="number" id="og-a2" min="0" value="0"></div>
+            <div class="inning-box"><label>Inn 3</label><input type="number" id="og-a3" min="0" value="0"></div>
+            <div class="inning-box"><label>Inn 4</label><input type="number" id="og-a4" min="0" value="0"></div>
+            <div class="inning-box"><label>XI</label><input type="number" id="og-a5" min="0" value="0"></div>
+          </div>
+        </div>
+        <div style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--green-dark);padding-bottom:8px;">VS</div>
+        <div>
+          <div class="form-divider">Team B</div>
+          <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group"><label>Team</label><select id="og-team-b"><option value="">-- Select --</option></select></div>
+            <div class="form-group"><label>Score</label><input type="number" id="og-score-b" min="0" value="0"></div>
+          </div>
+          <div class="inning-grid">
+            <div class="inning-box"><label>Inn 1</label><input type="number" id="og-b1" min="0" value="0"></div>
+            <div class="inning-box"><label>Inn 2</label><input type="number" id="og-b2" min="0" value="0"></div>
+            <div class="inning-box"><label>Inn 3</label><input type="number" id="og-b3" min="0" value="0"></div>
+            <div class="inning-box"><label>Inn 4</label><input type="number" id="og-b4" min="0" value="0"></div>
+            <div class="inning-box"><label>XI</label><input type="number" id="og-b5" min="0" value="0"></div>
+          </div>
+        </div>
       </div>
       <button class="btn btn-primary" onclick="addOppGame()">+ Save Opponent Game</button>
     </div>
@@ -421,8 +449,8 @@
     <div class="panel-header" onclick="togglePanel(this)">👤 Log Opponent Player Stats <span class="toggle-icon">▼</span></div>
     <div class="panel-body">
       <div class="form-row">
-        <div class="form-group"><label>Opp Game #</label><select id="ops-game"><option value="">-- Select Game --</option></select></div>
-        <div class="form-group"><label>Team</label><input type="text" id="ops-team-display" readonly style="background:#e8e8e8;"></div>
+        <div class="form-group"><label>Opp Game #</label><select id="ops-game" onchange="onOppGameSelect()"><option value="">-- Select Game --</option></select></div>
+        <div class="form-group"><label>Which Team</label><select id="ops-which-team"><option value="">-- Select --</option></select></div>
         <div class="form-group"><label>Player Name</label><input type="text" id="ops-name" placeholder="First name"></div>
         <div class="form-group"><label>Jersey #</label><input type="number" id="ops-num" min="0" value="0"></div>
       </div>
@@ -458,12 +486,49 @@
       <table>
         <thead><tr>
           <th style="text-align:left;padding-left:12px;">Game</th>
-          <th>Date</th><th>Team</th><th>Result</th><th>Score</th><th>Players Logged</th><th></th>
+          <th>Date</th><th>Matchup</th><th>Score</th><th>Players Logged</th><th></th>
         </tr></thead>
         <tbody id="oppGamesBody"></tbody>
       </table>
     </div>
     <div id="noOppGames" class="no-data">No opponent games logged yet.</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════ STANDINGS PAGE -->
+<div id="page-standings" class="page">
+<div class="container">
+  <div class="section-title">League Standings</div>
+  <div class="panel">
+    <div class="legend">
+      <span class="legend-item"><strong>W</strong>Wins</span>
+      <span class="legend-item"><strong>L</strong>Losses</span>
+      <span class="legend-item"><strong>T</strong>Ties</span>
+      <span class="legend-item"><strong>PCT</strong>Win %</span>
+      <span class="legend-item"><strong>R</strong>Runs Scored</span>
+      <span class="legend-item"><strong>RA</strong>Runs Allowed</span>
+      <span class="legend-item"><strong>H</strong>Hits</span>
+      <span class="legend-item"><strong>RBI</strong>RBI</span>
+      <span class="legend-item"><strong>AVG</strong>Team Batting Average</span>
+      <span class="legend-item"><strong>SLG</strong>Team Slugging %</span>
+      <span class="legend-item"><strong>OO</strong>Offensive Outs (AB-H)</span>
+      <span class="legend-item"><strong>PO</strong>Put Outs</span>
+      <span class="legend-item"><strong>DO</strong>Defensive Outs (PO)</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="name-col" style="text-align:left;padding-left:14px;">Team</th>
+          <th>W</th><th>L</th><th>T</th><th>PCT</th>
+          <th>R</th><th>RA</th>
+          <th>H</th><th>RBI</th><th>AVG</th><th>SLG</th><th>OO</th>
+          <th>PO</th><th>DO</th>
+        </tr></thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </div>
+    <div id="noStandings" class="no-data">No games logged yet.</div>
   </div>
 </div>
 </div>
@@ -519,6 +584,13 @@
         <div class="form-group"><label>Game #</label><input type="number" id="gr-num" min="1" placeholder="e.g. 1"></div>
         <div class="form-group"><label>Date</label><input type="date" id="gr-date"></div>
         <div class="form-group"><label>Opponent</label><input type="text" id="gr-opp" placeholder="vs. Team"></div>
+        <div class="form-group">
+          <label>Home or Away?</label>
+          <select id="gr-homeaway">
+            <option value="away">Away (we bat first)</option>
+            <option value="home">Home (they bat first)</option>
+          </select>
+        </div>
         <div class="form-group"><label>Our Score</label><input type="number" id="gr-us" min="0" value="0"></div>
         <div class="form-group"><label>Their Score</label><input type="number" id="gr-them" min="0" value="0"></div>
         <div class="form-group" style="grid-column:span 2"><label>YouTube Link (optional)</label><input type="url" id="gr-yturl" placeholder="https://youtube.com/watch?v=..."></div>
@@ -652,6 +724,13 @@
         <div class="form-group"><label>Game #</label><input type="number" id="er-num" readonly style="background:#e8e8e8;"></div>
         <div class="form-group"><label>Date</label><input type="date" id="er-date"></div>
         <div class="form-group"><label>Opponent</label><input type="text" id="er-opp"></div>
+        <div class="form-group">
+          <label>Home or Away?</label>
+          <select id="er-homeaway">
+            <option value="away">Away (we bat first)</option>
+            <option value="home">Home (they bat first)</option>
+          </select>
+        </div>
         <div class="form-group"><label>Our Score</label><input type="number" id="er-us" min="0"></div>
         <div class="form-group"><label>Their Score</label><input type="number" id="er-them" min="0"></div>
         <div class="form-group" style="grid-column:span 2"><label>YouTube Link (optional)</label><input type="url" id="er-yturl" placeholder="https://youtube.com/watch?v=..."></div>
@@ -765,18 +844,18 @@ function requirePassword(){
 
 // ── PLAYERS ───────────────────────────────────────────────────────────────
 const PLAYERS = [
-  {id:1, num:1, first:'Player 1'},
-  {id:2, num:2, first:'Player 2'},
-  {id:3, num:3, first:'Player 3'},
-  {id:4, num:4, first:'Player 4'},
-  {id:5, num:5, first:'Player 5'},
-  {id:6, num:6, first:'Player 6'},
-  {id:7, num:7, first:'Player 7'},
-  {id:8, num:8, first:'Player 8'},
-  {id:9, num:9, first:'Player 9'},
-  {id:10,num:10,first:'Player 10'},
-  {id:11,num:11,first:'Player 11'},
-  {id:12,num:12,first:'Player 12'},
+  {id:1,  num:1,  first:'Mae'},
+  {id:2,  num:2,  first:'Elfie'},
+  {id:3,  num:3,  first:'Cora'},
+  {id:4,  num:4,  first:'Isla'},
+  {id:5,  num:5,  first:'Riley'},
+  {id:6,  num:6,  first:'Ellen'},
+  {id:7,  num:7,  first:'Stevie'},
+  {id:8,  num:8,  first:'Evelyn'},
+  {id:9,  num:9,  first:'Harper'},
+  {id:10, num:10, first:'Rosalie'},
+  {id:11, num:11, first:'Weslyn'},
+  {id:12, num:12, first:'Vaani'},
 ];
 
 // ── DATA ──────────────────────────────────────────────────────────────────
@@ -845,6 +924,7 @@ window.renderAll = function(){
   renderBatting(); renderFielding(); renderPitching();
   renderBoxScoreSelect();
   renderOpponents();
+  renderStandings();
   renderLeagueLeaders();
   if(activePlayer) renderModal(activePlayer);
 }
@@ -876,23 +956,24 @@ function populateSelects(){
   if(msg) msg.style.display=gameResults.length===0?'block':'none';
   onGameSelect();
 
-  // Opponent team dropdown
-  const otsel=document.getElementById('og-team');
-  if(otsel){
-    const otCur=otsel.value;
-    otsel.innerHTML='<option value="">-- Select Team --</option>';
-    oppTeams.forEach(t=>{ const o=document.createElement('option'); o.value=t._id; o.textContent=t.name; otsel.appendChild(o); });
-    if(otCur) otsel.value=otCur;
-  }
+  // Opponent team dropdowns (A and B for game log)
+  ['og-team-a','og-team-b'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value;
+    el.innerHTML='<option value="">-- Select --</option>';
+    oppTeams.forEach(t=>{ const o=document.createElement('option'); o.value=t._id; o.textContent=t.name; el.appendChild(o); });
+    if(cur) el.value=cur;
+  });
 
-  // Opponent game dropdown
+  // Opponent game dropdown for player stats
   const ogsel=document.getElementById('ops-game');
   if(ogsel){
     const ogCur=ogsel.value;
     ogsel.innerHTML='<option value="">-- Select Opp Game --</option>';
     [...oppGames].sort((a,b)=>a.gameNum-b.gameNum).forEach(g=>{
       const o=document.createElement('option'); o.value=g._id;
-      o.textContent=`Game ${g.gameNum} — ${g.date} vs ${tName(g.teamId)}`;
+      const aName=tName(g.teamAId); const bName=tName(g.teamBId);
+      o.textContent=`Game ${g.gameNum} — ${g.date}: ${aName} vs ${bName}`;
       ogsel.appendChild(o);
     });
     if(ogCur) ogsel.value=ogCur;
@@ -910,7 +991,8 @@ function populateSelects(){
     oppTeams.forEach(t=>{
       const chip=document.createElement('span');
       chip.className='opp-chip';
-      chip.innerHTML=`${t.name} <button onclick="delOppTeam('${t._id}')">✕</button>`;
+      const leagueLabel=t.isLeague===false?'<span style="font-size:.7rem;background:#888;color:white;padding:1px 5px;border-radius:3px;margin-left:4px;">non-league</span>':'<span style="font-size:.7rem;background:var(--green-dark);color:var(--gold);padding:1px 5px;border-radius:3px;margin-left:4px;">league</span>';
+      chip.innerHTML=`${t.name}${leagueLabel} <button onclick="delOppTeam('${t._id}')">✕</button>`;
       tlist.appendChild(chip);
     });
   }
@@ -925,7 +1007,13 @@ window.onGameSelect=function(){
 window.onOppGameSelect=function(){
   const id=document.getElementById('ops-game').value;
   const g=oppGames.find(x=>x._id===id);
-  document.getElementById('ops-team-display').value=g?tName(g.teamId):'';
+  const whichSel=document.getElementById('ops-which-team');
+  whichSel.innerHTML='<option value="">-- Select --</option>';
+  if(g){
+    [{id:g.teamAId,name:tName(g.teamAId)},{id:g.teamBId,name:tName(g.teamBId)}].forEach(t=>{
+      const o=document.createElement('option'); o.value=t.id; o.textContent=t.name; whichSel.appendChild(o);
+    });
+  }
 }
 
 // ── TEAM STATS ────────────────────────────────────────────────────────────
@@ -1052,6 +1140,16 @@ window.showBoxScore=function(num){
   const ihdr=[1,2,3,4].map(i=>`<div class="linescore-cell header">I${i}</div>`).join('');
   const ourR=[0,1,2,3].map(i=>`<div class="linescore-cell our-run">${inn[i]||0}</div>`).join('');
   const oppR=[0,1,2,3].map(i=>`<div class="linescore-cell">${oppInn[i]||0}</div>`).join('');
+  // visitor on top, home on bottom
+  const isHome = g.homeaway === 'home';
+  const visitorName    = isHome ? g.opp          : 'Little Wombats';
+  const homeName       = isHome ? 'Little Wombats': g.opp;
+  const visitorRuns    = isHome ? oppR            : ourR;
+  const homeRuns       = isHome ? ourR            : oppR;
+  const visitorTotal   = isHome ? g.them          : g.us;
+  const homeTotal      = isHome ? g.us            : g.them;
+  const visitorCls     = isHome ? ''              : 'our-run';
+  const homeCls        = isHome ? 'our-run'       : '';
 
   const batRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---'; const potgGm=g.potgIds&&g.potgIds.includes(p.id);
@@ -1078,8 +1176,8 @@ window.showBoxScore=function(num){
     <div class="bs-header"><h2>Game ${g.gameNum} — vs ${g.opp}</h2><div class="bs-meta">${g.date} · <strong>${res} ${g.us}–${g.them}</strong></div></div>
     <div class="bs-section"><div class="bs-section-title">Line Score</div>
       <div class="linescore"><div class="linescore-cell header team-name">Team</div>${ihdr}<div class="linescore-cell header">R</div></div>
-      <div class="linescore"><div class="linescore-cell team-name">Little Wombats</div>${ourR}<div class="linescore-cell total">${g.us}</div></div>
-      <div class="linescore"><div class="linescore-cell team-name">${g.opp}</div>${oppR}<div class="linescore-cell total">${g.them}</div></div>
+      <div class="linescore"><div class="linescore-cell team-name">${visitorName}</div>${visitorRuns}<div class="linescore-cell total">${visitorTotal}</div></div>
+      <div class="linescore"><div class="linescore-cell team-name">${homeName}</div>${homeRuns}<div class="linescore-cell total">${homeTotal}</div></div>
     </div>
     <div class="bs-section"><div class="bs-section-title">Batting</div>
       ${lineup.length?`<div class="table-wrap"><table class="bs-table"><thead><tr>
@@ -1104,18 +1202,100 @@ function renderOpponents(){
   const body=document.getElementById('oppGamesBody'); body.innerHTML='';
   [...oppGames].sort((a,b)=>a.gameNum-b.gameNum).forEach(g=>{
     const playerCount=oppPlayerStats.filter(x=>x.oppGameId===g._id).length;
-    const res=g.them>g.us?'W':g.them<g.us?'L':'T'; // from their perspective
-    const rcls=res==='W'?'result-w':res==='L'?'result-l':'result-t';
+    const aName=tName(g.teamAId), bName=tName(g.teamBId);
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}</td>
-      <td><span class="team-badge-cell">${tName(g.teamId)}</span></td>
-      <td><span class="${rcls}">${res}</span></td>
-      <td>${g.them}–${g.us}</td>
+      <td><span class="team-badge-cell">${aName}</span> vs <span class="team-badge-cell">${bName}</span></td>
+      <td>${g.scoreA}–${g.scoreB}</td>
       <td>${playerCount} players</td>
       <td><span class="delete-row" onclick="delOppGame('${g._id}')">🗑</span></td>`;
     body.appendChild(tr);
   });
   document.getElementById('noOppGames').style.display=oppGames.length?'none':'block';
+}
+
+// ── STANDINGS ─────────────────────────────────────────────────────────────
+function renderStandings(){
+  // Build a record for each team: Little Wombats + all opponent teams
+  const teamRecords = {};
+
+  // Helper to get or create a team record
+  function getTeam(id, name){
+    if(!teamRecords[id]) teamRecords[id]={id,name,w:0,l:0,t:0,r:0,ra:0,h:0,ab:0,rbi:0,d:0,t2:0,hr:0,po:0};
+    return teamRecords[id];
+  }
+
+  // Little Wombats record from lw_game_results
+  const lwId = 'little-wombats';
+  getTeam(lwId, 'Little Wombats');
+  gameResults.forEach(g=>{
+    const rec = getTeam(lwId, 'Little Wombats');
+    if(g.us>g.them) rec.w++; else if(g.us<g.them) rec.l++; else rec.t++;
+    rec.r  += g.us;
+    rec.ra += g.them;
+  });
+  // Little Wombats batting/fielding from player_stats
+  PLAYERS.forEach(p=>{
+    const b=bStats(p.id), f=fStats(p.id);
+    const rec=getTeam(lwId,'Little Wombats');
+    rec.h+=b.h; rec.ab+=b.ab; rec.rbi+=b.rbi; rec.d+=b.d; rec.t2+=b.t; rec.hr+=b.hr; rec.po+=f.po;
+  });
+
+  // Opponent teams from lw_opp_games
+  oppGames.forEach(g=>{
+    const aRec = getTeam(g.teamAId, tName(g.teamAId));
+    const bRec = getTeam(g.teamBId, tName(g.teamBId));
+    // Team A result
+    if(g.scoreA>g.scoreB){ aRec.w++; bRec.l++; }
+    else if(g.scoreA<g.scoreB){ aRec.l++; bRec.w++; }
+    else { aRec.t++; bRec.t++; }
+    aRec.r+=g.scoreA; aRec.ra+=g.scoreB;
+    bRec.r+=g.scoreB; bRec.ra+=g.scoreA;
+  });
+
+  // Opponent player stats aggregated per team
+  oppTeams.forEach(t=>{
+    const rec = getTeam(t._id, t.name);
+    oppPlayerStats.filter(x=>x.teamId===t._id).forEach(s=>{
+      rec.h+=s.h; rec.ab+=s.ab; rec.rbi+=s.rbi; rec.d+=s.d; rec.t2+=s.t; rec.hr+=s.hr;
+    });
+  });
+
+  // Only show league teams in standings (but their records include all games)
+  const rows = Object.values(teamRecords).filter(r=>
+    r.id==='little-wombats' || oppTeams.find(t=>t._id===r.id&&t.isLeague!==false)
+  );
+  rows.forEach(r=>{
+    const gp=r.w+r.l+r.t;
+    r.pct = gp>0 ? (r.w+(r.t*0.5))/gp : 0;
+    const tb=(r.h-r.d-r.t2-r.hr)+2*r.d+3*r.t2+4*r.hr;
+    r.avg = r.ab>0 ? r.h/r.ab : 0;
+    r.slg = r.ab>0 ? tb/r.ab  : 0;
+    r.oo  = r.ab - r.h;
+  });
+  rows.sort((a,b)=>b.pct-a.pct || b.w-a.w);
+
+  const body=document.getElementById('standingsBody'); body.innerHTML='';
+  rows.forEach((r,i)=>{
+    const gp=r.w+r.l+r.t;
+    const isLW = r.id==='little-wombats';
+    const tr=document.createElement('tr');
+    if(isLW) tr.style.fontWeight='700';
+    tr.innerHTML=`
+      <td style="text-align:left;padding-left:14px;font-weight:700;">
+        ${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}
+        ${isLW?'<span style="background:var(--green-dark);color:var(--gold);font-family:Bebas Neue,sans-serif;border-radius:4px;padding:1px 6px;margin-right:4px;font-size:.9rem;">LW</span>':''}
+        ${r.name}
+      </td>
+      <td>${r.w}</td><td>${r.l}</td><td>${r.t}</td>
+      <td style="font-weight:700;">${gp>0?(r.pct).toFixed(3).replace(/^0/,''):'.000'}</td>
+      <td>${r.r}</td><td>${r.ra}</td>
+      <td>${r.h}</td><td>${r.rbi}</td>
+      <td>${f3(r.avg)}</td><td>${f3(r.slg)}</td><td>${r.oo}</td>
+      <td>${r.po}</td><td>${r.po}</td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('noStandings').style.display=rows.length?'none':'block';
 }
 
 // ── LEAGUE LEADERS ────────────────────────────────────────────────────────
@@ -1139,7 +1319,7 @@ function renderLeagueLeaders(){
     const first=gs[0];
     // find team via game
     const game=oppGames.find(x=>x._id===first.oppGameId);
-    const teamName=game?tName(game.teamId):'Unknown';
+    const teamName=tName(first.teamId)||'Unknown';
     const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,bb:0,so:0,sb:0,ip:0,er:0,ph:0,pbb:0,pk:0};
     gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=g.d;s.t+=g.t;s.hr+=g.hr;s.rbi+=g.rbi;s.bb+=g.bb;s.so+=g.so;s.sb+=g.sb;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;});
     s.avg=s.ab>0?s.h/s.ab:0;
@@ -1192,9 +1372,10 @@ window.addGameResult=async function(){
   const potgIds=Array.from(document.getElementById('gr-potg').selectedOptions).map(o=>parseInt(o.value));
   const potgDescs={}; potgIds.forEach(id=>{const el=document.getElementById('gr-potg-desc-'+id);if(el)potgDescs[id]=el.value.trim();});
   const ytUrl=document.getElementById('gr-yturl').value.trim();
+  const homeaway=document.getElementById('gr-homeaway').value;
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_game_results'),{gameNum,date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl});
+    await addDoc(collection(db,'lw_game_results'),{gameNum,date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl,homeaway});
     document.getElementById('gr-descs').innerHTML='';
     ['gr-opp','gr-yturl'].forEach(id=>document.getElementById(id).value='');
     ['gr-us','gr-them','gr-num'].forEach(id=>document.getElementById(id).value=0);
@@ -1261,10 +1442,11 @@ window.delPlayerStat=async function(docId){
 window.addOpponentTeam=async function(){
   if(!requirePassword()) return;
   const name=document.getElementById('opp-team-name').value.trim();
+  const isLeague=document.getElementById('opp-team-league').value==='league';
   if(!name){alert('Please enter a team name.');return;}
   if(oppTeams.find(t=>t.name.toLowerCase()===name.toLowerCase())){alert('That team already exists.');return;}
   setSync('syncing','Saving...');
-  try{await addDoc(collection(db,'lw_opp_teams'),{name});document.getElementById('opp-team-name').value='';setSync('connected','Live — synced');}
+  try{await addDoc(collection(db,'lw_opp_teams'),{name,isLeague});document.getElementById('opp-team-name').value='';document.getElementById('opp-team-league').value='league';setSync('connected','Live — synced');}
   catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
 window.delOppTeam=async function(docId){
@@ -1279,20 +1461,23 @@ window.delOppTeam=async function(docId){
 window.addOppGame=async function(){
   if(!requirePassword()) return;
   const gameNum=parseInt(document.getElementById('og-num').value);
-  const teamId=document.getElementById('og-team').value;
+  const teamAId=document.getElementById('og-team-a').value;
+  const teamBId=document.getElementById('og-team-b').value;
   if(!gameNum){alert('Please enter a Game #.');return;}
-  if(!teamId){alert('Please select an opponent team.');return;}
-  if(oppGames.find(g=>g.gameNum===gameNum&&g.teamId===teamId)){alert(`Game #${gameNum} for this team already exists.`);return;}
+  if(!teamAId||!teamBId){alert('Please select both teams.');return;}
+  if(teamAId===teamBId){alert('Team A and Team B must be different.');return;}
   const date=document.getElementById('og-date').value||today();
-  const them=+document.getElementById('og-them').value||0;
-  const us=+document.getElementById('og-us').value||0;
-  const innings=[1,2,3,4,5].map(i=>+document.getElementById(`og-i${i}`).value||0);
+  const scoreA=+document.getElementById('og-score-a').value||0;
+  const scoreB=+document.getElementById('og-score-b').value||0;
+  const inningsA=[1,2,3,4,5].map(i=>+document.getElementById(`og-a${i}`).value||0);
+  const inningsB=[1,2,3,4,5].map(i=>+document.getElementById(`og-b${i}`).value||0);
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_opp_games'),{gameNum,teamId,date,them,us,innings});
-    ['og-them','og-us','og-num'].forEach(id=>document.getElementById(id).value=0);
-    [1,2,3,4,5].forEach(i=>document.getElementById(`og-i${i}`).value=0);
-    document.getElementById('og-team').value='';
+    await addDoc(collection(db,'lw_opp_games'),{gameNum,teamAId,teamBId,date,scoreA,scoreB,inningsA,inningsB});
+    ['og-score-a','og-score-b','og-num'].forEach(id=>document.getElementById(id).value=0);
+    [1,2,3,4,5].forEach(i=>{document.getElementById(`og-a${i}`).value=0;document.getElementById(`og-b${i}`).value=0;});
+    document.getElementById('og-team-a').value='';
+    document.getElementById('og-team-b').value='';
     setSync('connected','Live — synced'); alert(`Opponent Game #${gameNum} saved!`);
   }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
@@ -1312,14 +1497,16 @@ window.delOppGame=async function(docId){
 window.addOppPlayerStat=async function(){
   if(!requirePassword()) return;
   const oppGameId=document.getElementById('ops-game').value;
+  const teamId=document.getElementById('ops-which-team').value;
   const playerName=document.getElementById('ops-name').value.trim();
   if(!oppGameId){alert('Please select an opponent game.');return;}
+  if(!teamId){alert('Please select which team this player is on.');return;}
   if(!playerName){alert('Please enter a player name.');return;}
   const oppGame=oppGames.find(x=>x._id===oppGameId);
   // Use a stable playerId based on team + name
-  const playerId=`${oppGame?oppGame.teamId:'unk'}_${playerName.toLowerCase().replace(/\s+/g,'_')}`;
+  const playerId=`${teamId}_${playerName.toLowerCase().replace(/\s+/g,'_')}`;
   const rec={oppGameId,playerId,playerName,playerNum:+document.getElementById('ops-num').value||0,
-    gameNum:oppGame?oppGame.gameNum:0,teamId:oppGame?oppGame.teamId:'',
+    gameNum:oppGame?oppGame.gameNum:0,teamId,
     ab:+document.getElementById('ops-ab').value||0,r:+document.getElementById('ops-r').value||0,
     h:+document.getElementById('ops-h').value||0,d:+document.getElementById('ops-2b').value||0,
     t:+document.getElementById('ops-3b').value||0,hr:+document.getElementById('ops-hr').value||0,
@@ -1349,6 +1536,7 @@ window.openEditResult=function(docId){
   document.getElementById('er-num').value=g.gameNum;
   document.getElementById('er-date').value=g.date;
   document.getElementById('er-opp').value=g.opp;
+  document.getElementById('er-homeaway').value=g.homeaway||'away';
   document.getElementById('er-us').value=g.us;
   document.getElementById('er-them').value=g.them;
   document.getElementById('er-yturl').value=g.ytUrl||'';
@@ -1367,8 +1555,9 @@ window.saveEditResult=async function(){
   const potgIds=Array.from(document.getElementById('er-potg').selectedOptions).map(o=>parseInt(o.value));
   const potgDescs={}; potgIds.forEach(id=>{const el=document.getElementById('er-potg-desc-'+id);if(el)potgDescs[id]=el.value.trim();});
   const ytUrl=document.getElementById('er-yturl').value.trim();
+  const homeaway=document.getElementById('er-homeaway').value;
   setSync('syncing','Saving...');
-  try{await updateDoc(doc(db,'lw_game_results',docId),{date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl});setSync('connected','Live — synced');closeEditResult();}
+  try{await updateDoc(doc(db,'lw_game_results',docId),{date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl,homeaway});setSync('connected','Live — synced');closeEditResult();}
   catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
 window.closeEditResult=()=>document.getElementById('editResultModal').classList.remove('active');
@@ -1506,7 +1695,7 @@ window.renderPotgDescs=function(selectId,containerId,existingDescs,fallback){
 window.showPage=function(name,gameNum){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['team','players','boxscore','opponents','leaders','log'][i]===name);
+    b.classList.toggle('active',['team','players','boxscore','opponents','standings','leaders','log'][i]===name);
   });
   document.getElementById('page-'+name).classList.add('active');
   if(name==='boxscore'&&gameNum) setTimeout(()=>showBoxScore(gameNum),50);
