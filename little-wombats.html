@@ -513,8 +513,7 @@
       <span class="legend-item"><strong>AVG</strong>Team Batting Average</span>
       <span class="legend-item"><strong>SLG</strong>Team Slugging %</span>
       <span class="legend-item"><strong>OO</strong>Offensive Outs (AB-H)</span>
-      <span class="legend-item"><strong>PO</strong>Put Outs</span>
-      <span class="legend-item"><strong>DO</strong>Defensive Outs (PO)</span>
+      <span class="legend-item"><strong>PO</strong>Put Outs (Defensive Outs)</span>
     </div>
     <div class="table-wrap">
       <table>
@@ -523,7 +522,7 @@
           <th>W</th><th>L</th><th>T</th><th>PCT</th>
           <th>R</th><th>RA</th>
           <th>H</th><th>RBI</th><th>AVG</th><th>SLG</th><th>OO</th>
-          <th>PO</th><th>DO</th>
+          <th>PO</th>
         </tr></thead>
         <tbody id="standingsBody"></tbody>
       </table>
@@ -1410,7 +1409,7 @@ function renderStandings(){
       <td>${r.r}</td><td>${r.ra}</td>
       <td>${r.h}</td><td>${r.rbi}</td>
       <td>${f3(r.avg)}</td><td>${f3(r.slg)}</td><td>${r.oo}</td>
-      <td>${r.po}</td><td>${r.po}</td>`;
+      <td>${r.po}</td>`;
     body.appendChild(tr);
   });
   document.getElementById('noStandings').style.display=rows.length?'none':'block';
