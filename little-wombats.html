@@ -1113,17 +1113,28 @@ function renderPitching(){
 function renderBoxScoreSelect(){
   const sel=document.getElementById('bs-game-select'); const cur=sel.value;
   sel.innerHTML='<option value="">-- Choose a game --</option>';
+  // LW games
+  const lwGroup=document.createElement('optgroup'); lwGroup.label='Little Wombats Games';
   [...gameResults].sort((a,b)=>a.gameNum-b.gameNum).forEach(g=>{
-    const o=document.createElement('option'); o.value=g.gameNum;
+    const o=document.createElement('option'); o.value='lw:'+g.gameNum;
     const res=g.us>g.them?'W':g.us<g.them?'L':'T';
-    o.textContent=`Game ${g.gameNum} — ${g.date} vs ${g.opp} (${res} ${g.us}-${g.them})`; sel.appendChild(o);
+    o.textContent=`G${g.gameNum} — ${g.date} vs ${g.opp} (${res} ${g.us}-${g.them})`; lwGroup.appendChild(o);
   });
+  if(lwGroup.children.length) sel.appendChild(lwGroup);
+  // Opp vs opp games
+  const oppGroup=document.createElement('optgroup'); oppGroup.label='Opponent Games';
+  [...oppGames].sort((a,b)=>a.gameNum-b.gameNum).forEach(g=>{
+    const o=document.createElement('option'); o.value='opp:'+g._id;
+    o.textContent=`G${g.gameNum} — ${g.date}: ${tName(g.teamAId)} vs ${tName(g.teamBId)} (${g.scoreA}-${g.scoreB})`; oppGroup.appendChild(o);
+  });
+  if(oppGroup.children.length) sel.appendChild(oppGroup);
   if(cur) sel.value=cur;
 }
 window.renderBoxScore=function(){
-  const num=parseInt(document.getElementById('bs-game-select').value);
-  if(!num){document.getElementById('boxscoreContent').innerHTML='';return;}
-  showBoxScore(num);
+  const val=document.getElementById('bs-game-select').value;
+  if(!val){document.getElementById('boxscoreContent').innerHTML='';return;}
+  if(val.startsWith('opp:')) showOppBoxScore(val.slice(4));
+  else showBoxScore(parseInt(val.slice(3)));
 }
 window.showBoxScore=function(num){
   const g=gameResults.find(x=>x.gameNum===num);
@@ -1151,6 +1162,7 @@ window.showBoxScore=function(num){
   const visitorCls     = isHome ? ''              : 'our-run';
   const homeCls        = isHome ? 'our-run'       : '';
 
+  // ── LW players ──────────────────────────────────────────────────────────
   const batRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---'; const potgGm=g.potgIds&&g.potgIds.includes(p.id);
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}${potgGm?' ⭐':''}</td>
@@ -1166,11 +1178,41 @@ window.showBoxScore=function(num){
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
       <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pbb}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`; }).join('');
 
+  // ── Opponent players (logged via Opponents section) ───────────────────────
+  // Find the matching opp game by date+opp name
+  const matchOppGame = oppGames.find(og=>og.date===g.date&&(tName(og.teamAId)===g.opp||tName(og.teamBId)===g.opp));
+  const oppGamePlayers = matchOppGame ? oppPlayerStats.filter(x=>x.oppGameId===matchOppGame._id) : [];
+  const oppPlayerIds = [...new Set(oppGamePlayers.map(x=>x.playerId))];
+
+  function oppBatRow(pid){
+    const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs) return '';
+    const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
+    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+      <td></td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td>
+      <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.bb}</td><td>${gs.so}</td><td>${gs.sb}</td><td>${avg}</td></tr>`;
+  }
+  function oppPitRow(pid){
+    const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
+    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pbb}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
+  }
+  const oppBatRows = oppPlayerIds.map(oppBatRow).join('');
+  const oppPitRows = oppPlayerIds.map(oppPitRow).filter(Boolean).join('');
+
+  // ── Section headers with team name dividers ───────────────────────────────
+  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="13" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
+  function teamDividerFld(name){ return `<tr style="background:var(--green-dark);"><td colspan="5" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
+  function teamDividerPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
+
   const potgIds_bs=g.potgIds||[], potgDescs_bs=g.potgDescs||{};
   const potgSection=potgIds_bs.length?`<div class="potg-section"><div class="potg-title">⭐ Player of the Game</div>
     <div class="potg-chips">${potgIds_bs.map(id=>`<div class="potg-chip">⭐ ${pName(id)}</div>`).join('')}</div>
     ${potgIds_bs.map(id=>`<div style="margin-top:10px"><div style="font-family:'Oswald',sans-serif;font-size:.8rem;letter-spacing:1.5px;color:var(--green-dark);margin-bottom:4px">⭐ ${pName(id)}</div><div class="potg-desc">${potgDescs_bs[id]||'No description.'}</div></div>`).join('')}
     </div>`:'';
+
+  const hasBatStats = lineup.length||oppBatRows;
+  const hasFldStats = lineup.length;
+  const hasPitStats = pitchers.length||oppPitRows;
 
   document.getElementById('boxscoreContent').innerHTML=`<div class="boxscore-panel">
     <div class="bs-header"><h2>Game ${g.gameNum} — vs ${g.opp}</h2><div class="bs-meta">${g.date} · <strong>${res} ${g.us}–${g.them}</strong></div></div>
@@ -1180,20 +1222,95 @@ window.showBoxScore=function(num){
       <div class="linescore"><div class="linescore-cell team-name">${homeName}</div>${homeRuns}<div class="linescore-cell total">${homeTotal}</div></div>
     </div>
     <div class="bs-section"><div class="bs-section-title">Batting</div>
-      ${lineup.length?`<div class="table-wrap"><table class="bs-table"><thead><tr>
+      ${hasBatStats?`<div class="table-wrap"><table class="bs-table"><thead><tr>
         <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th><th>AVG</th>
-      </tr></thead><tbody>${batRows}</tbody></table></div>`:'<div class="no-data">No player stats yet.</div>'}
+      </tr></thead><tbody>
+        ${lineup.length?teamDivider('Little Wombats')+batRows:''}
+        ${oppBatRows?teamDivider(g.opp)+oppBatRows:''}
+      </tbody></table></div>`:'<div class="no-data">No player stats logged for this game.</div>'}
     </div>
     <div class="bs-section"><div class="bs-section-title">Fielding</div>
-      ${lineup.length?`<div class="table-wrap"><table class="bs-table"><thead><tr>
+      ${hasFldStats?`<div class="table-wrap"><table class="bs-table"><thead><tr>
         <th style="text-align:left;padding-left:12px">Player</th><th>Pos</th><th>PO</th><th>A</th><th>TC</th>
-      </tr></thead><tbody>${fldRows}</tbody></table></div>`:'<div class="no-data">No fielding stats yet.</div>'}
+      </tr></thead><tbody>
+        ${lineup.length?teamDividerFld('Little Wombats')+fldRows:''}
+      </tbody></table></div>`:'<div class="no-data">No fielding stats logged for this game.</div>'}
     </div>
-    ${pitchers.length?`<div class="bs-section"><div class="bs-section-title">Pitching</div>
+    ${hasPitStats?`<div class="bs-section"><div class="bs-section-title">Pitching</div>
       <div class="table-wrap"><table class="bs-table"><thead><tr>
         <th style="text-align:left;padding-left:12px">Player</th><th>IP</th><th>ER</th><th>H</th><th>BB</th><th>K</th><th>ERA</th>
-      </tr></thead><tbody>${pitRows}</tbody></table></div></div>`:''}
+      </tr></thead><tbody>
+        ${pitchers.length?teamDividerPit('Little Wombats')+pitRows:''}
+        ${oppPitRows?teamDividerPit(g.opp)+oppPitRows:''}
+      </tbody></table></div></div>`:''}
     ${potgSection}
+  </div>`;
+}
+
+
+// ── OPP VS OPP BOX SCORE ─────────────────────────────────────────────────
+window.showOppBoxScore=function(oppGameId){
+  const g=oppGames.find(x=>x._id===oppGameId);
+  if(!g){document.getElementById('boxscoreContent').innerHTML='<div class="no-data">Game not found.</div>';return;}
+  showPage('boxscore');
+  document.getElementById('bs-game-select').value='opp:'+oppGameId;
+
+  const aName=tName(g.teamAId), bName=tName(g.teamBId);
+  const innA=g.inningsA||[0,0,0,0,0], innB=g.inningsB||[0,0,0,0,0];
+  const res=g.scoreA>g.scoreB?aName+' Win':g.scoreA<g.scoreB?bName+' Win':'Tie';
+  const ihdr=[1,2,3,4].map(i=>`<div class="linescore-cell header">I${i}</div>`).join('');
+  const runsA=[0,1,2,3].map(i=>`<div class="linescore-cell">${innA[i]||0}</div>`).join('');
+  const runsB=[0,1,2,3].map(i=>`<div class="linescore-cell">${innB[i]||0}</div>`).join('');
+
+  // Player stats split by team
+  const gPlayers=oppPlayerStats.filter(x=>x.oppGameId===oppGameId);
+  const aPlayers=[...new Set(gPlayers.filter(x=>x.teamId===g.teamAId).map(x=>x.playerId))];
+  const bPlayers=[...new Set(gPlayers.filter(x=>x.teamId===g.teamBId).map(x=>x.playerId))];
+
+  function batRow(pid){
+    const gs=gPlayers.find(x=>x.playerId===pid); if(!gs) return '';
+    const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
+    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+      <td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td><td>${gs.t||0}</td>
+      <td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.bb}</td><td>${gs.so}</td><td>${gs.sb}</td><td>${avg}</td></tr>`;
+  }
+  function pitRow(pid){
+    const gs=gPlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
+    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pbb}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
+  }
+  function teamDivBat(name){ return `<tr style="background:var(--green-dark);"><td colspan="12" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
+  function teamDivPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
+
+  const aBatRows=aPlayers.map(batRow).join('');
+  const bBatRows=bPlayers.map(batRow).join('');
+  const aPitRows=aPlayers.map(pitRow).filter(Boolean).join('');
+  const bPitRows=bPlayers.map(pitRow).filter(Boolean).join('');
+  const hasBat=aBatRows||bBatRows;
+  const hasPit=aPitRows||bPitRows;
+
+  document.getElementById('boxscoreContent').innerHTML=`<div class="boxscore-panel">
+    <div class="bs-header"><h2>${aName} vs ${bName}</h2><div class="bs-meta">${g.date} · <strong>${res} · ${g.scoreA}–${g.scoreB}</strong></div></div>
+    <div class="bs-section"><div class="bs-section-title">Line Score</div>
+      <div class="linescore"><div class="linescore-cell header team-name">Team</div>${ihdr}<div class="linescore-cell header">R</div></div>
+      <div class="linescore"><div class="linescore-cell team-name">${aName}</div>${runsA}<div class="linescore-cell total">${g.scoreA}</div></div>
+      <div class="linescore"><div class="linescore-cell team-name">${bName}</div>${runsB}<div class="linescore-cell total">${g.scoreB}</div></div>
+    </div>
+    <div class="bs-section"><div class="bs-section-title">Batting</div>
+      ${hasBat?`<div class="table-wrap"><table class="bs-table"><thead><tr>
+        <th style="text-align:left;padding-left:12px">Player</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th><th>AVG</th>
+      </tr></thead><tbody>
+        ${teamDivBat(aName)}${aBatRows||'<tr><td colspan="12" style="text-align:left;padding:8px 12px;color:#aaa;font-style:italic;">No stats logged</td></tr>'}
+        ${teamDivBat(bName)}${bBatRows||'<tr><td colspan="12" style="text-align:left;padding:8px 12px;color:#aaa;font-style:italic;">No stats logged</td></tr>'}
+      </tbody></table></div>`:'<div class="no-data">No individual player stats logged for this game.</div>'}
+    </div>
+    ${hasPit?`<div class="bs-section"><div class="bs-section-title">Pitching</div>
+      <div class="table-wrap"><table class="bs-table"><thead><tr>
+        <th style="text-align:left;padding-left:12px">Player</th><th>IP</th><th>ER</th><th>H</th><th>BB</th><th>K</th><th>ERA</th>
+      </tr></thead><tbody>
+        ${aPitRows?teamDivPit(aName)+aPitRows:''}
+        ${bPitRows?teamDivPit(bName)+bPitRows:''}
+      </tbody></table></div></div>`:''}
   </div>`;
 }
 
@@ -1208,7 +1325,8 @@ function renderOpponents(){
       <td><span class="team-badge-cell">${aName}</span> vs <span class="team-badge-cell">${bName}</span></td>
       <td>${g.scoreA}–${g.scoreB}</td>
       <td>${playerCount} players</td>
-      <td><span class="delete-row" onclick="delOppGame('${g._id}')">🗑</span></td>`;
+      <td><button class="edit-row" onclick="showOppBoxScore('${g._id}')">📋 Box Score</button>
+          <span class="delete-row" onclick="delOppGame('${g._id}')">🗑</span></td>`;
     body.appendChild(tr);
   });
   document.getElementById('noOppGames').style.display=oppGames.length?'none':'block';
