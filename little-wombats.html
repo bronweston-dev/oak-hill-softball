@@ -2052,9 +2052,12 @@ window.renderRosterPanel=function(){
       <tbody>`;
   roster.forEach(p=>{
     html+=`<tr>
-      <td style="text-align:left;padding-left:8px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;">#${p.num}</td>
-      <td style="text-align:left;padding-left:8px;font-weight:700;">${p.name}</td>
-      <td><span class="delete-row" onclick="delRosterPlayer('${p._id}')">🗑</span></td>
+      <td style="text-align:left;padding-left:8px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;" id="rnum-${p._id}">#${p.num}</td>
+      <td style="text-align:left;padding-left:8px;font-weight:700;" id="rname-${p._id}">${p.name}</td>
+      <td style="white-space:nowrap;">
+        <button class="edit-row" onclick="editRosterPlayer('${p._id}','${p.num}','${p.name.replace(/'/g,"\\\\'")}')">✏️</button>
+        <span class="delete-row" onclick="delRosterPlayer('${p._id}')">🗑</span>
+      </td>
     </tr>`;
   });
   html+=`</tbody></table>
@@ -2065,6 +2068,31 @@ window.renderRosterPanel=function(){
     </div>
   </div>`;
   container.innerHTML=html;
+}
+
+window.editRosterPlayer=function(docId, curNum, curName){
+  // Inline edit — replace the cells with inputs
+  const numCell=document.getElementById('rnum-'+docId);
+  const nameCell=document.getElementById('rname-'+docId);
+  if(!numCell||!nameCell) return;
+  numCell.innerHTML=`<input type="number" id="edit-rnum-${docId}" value="${curNum}" style="width:55px;padding:4px;border:1px solid var(--gray);border-radius:4px;font-size:.9rem;">`;
+  nameCell.innerHTML=`<input type="text" id="edit-rname-${docId}" value="${curName}" style="width:140px;padding:4px;border:1px solid var(--gray);border-radius:4px;font-size:.9rem;">`;
+  // Replace edit button with save/cancel
+  const btnCell=numCell.nextElementSibling.nextElementSibling;
+  btnCell.innerHTML=`<button class="btn btn-primary btn-sm" onclick="saveRosterPlayer('${docId}')">💾</button>
+    <button class="btn btn-secondary btn-sm" onclick="renderRosterPanel()" style="margin-left:4px;">✕</button>`;
+}
+
+window.saveRosterPlayer=async function(docId){
+  if(!requirePassword()) return;
+  const num=+document.getElementById('edit-rnum-'+docId).value||0;
+  const name=document.getElementById('edit-rname-'+docId).value.trim();
+  if(!name){ alert('Name cannot be empty.'); return; }
+  setSync('syncing','Saving...');
+  try{
+    await updateDoc(doc(db,'lw_opp_rosters',docId),{num,name});
+    setSync('connected','Live — synced');
+  }catch(e){ setSync('error','Save failed'); alert('Error: '+e.message); }
 }
 
 window.addRosterPlayer=async function(teamId){
