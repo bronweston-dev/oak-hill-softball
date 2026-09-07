@@ -1738,6 +1738,10 @@ function renderStandings(){
   oppGames.forEach(g=>{
     if(!g.teamAId||!g.teamBId) return; // skip incomplete games
     if(g.teamAId.startsWith('lw_opp:')||g.teamBId.startsWith('lw_opp:')) return; // skip LW-game opponent entries
+    if(g.teamAId===g.teamBId) return; // skip malformed games
+    const aTeam=oppTeams.find(t=>t._id===g.teamAId);
+    const bTeam=oppTeams.find(t=>t._id===g.teamBId);
+    if(!aTeam||!bTeam) return; // skip if either team not found in registry
     const aRec = getTeam(g.teamAId, tName(g.teamAId));
     const bRec = getTeam(g.teamBId, tName(g.teamBId));
     // Team A result
@@ -1750,6 +1754,7 @@ function renderStandings(){
 
   // Opponent player stats aggregated per team
   oppTeams.forEach(t=>{
+    if(!t._id||!t.name) return; // skip malformed team entries
     const rec = getTeam(t._id, t.name);
     oppPlayerStats.filter(x=>x.teamId===t._id).forEach(s=>{
       rec.h+=s.h; rec.ab+=s.ab; rec.rbi+=s.rbi; rec.d+=s.d; rec.t2+=s.t; rec.hr+=s.hr;
