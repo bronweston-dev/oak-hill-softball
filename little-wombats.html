@@ -920,27 +920,43 @@ let playerStats   = [];
 let oppTeams      = [];
 let oppGames      = [];
 let oppPlayerStats= [];
-let loadedCount   = 0;
 let activePlayer  = null;
 let sortState     = { bat:{k:'num',a:true}, fld:{k:'num',a:true}, pit:{k:'num',a:true} };
 
 // ── SYNC ──────────────────────────────────────────────────────────────────
 function setSync(s,m){ document.getElementById('syncDot').className='sync-dot '+s; document.getElementById('syncStatus').textContent=m; }
-function checkLoaded(){
-  loadedCount++;
-  if(loadedCount>=5){
-    document.getElementById('loadingOverlay').classList.add('hidden');
-    setSync('connected','Live — synced across all devices');
-    renderAll();
-  }
+
+function hideLoader(){
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  renderAll();
 }
 
+// Fallback — always show site after 5 seconds regardless
+setTimeout(()=>{
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  renderAll();
+}, 5000);
+
 // ── FIRESTORE LISTENERS ───────────────────────────────────────────────────
-onSnapshot(query(collection(db,'lw_game_results'),   orderBy('gameNum')), s=>{ gameResults=s.docs.map(d=>({...d.data(),_id:d.id}));    checkLoaded(); renderAll(); }, e=>{setSync('error','Error');console.error(e);});
-onSnapshot(query(collection(db,'lw_player_stats'),   orderBy('gameNum')), s=>{ playerStats=s.docs.map(d=>({...d.data(),_id:d.id}));    checkLoaded(); renderAll(); }, e=>{setSync('error','Error');console.error(e);});
-onSnapshot(collection(db,'lw_opp_teams'),      s=>{ oppTeams=s.docs.map(d=>({...d.data(),_id:d.id}));       checkLoaded(); renderAll(); }, e=>{setSync('error','Error');console.error(e);});
-onSnapshot(collection(db,'lw_opp_games'),      s=>{ oppGames=s.docs.map(d=>({...d.data(),_id:d.id}));       checkLoaded(); renderAll(); }, e=>{setSync('error','Error');console.error(e);});
-onSnapshot(collection(db,'lw_opp_player_stats'), s=>{ oppPlayerStats=s.docs.map(d=>({...d.data(),_id:d.id})); checkLoaded(); renderAll(); }, e=>{setSync('error','Error');console.error(e);});
+onSnapshot(query(collection(db,'lw_game_results'), orderBy('gameNum')),
+  s=>{ gameResults=s.docs.map(d=>({...d.data(),_id:d.id})); setSync('connected','Live — synced'); hideLoader(); renderAll(); },
+  e=>{ setSync('error','Error loading game results'); console.error('lw_game_results',e); hideLoader(); });
+
+onSnapshot(query(collection(db,'lw_player_stats'), orderBy('gameNum')),
+  s=>{ playerStats=s.docs.map(d=>({...d.data(),_id:d.id})); hideLoader(); renderAll(); },
+  e=>{ console.error('lw_player_stats',e); hideLoader(); });
+
+onSnapshot(collection(db,'lw_opp_teams'),
+  s=>{ oppTeams=s.docs.map(d=>({...d.data(),_id:d.id})); hideLoader(); renderAll(); },
+  e=>{ console.error('lw_opp_teams',e); hideLoader(); });
+
+onSnapshot(collection(db,'lw_opp_games'),
+  s=>{ oppGames=s.docs.map(d=>({...d.data(),_id:d.id})); hideLoader(); renderAll(); },
+  e=>{ console.error('lw_opp_games',e); hideLoader(); });
+
+onSnapshot(collection(db,'lw_opp_player_stats'),
+  s=>{ oppPlayerStats=s.docs.map(d=>({...d.data(),_id:d.id})); hideLoader(); renderAll(); },
+  e=>{ console.error('lw_opp_player_stats',e); hideLoader(); });
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
 function today(){ return new Date().toISOString().slice(0,10); }
