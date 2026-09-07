@@ -339,7 +339,7 @@
       <span class="legend-item"><strong>3B</strong>Triples</span><span class="legend-item"><strong>HR</strong>Home Runs</span>
       <span class="legend-item"><strong>RBI</strong>RBI</span><span class="legend-item"><strong>BB</strong>Walks</span>
       <span class="legend-item"><strong>AVG</strong>Average</span>
-      <span class="legend-item"><strong>OBP</strong>On-Base%</span><span class="legend-item"><strong>SLG</strong>Slugging%</span>
+      <span class="legend-item"><strong>SLG</strong>Slugging%</span>
     </div>
     <div class="table-wrap"><table><thead><tr>
       <th class="name-col" onclick="sortPlayers('bat','name')">Player ⇅</th>
@@ -349,7 +349,7 @@
       <th onclick="sortPlayers('bat','hr')">HR ⇅</th><th onclick="sortPlayers('bat','rbi')">RBI ⇅</th>
       <th onclick="sortPlayers('bat','so')">SO ⇅</th>
       <th onclick="sortPlayers('bat','avg')">AVG ⇅</th>
-      <th onclick="sortPlayers('bat','obp')">OBP ⇅</th><th onclick="sortPlayers('bat','slg')">SLG ⇅</th>
+      <th onclick="sortPlayers('bat','slg')">SLG ⇅</th>
     </tr></thead><tbody id="batBody"></tbody></table></div>
   </div></div>
   <div id="stat-fielding" class="tab-content"><div class="tab-panel">
@@ -636,7 +636,7 @@
     <div class="panel">
       <div class="legend">
         <span class="legend-item"><strong>Includes</strong>Little Wombats players + all logged opponent players</span>
-        <span class="legend-item"><strong>Min 1 AB</strong>to qualify for AVG/OBP/SLG</span>
+        <span class="legend-item"><strong>Min 1 AB</strong>to qualify for AVG/SLG</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:16px;">
         <div><div class="bs-section-title" style="margin-bottom:8px;">AVG Leaders</div><div id="ll-avg"></div></div>
@@ -1726,7 +1726,7 @@ function renderBatting(){
       <td>${s.g}</td><td>${s.ab}</td><td>${s.r}</td><td class="stat-hi">${s.h}</td>
       <td>${s.d}</td><td>${s.t}</td><td>${s.hr}</td><td>${s.rbi}</td>
       <td>${s.so}</td>
-      <td class="stat-avg">${f3(s.avg)}</td><td>${f3(s.obp)}</td><td>${f3(s.slg)}</td>`; body.appendChild(tr); });
+      <td class="stat-avg">${f3(s.avg)}</td><td>${f3(s.slg)}</td>`; body.appendChild(tr); });
 }
 function renderFielding(){
   const body=document.getElementById('fldBody'); body.innerHTML='';
@@ -2581,7 +2581,7 @@ function renderModal(pid){
   document.getElementById('mCardBat').innerHTML=[
     ['G',bs.g],['AB',bs.ab],['R',bs.r],['H',bs.h],['2B',bs.d],['3B',bs.t],
     ['HR',bs.hr],['RBI',bs.rbi],['SO',bs.so],
-    ['AVG',f3(bs.avg)],['OBP',f3(bs.obp)],['SLG',f3(bs.slg)]
+    ['AVG',f3(bs.avg)],['SLG',f3(bs.slg)]
   ].map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
   document.getElementById('mCardFld').innerHTML=[['G',fs.g],['PO',fs.po],['A',fs.a],['TC',fs.tc]]
     .map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
