@@ -225,6 +225,26 @@
   .tab-content.active{display:block;}
   .tab-panel{background:var(--white);border-radius:0 12px 12px 12px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:24px;}
 
+  /* STAT GRID */
+  .stat-grid-wrap{overflow-x:auto;margin-bottom:10px;}
+  .stat-grid-table{border-collapse:collapse;font-size:.82rem;}
+  .stat-grid-table th{background:var(--green-dark);color:var(--gold);font-family:'Oswald',sans-serif;font-size:.7rem;letter-spacing:.5px;text-transform:uppercase;padding:5px 3px;text-align:center;white-space:nowrap;}
+  .stat-grid-table th.player-col{text-align:left;padding-left:8px;min-width:90px;}
+  .stat-grid-table td{padding:3px 2px;text-align:center;border-bottom:1px solid var(--gray-light);vertical-align:middle;}
+  .stat-grid-table td.player-name-td{text-align:left;padding-left:6px;font-weight:700;font-size:.8rem;white-space:nowrap;}
+  .stat-grid-table tr:hover td{background:#f0fff4;}
+  .stat-grid-table input[type=number]{width:36px;padding:3px 1px;border:1px solid var(--gray);border-radius:3px;font-family:'Roboto Condensed',sans-serif;font-size:.82rem;text-align:center;background:var(--gray-light);}
+  .stat-grid-table input[type=number]:focus{outline:none;border-color:var(--green);background:white;}
+  .stat-grid-table input[type=text]{width:42px;padding:3px 1px;border:1px solid var(--gray);border-radius:3px;font-family:'Roboto Condensed',sans-serif;font-size:.82rem;text-align:center;background:var(--gray-light);}
+  .stat-grid-table input[type=text]:focus{outline:none;border-color:var(--green);background:white;}
+  .order-btn{background:none;border:1px solid var(--gray);border-radius:3px;padding:1px 4px;cursor:pointer;font-size:.7rem;color:var(--green-dark);line-height:1.2;}
+  .order-btn:hover{background:var(--green-dark);color:var(--gold);}
+  .remove-row-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:.9rem;padding:1px 3px;}
+  .grid-save-bar{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap;}
+  .grid-status{font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:1px;color:#888;}
+  .grid-status.ok{color:var(--green);}
+  .grid-status.err{color:var(--red);}
+
   .footer{text-align:center;padding:20px;color:rgba(200,212,232,0.4);font-size:.75rem;letter-spacing:2px;}
   @media(max-width:600px){.header-logo{height:80px}.header-text h1{font-size:2rem}.header-season{display:none}.main-nav{overflow-x:auto}}
 </style>
