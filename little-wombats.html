@@ -713,7 +713,7 @@
         <table class="stat-grid-table" id="fld-grid">
           <thead><tr>
             <th class="player-col">Player</th>
-            <th>Pos</th><th>PO</th><th>A</th>
+            <th>Pos</th><th>Inn</th><th>PO</th><th>A</th><th>+</th>
           </tr></thead>
           <tbody id="fld-grid-body"></tbody>
         </table>
@@ -1116,22 +1116,32 @@ window.onGameSelect=function(){
 
 // ── GRID STATE ────────────────────────────────────────────────────────────
 let gridPlayers = []; // ordered list of {id,num,first} for active game
+let fldPositions = {}; // {pid: [{pos,inn,po,a}]}
 
 function buildGrids(gameNum){
-  // Start with full roster in order 1-12, load existing stats if any
   const existing = playerStats.filter(x=>x.gameNum===gameNum).sort((a,b)=>(a.batOrder||99)-(b.batOrder||99));
   if(existing.length>0){
-    // Use existing batting order, only include players with entries
     gridPlayers = existing.map(e=>PLAYERS.find(p=>p.id===e.pid)).filter(Boolean);
-    // Add any players not yet entered at the end
     PLAYERS.forEach(p=>{ if(!gridPlayers.find(x=>x.id===p.id)) gridPlayers.push(p); });
   } else {
     gridPlayers = [...PLAYERS];
   }
+  // Initialize fldPositions from existing data
+  fldPositions = {};
+  gridPlayers.forEach(p=>{
+    const ex=getExisting(gameNum,p.id);
+    if(ex && ex.positions && ex.positions.length>0){
+      fldPositions[p.id] = ex.positions.map(x=>({pos:x.pos||'',inn:x.inn||0,po:x.po||0,a:x.a||0}));
+    } else if(ex && ex.pos){
+      // Legacy single position
+      fldPositions[p.id] = [{pos:ex.pos,inn:0,po:ex.po||0,a:ex.a||0}];
+    } else {
+      fldPositions[p.id] = [{pos:'',inn:0,po:0,a:0}];
+    }
+  });
   renderBatGrid(gameNum);
   renderFldGrid(gameNum);
   renderPitGrid(gameNum);
-  // Clear status messages
   ['bat-grid-status','fld-grid-status','pit-grid-status'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent='';el.className='grid-status';} });
 }
 
@@ -1164,16 +1174,40 @@ function renderBatGrid(gameNum){
 
 function renderFldGrid(gameNum){
   const body=document.getElementById('fld-grid-body'); body.innerHTML='';
+  const IS='style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"';
+  const TS='style="width:40px;padding:3px 1px;font-size:.82rem;text-align:center;"';
   gridPlayers.forEach(p=>{
-    const ex=getExisting(gameNum,p.id);
-    const tr=document.createElement('tr'); tr.dataset.pid=p.id;
-    tr.innerHTML=`
-      <td class="player-name-td"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>
-      <td><input type="text" value="${ex?ex.pos||'':''}" data-field="pos" class="bg" data-pid="${p.id}" placeholder="SS" style="width:42px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
-      <td><input type="number" min="0" value="${ex?ex.po:0}" data-field="po" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
-      <td><input type="number" min="0" value="${ex?ex.a:0}" data-field="a" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>`;
-    body.appendChild(tr);
+    if(!fldPositions[p.id]) fldPositions[p.id]=[{pos:'',inn:0,po:0,a:0}];
+    const rows=fldPositions[p.id];
+    rows.forEach((row,ri)=>{
+      const tr=document.createElement('tr'); tr.dataset.pid=p.id; tr.dataset.ri=ri;
+      const nameCell = ri===0
+        ? `<td class="player-name-td" rowspan="${rows.length}" style="vertical-align:middle;"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>`
+        : '';
+      tr.innerHTML=`${nameCell}
+        <td><input type="text" value="${row.pos}" placeholder="SS" data-fpid="${p.id}" data-ri="${ri}" data-ff="pos" ${TS}></td>
+        <td><input type="number" min="0" value="${row.inn}" data-fpid="${p.id}" data-ri="${ri}" data-ff="inn" ${IS}></td>
+        <td><input type="number" min="0" value="${row.po}" data-fpid="${p.id}" data-ri="${ri}" data-ff="po" ${IS}></td>
+        <td><input type="number" min="0" value="${row.a}" data-fpid="${p.id}" data-ri="${ri}" data-ff="a" ${IS}></td>
+        <td>${ri===0
+          ? `<button class="order-btn" style="font-size:.8rem;" onclick="addFldPosRow(${p.id},${gameNum})">+</button>`
+          : `<button class="remove-row-btn" onclick="removeFldPosRow(${p.id},${ri},${gameNum})">✕</button>`
+        }</td>`;
+      body.appendChild(tr);
+    });
   });
+}
+
+window.addFldPosRow=function(pid,gameNum){
+  if(!fldPositions[pid]) fldPositions[pid]=[];
+  fldPositions[pid].push({pos:'',inn:0,po:0,a:0});
+  renderFldGrid(gameNum);
+}
+window.removeFldPosRow=function(pid,ri,gameNum){
+  if(fldPositions[pid] && fldPositions[pid].length>1){
+    fldPositions[pid].splice(ri,1);
+  }
+  renderFldGrid(gameNum);
 }
 
 function renderPitGrid(gameNum){
@@ -1256,22 +1290,34 @@ window.saveFieldingGrid=async function(){
   if(!gameNum){alert('Please select a game first.');return;}
   const g=gameResults.find(x=>x.gameNum===gameNum);
   if(!g){alert('Game not found.');return;}
+
+  // Read current values from inputs into fldPositions
+  document.querySelectorAll('input[data-fpid]').forEach(inp=>{
+    const pid=parseInt(inp.dataset.fpid), ri=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
+    if(!fldPositions[pid]) return;
+    if(!fldPositions[pid][ri]) return;
+    fldPositions[pid][ri][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
+  });
+
   setSync('syncing','Saving...');
   const status=document.getElementById('fld-grid-status');
   status.textContent='Saving...'; status.className='grid-status';
   try{
     for(const p of gridPlayers){
       const pid=p.id;
+      const positions=(fldPositions[pid]||[]).filter(r=>r.pos||r.po||r.a||r.inn);
+      // Aggregate totals for backward compat
+      const po=positions.reduce((s,r)=>s+r.po,0);
+      const a=positions.reduce((s,r)=>s+r.a,0);
+      const pos=positions.map(r=>r.pos).filter(Boolean).join('/');
       const existing=getExisting(gameNum,pid);
-      const pos=getGridVal(pid,'pos',false), po=getGridVal(pid,'po'), a=getGridVal(pid,'a');
       if(existing){
-        await updateDoc(doc(db,'lw_player_stats',existing._id),{pos,po,a});
+        await updateDoc(doc(db,'lw_player_stats',existing._id),{positions,pos,po,a});
       } else {
-        const hasStats=po||a||pos;
-        if(hasStats){
+        if(positions.length>0){
           const batOrder=gridPlayers.indexOf(p)+1;
           await addDoc(collection(db,'lw_player_stats'),{gameNum,pid,date:g.date,opp:g.opp,batOrder,
-            ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,pos,po,a,ip:0,er:0,ph:0,pk:0,ppo:0});
+            ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,positions,pos,po,a,ip:0,er:0,ph:0,pk:0,ppo:0});
         }
       }
     }
