@@ -347,7 +347,6 @@
       <span class="legend-item"><strong>G</strong>Games</span><span class="legend-item"><strong>IP</strong>Innings</span>
       <span class="legend-item"><strong>ER</strong>Earned Runs</span><span class="legend-item"><strong>H</strong>Hits Allowed</span>
       <span class="legend-item"><strong>K</strong>Strikeouts</span>
-      <span class="legend-item"><strong>Team PO</strong>Team Put Outs while pitching</span>
       <span class="legend-item"><strong>DO/IP</strong>Defensive Outs per Inning</span>
       <span class="legend-item"><strong>ERA</strong>ERA (per 4 inn)</span>
     </div>
@@ -356,7 +355,6 @@
       <th onclick="sortPlayers('pit','g')">G ⇅</th><th onclick="sortPlayers('pit','ip')">IP ⇅</th>
       <th onclick="sortPlayers('pit','er')">ER ⇅</th><th onclick="sortPlayers('pit','ph')">H ⇅</th>
       <th onclick="sortPlayers('pit','pk')">K ⇅</th>
-      <th onclick="sortPlayers('pit','ppo')">Team PO ⇅</th>
       <th onclick="sortPlayers('pit','doip')">DO/IP ⇅</th>
       <th onclick="sortPlayers('pit','era')">ERA ⇅</th>
     </tr></thead><tbody id="pitBody"></tbody></table></div>
@@ -1105,7 +1103,7 @@ function renderPitching(){
     tr.innerHTML=`<td class="name-cell"><span class="player-num">${p.num}</span>${p.first}</td>
       <td>${s.g}</td><td>${s.ip.toFixed(1)}</td><td>${s.er}</td>
       <td>${s.ph}</td><td>${s.pk}</td>
-      <td>${s.ppo}</td><td class="stat-avg">${s.ip>0?f2(s.ppo/s.ip):'—'}</td>
+      <td class="stat-avg">${s.ip>0?f2(s.ppo/s.ip):'—'}</td>
       <td class="stat-avg">${f2(s.era)}</td>`; body.appendChild(tr); });
 }
 
