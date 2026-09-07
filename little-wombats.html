@@ -559,11 +559,11 @@
   <div id="ll-pitching" class="ll-tab-content">
     <div class="panel">
       <div class="legend">
-        <span class="legend-item"><strong>Min 1 IP</strong>to qualify for ERA</span>
+        <span class="legend-item"><strong>Min 1 IP</strong>to qualify for ERA and DO/IP</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:16px;">
         <div><div class="bs-section-title" style="margin-bottom:8px;">ERA Leaders (lowest)</div><div id="ll-era"></div></div>
-        <div><div class="bs-section-title" style="margin-bottom:8px;">Strikeout Leaders</div><div id="ll-k"></div></div>
+        <div><div class="bs-section-title" style="margin-bottom:8px;">Def. Outs per Inning</div><div id="ll-doip"></div></div>
         <div><div class="bs-section-title" style="margin-bottom:8px;">Innings Pitched</div><div id="ll-ip"></div></div>
       </div>
     </div>
@@ -662,6 +662,7 @@
         <div class="form-group"><label>H Allowed</label><input type="number" id="ps-ph" min="0" value="0"></div>
         <div class="form-group"><label>BB Allowed</label><input type="number" id="ps-pbb" min="0" value="0"></div>
         <div class="form-group"><label>K</label><input type="number" id="ps-pk" min="0" value="0"></div>
+        <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ps-ppo" min="0" value="0" title="Total defensive put outs recorded by the team while this pitcher was on the mound"></div>
       </div>
       <button class="btn btn-primary" onclick="addPlayerStats()">+ Save Player Game Stats</button>
     </div>
@@ -804,6 +805,7 @@
         <div class="form-group"><label>H Allowed</label><input type="number" id="ep-ph" min="0"></div>
         <div class="form-group"><label>BB Allowed</label><input type="number" id="ep-pbb" min="0"></div>
         <div class="form-group"><label>K</label><input type="number" id="ep-pk" min="0"></div>
+        <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ep-ppo" min="0"></div>
       </div>
       <div class="edit-btn-row">
         <button class="btn btn-primary" onclick="saveEditPlayer()">💾 Save Changes</button>
@@ -911,8 +913,8 @@ function fStats(pid){
 }
 function pStats(pid){
   const gs=playerStats.filter(g=>g.pid===pid&&g.ip>0);
-  const s={g:gs.length,ip:0,er:0,ph:0,pbb:0,pk:0};
-  gs.forEach(g=>{s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;});
+  const s={g:gs.length,ip:0,er:0,ph:0,pbb:0,pk:0,ppo:0};
+  gs.forEach(g=>{s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
   s.era=s.ip>0?(s.er/s.ip)*4:null; return s;
 }
 
@@ -1425,7 +1427,8 @@ function renderLeagueLeaders(){
     const s=bStats(p.id);
     const ps2=pStats(p.id);
     if(s.ab>0) allBat.push({name:p.first,team:'Little Wombats',num:p.num,...s});
-    if(ps2.ip>0) allPit.push({name:p.first,team:'Little Wombats',num:p.num,...ps2});
+    const fs2=fStats(p.id);
+    if(ps2.ip>0) allPit.push({name:p.first,team:'Little Wombats',num:p.num,...ps2,po:fs2.po});
   });
 
   // Opponent players — aggregate across all games
@@ -1445,7 +1448,7 @@ function renderLeagueLeaders(){
     s.slg=s.ab>0?tb/s.ab:0;
     s.era=s.ip>0?(s.er/s.ip)*4:null;
     if(s.ab>0) allBat.push({name:first.playerName,team:teamName,num:first.playerNum,...s});
-    if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,...s});
+    if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,...s,po:s.po||0});
   });
 
   function leaderList(arr, key, asc=false, limit=20){
@@ -1453,7 +1456,7 @@ function renderLeagueLeaders(){
     sorted.sort((a,b)=>asc?(a[key]-b[key]):(b[key]-a[key]));
     return sorted.slice(0,limit).map((x,i)=>{
       const rankCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
-      const val=key==='avg'||key==='obp'||key==='slg'?f3(x[key]):key==='era'?f2(x[key]):(key==='ip'?x[key].toFixed(1):x[key]);
+      const val=key==='avg'||key==='obp'||key==='slg'?f3(x[key]):key==='era'||key==='doip'?f2(x[key]):(key==='ip'?x[key].toFixed(1):x[key]);
       return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eee;">
         <span class="rank-num ${rankCls}">${i+1}</span>
         <span class="player-num" style="background:var(--green-dark)">${x.num}</span>
@@ -1470,8 +1473,10 @@ function renderLeagueLeaders(){
   document.getElementById('ll-hr').innerHTML=leaderList(allBat,'hr');
   document.getElementById('ll-sb').innerHTML=leaderList(allBat,'sb');
   document.getElementById('ll-obp').innerHTML=leaderList(allBat,'obp');
+  // Calculate DO/IP using team PO while pitching (ppo field)
+  allPit.forEach(p=>{ p.doip = p.ip>0 ? (p.ppo||0)/p.ip : 0; });
   document.getElementById('ll-era').innerHTML=leaderList(allPit,'era',true);
-  document.getElementById('ll-k').innerHTML=leaderList(allPit,'pk');
+  document.getElementById('ll-doip').innerHTML=leaderList(allPit,'doip');
   document.getElementById('ll-ip').innerHTML=leaderList(allPit,'ip');
 }
 
@@ -1533,12 +1538,13 @@ window.addPlayerStats=async function(){
     po:+document.getElementById('ps-po').value||0,a:+document.getElementById('ps-a').value||0,
     ip:+document.getElementById('ps-ip').value||0,er:+document.getElementById('ps-er').value||0,
     ph:+document.getElementById('ps-ph').value||0,pbb:+document.getElementById('ps-pbb').value||0,
-    pk:+document.getElementById('ps-pk').value||0};
+    pk:+document.getElementById('ps-pk').value||0,
+    ppo:+document.getElementById('ps-ppo').value||0};
   setSync('syncing','Saving...');
   try{
     await addDoc(collection(db,'lw_player_stats'),rec);
     document.getElementById('ps-batorder').value=1;
-    ['ps-ab','ps-r','ps-h','ps-2b','ps-3b','ps-hr','ps-rbi','ps-bb','ps-so','ps-sb','ps-po','ps-a','ps-ip','ps-er','ps-ph','ps-pbb','ps-pk'].forEach(id=>document.getElementById(id).value=0);
+    ['ps-ab','ps-r','ps-h','ps-2b','ps-3b','ps-hr','ps-rbi','ps-bb','ps-so','ps-sb','ps-po','ps-a','ps-ip','ps-er','ps-ph','ps-pbb','ps-pk','ps-ppo'].forEach(id=>document.getElementById(id).value=0);
     document.getElementById('ps-pos').value='';
     document.getElementById('ps-player').value='';
     document.getElementById('ps-gamenum').value='';
@@ -1699,7 +1705,7 @@ window.openEditPlayer=function(docId){
   document.getElementById('ep-po').value=g.po; document.getElementById('ep-a').value=g.a;
   document.getElementById('ep-ip').value=g.ip; document.getElementById('ep-er').value=g.er;
   document.getElementById('ep-ph').value=g.ph; document.getElementById('ep-pbb').value=g.pbb;
-  document.getElementById('ep-pk').value=g.pk;
+  document.getElementById('ep-pk').value=g.pk; document.getElementById('ep-ppo').value=g.ppo||0;
   document.getElementById('editPlayerModal').classList.add('active');
 }
 window.saveEditPlayer=async function(){
@@ -1715,7 +1721,8 @@ window.saveEditPlayer=async function(){
     po:+document.getElementById('ep-po').value||0,a:+document.getElementById('ep-a').value||0,
     ip:+document.getElementById('ep-ip').value||0,er:+document.getElementById('ep-er').value||0,
     ph:+document.getElementById('ep-ph').value||0,pbb:+document.getElementById('ep-pbb').value||0,
-    pk:+document.getElementById('ep-pk').value||0};
+    pk:+document.getElementById('ep-pk').value||0,
+    ppo:+document.getElementById('ep-ppo').value||0};
   setSync('syncing','Saving...');
   try{await updateDoc(doc(db,'lw_player_stats',docId),rec);setSync('connected','Live — synced');closeEditPlayer();}
   catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
@@ -1739,7 +1746,7 @@ function renderModal(pid){
   ].map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
   document.getElementById('mCardFld').innerHTML=[['G',fs.g],['PO',fs.po],['A',fs.a],['TC',fs.tc]]
     .map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
-  document.getElementById('mCardPit').innerHTML=[['G',ps2.g],['IP',ps2.ip.toFixed(1)],['ER',ps2.er],['H',ps2.ph],['BB',ps2.pbb],['K',ps2.pk],['ERA',f2(ps2.era)]]
+  document.getElementById('mCardPit').innerHTML=[['G',ps2.g],['IP',ps2.ip.toFixed(1)],['ER',ps2.er],['H',ps2.ph],['BB',ps2.pbb],['K',ps2.pk],['Team PO',ps2.ppo],['ERA',f2(ps2.era)]]
     .map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
 
   const gs=playerStats.filter(g=>g.pid===pid).sort((a,b)=>a.gameNum-b.gameNum);
