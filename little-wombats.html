@@ -326,8 +326,8 @@
       <th onclick="sortPlayers('bat','r')">R ⇅</th><th onclick="sortPlayers('bat','h')">H ⇅</th>
       <th onclick="sortPlayers('bat','d')">2B ⇅</th><th onclick="sortPlayers('bat','t')">3B ⇅</th>
       <th onclick="sortPlayers('bat','hr')">HR ⇅</th><th onclick="sortPlayers('bat','rbi')">RBI ⇅</th>
-      <th onclick="sortPlayers('bat','bb')">BB ⇅</th><th onclick="sortPlayers('bat','so')">SO ⇅</th>
-      <th onclick="sortPlayers('bat','sb')">SB ⇅</th><th onclick="sortPlayers('bat','avg')">AVG ⇅</th>
+      <th onclick="sortPlayers('bat','so')">SO ⇅</th>
+      <th onclick="sortPlayers('bat','avg')">AVG ⇅</th>
       <th onclick="sortPlayers('bat','obp')">OBP ⇅</th><th onclick="sortPlayers('bat','slg')">SLG ⇅</th>
     </tr></thead><tbody id="batBody"></tbody></table></div>
   </div></div>
@@ -463,16 +463,13 @@
         <div class="form-group"><label>3B</label><input type="number" id="ops-3b" min="0" value="0"></div>
         <div class="form-group"><label>HR</label><input type="number" id="ops-hr" min="0" value="0"></div>
         <div class="form-group"><label>RBI</label><input type="number" id="ops-rbi" min="0" value="0"></div>
-        <div class="form-group"><label>BB</label><input type="number" id="ops-bb" min="0" value="0"></div>
         <div class="form-group"><label>SO</label><input type="number" id="ops-so" min="0" value="0"></div>
-        <div class="form-group"><label>SB</label><input type="number" id="ops-sb" min="0" value="0"></div>
       </div>
       <div class="form-divider">⚾ Pitching <span style="font-size:.75rem;font-weight:400;color:#888;">(0 IP if did not pitch)</span></div>
       <div class="form-row">
         <div class="form-group"><label>IP</label><input type="number" id="ops-ip" min="0" step="0.1" value="0"></div>
         <div class="form-group"><label>ER</label><input type="number" id="ops-er" min="0" value="0"></div>
         <div class="form-group"><label>H Allowed</label><input type="number" id="ops-ph" min="0" value="0"></div>
-        <div class="form-group"><label>BB Allowed</label><input type="number" id="ops-pbb" min="0" value="0"></div>
         <div class="form-group"><label>K</label><input type="number" id="ops-pk" min="0" value="0"></div>
       </div>
       <button class="btn btn-primary" onclick="addOppPlayerStat()">+ Save Player Stats</button>
@@ -646,9 +643,7 @@
         <div class="form-group"><label>3B</label><input type="number" id="ps-3b" min="0" value="0"></div>
         <div class="form-group"><label>HR</label><input type="number" id="ps-hr" min="0" value="0"></div>
         <div class="form-group"><label>RBI</label><input type="number" id="ps-rbi" min="0" value="0"></div>
-        <div class="form-group"><label>BB</label><input type="number" id="ps-bb" min="0" value="0"></div>
         <div class="form-group"><label>SO</label><input type="number" id="ps-so" min="0" value="0"></div>
-        <div class="form-group"><label>SB</label><input type="number" id="ps-sb" min="0" value="0"></div>
       </div>
       <div class="form-divider">🧤 Fielding</div>
       <div class="form-row">
@@ -661,7 +656,6 @@
         <div class="form-group"><label>IP</label><input type="number" id="ps-ip" min="0" step="0.1" value="0"></div>
         <div class="form-group"><label>ER</label><input type="number" id="ps-er" min="0" value="0"></div>
         <div class="form-group"><label>H Allowed</label><input type="number" id="ps-ph" min="0" value="0"></div>
-        <div class="form-group"><label>BB Allowed</label><input type="number" id="ps-pbb" min="0" value="0"></div>
         <div class="form-group"><label>K</label><input type="number" id="ps-pk" min="0" value="0"></div>
         <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ps-ppo" min="0" value="0" title="Total defensive put outs recorded by the team while this pitcher was on the mound"></div>
       </div>
@@ -688,7 +682,7 @@
         <div class="card-stats" id="mCardBat"></div>
         <div class="log-title">BATTING GAME LOG</div>
         <div class="table-wrap"><table class="log-table">
-          <thead><tr><th>Gm</th><th>Date/Opp</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th><th>AVG</th><th>⭐</th><th></th></tr></thead>
+          <thead><tr><th>Gm</th><th>Date/Opp</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th><th>⭐</th><th></th></tr></thead>
           <tbody id="mBatLog"></tbody>
         </table></div>
         <div id="mNoBat" class="no-data" style="display:none">No batting stats yet.</div>
@@ -706,7 +700,7 @@
         <div class="card-stats" id="mCardPit"></div>
         <div class="log-title">PITCHING GAME LOG</div>
         <div class="table-wrap"><table class="log-table">
-          <thead><tr><th>Gm</th><th>Date/Opp</th><th>IP</th><th>ER</th><th>H</th><th>BB</th><th>K</th><th>ERA</th><th></th></tr></thead>
+          <thead><tr><th>Gm</th><th>Date/Opp</th><th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th><th>DO/IP</th><th>ERA</th><th></th></tr></thead>
           <tbody id="mPitLog"></tbody>
         </table></div>
         <div id="mNoPit" class="no-data" style="display:none">No pitching stats yet.</div>
@@ -789,9 +783,7 @@
         <div class="form-group"><label>3B</label><input type="number" id="ep-3b" min="0"></div>
         <div class="form-group"><label>HR</label><input type="number" id="ep-hr" min="0"></div>
         <div class="form-group"><label>RBI</label><input type="number" id="ep-rbi" min="0"></div>
-        <div class="form-group"><label>BB</label><input type="number" id="ep-bb" min="0"></div>
         <div class="form-group"><label>SO</label><input type="number" id="ep-so" min="0"></div>
-        <div class="form-group"><label>SB</label><input type="number" id="ep-sb" min="0"></div>
       </div>
       <div class="form-divider">🧤 Fielding</div>
       <div class="form-row">
@@ -804,7 +796,6 @@
         <div class="form-group"><label>IP</label><input type="number" id="ep-ip" min="0" step="0.1"></div>
         <div class="form-group"><label>ER</label><input type="number" id="ep-er" min="0"></div>
         <div class="form-group"><label>H Allowed</label><input type="number" id="ep-ph" min="0"></div>
-        <div class="form-group"><label>BB Allowed</label><input type="number" id="ep-pbb" min="0"></div>
         <div class="form-group"><label>K</label><input type="number" id="ep-pk" min="0"></div>
         <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ep-ppo" min="0"></div>
       </div>
@@ -1093,7 +1084,7 @@ function renderBatting(){
     tr.innerHTML=`<td class="name-cell"><span class="player-num">${p.num}</span>${p.first}</td>
       <td>${s.g}</td><td>${s.ab}</td><td>${s.r}</td><td class="stat-hi">${s.h}</td>
       <td>${s.d}</td><td>${s.t}</td><td>${s.hr}</td><td>${s.rbi}</td>
-      <td>${s.bb}</td><td>${s.so}</td><td>${s.sb}</td>
+      <td>${s.so}</td>
       <td class="stat-avg">${f3(s.avg)}</td><td>${f3(s.obp)}</td><td>${f3(s.slg)}</td>`; body.appendChild(tr); });
 }
 function renderFielding(){
@@ -1169,7 +1160,7 @@ window.showBoxScore=function(num){
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---'; const potgGm=g.potgIds&&g.potgIds.includes(p.id);
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}${potgGm?' ⭐':''}</td>
       <td>${gs.batOrder||''}</td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d}</td>
-      <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.bb}</td><td>${gs.so}</td><td>${gs.sb}</td><td>${avg}</td></tr>`; }).join('');
+      <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`; }).join('');
 
   const fldRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
@@ -1178,7 +1169,7 @@ window.showBoxScore=function(num){
   const pitchers=lineup.filter(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); return gs&&gs.ip>0; });
   const pitRows=pitchers.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id);
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
-      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pbb}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`; }).join('');
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`; }).join('');
 
   // ── Opponent players (logged via Opponents section) ───────────────────────
   // Find the matching opp game by date+opp name
@@ -1191,18 +1182,18 @@ window.showBoxScore=function(num){
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td></td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td>
-      <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.bb}</td><td>${gs.so}</td><td>${gs.sb}</td><td>${avg}</td></tr>`;
+      <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`;
   }
   function oppPitRow(pid){
     const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
-      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pbb}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
   }
   const oppBatRows = oppPlayerIds.map(oppBatRow).join('');
   const oppPitRows = oppPlayerIds.map(oppPitRow).filter(Boolean).join('');
 
   // ── Section headers with team name dividers ───────────────────────────────
-  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="13" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
+  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="11" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerFld(name){ return `<tr style="background:var(--green-dark);"><td colspan="5" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
 
@@ -1225,7 +1216,7 @@ window.showBoxScore=function(num){
     </div>
     <div class="bs-section"><div class="bs-section-title">Batting</div>
       ${hasBatStats?`<div class="table-wrap"><table class="bs-table"><thead><tr>
-        <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th><th>AVG</th>
+        <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th>
       </tr></thead><tbody>
         ${lineup.length?teamDivider('Little Wombats')+batRows:''}
         ${oppBatRows?teamDivider(g.opp)+oppBatRows:''}
@@ -1240,7 +1231,7 @@ window.showBoxScore=function(num){
     </div>
     ${hasPitStats?`<div class="bs-section"><div class="bs-section-title">Pitching</div>
       <div class="table-wrap"><table class="bs-table"><thead><tr>
-        <th style="text-align:left;padding-left:12px">Player</th><th>IP</th><th>ER</th><th>H</th><th>BB</th><th>K</th><th>ERA</th>
+        <th style="text-align:left;padding-left:12px">Player</th><th>IP</th><th>ER</th><th>H</th><th>K</th><th>ERA</th>
       </tr></thead><tbody>
         ${pitchers.length?teamDividerPit('Little Wombats')+pitRows:''}
         ${oppPitRows?teamDividerPit(g.opp)+oppPitRows:''}
@@ -1274,14 +1265,14 @@ window.showOppBoxScore=function(oppGameId){
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td><td>${gs.t||0}</td>
-      <td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.bb}</td><td>${gs.so}</td><td>${gs.sb}</td><td>${avg}</td></tr>`;
+      <td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`;
   }
   function pitRow(pid){
     const gs=gPlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
-      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pbb}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
   }
-  function teamDivBat(name){ return `<tr style="background:var(--green-dark);"><td colspan="12" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
+  function teamDivBat(name){ return `<tr style="background:var(--green-dark);"><td colspan="10" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
   function teamDivPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
 
   const aBatRows=aPlayers.map(batRow).join('');
@@ -1300,7 +1291,7 @@ window.showOppBoxScore=function(oppGameId){
     </div>
     <div class="bs-section"><div class="bs-section-title">Batting</div>
       ${hasBat?`<div class="table-wrap"><table class="bs-table"><thead><tr>
-        <th style="text-align:left;padding-left:12px">Player</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th><th>AVG</th>
+        <th style="text-align:left;padding-left:12px">Player</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th>
       </tr></thead><tbody>
         ${teamDivBat(aName)}${aBatRows||'<tr><td colspan="12" style="text-align:left;padding:8px 12px;color:#aaa;font-style:italic;">No stats logged</td></tr>'}
         ${teamDivBat(bName)}${bBatRows||'<tr><td colspan="12" style="text-align:left;padding:8px 12px;color:#aaa;font-style:italic;">No stats logged</td></tr>'}
@@ -1308,7 +1299,7 @@ window.showOppBoxScore=function(oppGameId){
     </div>
     ${hasPit?`<div class="bs-section"><div class="bs-section-title">Pitching</div>
       <div class="table-wrap"><table class="bs-table"><thead><tr>
-        <th style="text-align:left;padding-left:12px">Player</th><th>IP</th><th>ER</th><th>H</th><th>BB</th><th>K</th><th>ERA</th>
+        <th style="text-align:left;padding-left:12px">Player</th><th>IP</th><th>ER</th><th>H</th><th>K</th><th>ERA</th>
       </tr></thead><tbody>
         ${aPitRows?teamDivPit(aName)+aPitRows:''}
         ${bPitRows?teamDivPit(bName)+bPitRows:''}
@@ -1533,8 +1524,8 @@ window.addPlayerStats=async function(){
     ab:+document.getElementById('ps-ab').value||0,r:+document.getElementById('ps-r').value||0,
     h:+document.getElementById('ps-h').value||0,d:+document.getElementById('ps-2b').value||0,
     t:+document.getElementById('ps-3b').value||0,hr:+document.getElementById('ps-hr').value||0,
-    rbi:+document.getElementById('ps-rbi').value||0,bb:+document.getElementById('ps-bb').value||0,
-    so:+document.getElementById('ps-so').value||0,sb:+document.getElementById('ps-sb').value||0,
+    rbi:+document.getElementById('ps-rbi').value||0,
+    so:+document.getElementById('ps-so').value||0,
     pos:document.getElementById('ps-pos').value||'—',
     po:+document.getElementById('ps-po').value||0,a:+document.getElementById('ps-a').value||0,
     ip:+document.getElementById('ps-ip').value||0,er:+document.getElementById('ps-er').value||0,
@@ -1545,7 +1536,7 @@ window.addPlayerStats=async function(){
   try{
     await addDoc(collection(db,'lw_player_stats'),rec);
     document.getElementById('ps-batorder').value=1;
-    ['ps-ab','ps-r','ps-h','ps-2b','ps-3b','ps-hr','ps-rbi','ps-bb','ps-so','ps-sb','ps-po','ps-a','ps-ip','ps-er','ps-ph','ps-pbb','ps-pk','ps-ppo'].forEach(id=>document.getElementById(id).value=0);
+    ['ps-ab','ps-r','ps-h','ps-2b','ps-3b','ps-hr','ps-rbi','ps-so','ps-po','ps-a','ps-ip','ps-er','ps-ph','ps-pk','ps-ppo'].forEach(id=>document.getElementById(id).value=0);
     document.getElementById('ps-pos').value='';
     document.getElementById('ps-player').value='';
     document.getElementById('ps-gamenum').value='';
@@ -1634,17 +1625,17 @@ window.addOppPlayerStat=async function(){
     ab:+document.getElementById('ops-ab').value||0,r:+document.getElementById('ops-r').value||0,
     h:+document.getElementById('ops-h').value||0,d:+document.getElementById('ops-2b').value||0,
     t:+document.getElementById('ops-3b').value||0,hr:+document.getElementById('ops-hr').value||0,
-    rbi:+document.getElementById('ops-rbi').value||0,bb:+document.getElementById('ops-bb').value||0,
-    so:+document.getElementById('ops-so').value||0,sb:+document.getElementById('ops-sb').value||0,
+    rbi:+document.getElementById('ops-rbi').value||0,
+    so:+document.getElementById('ops-so').value||0,
     ip:+document.getElementById('ops-ip').value||0,er:+document.getElementById('ops-er').value||0,
-    ph:+document.getElementById('ops-ph').value||0,pbb:+document.getElementById('ops-pbb').value||0,
+    ph:+document.getElementById('ops-ph').value||0,
     pk:+document.getElementById('ops-pk').value||0};
   setSync('syncing','Saving...');
   try{
     await addDoc(collection(db,'lw_opp_player_stats'),rec);
     document.getElementById('ops-name').value='';
     document.getElementById('ops-num').value=0;
-    ['ops-ab','ops-r','ops-h','ops-2b','ops-3b','ops-hr','ops-rbi','ops-bb','ops-so','ops-sb','ops-ip','ops-er','ops-ph','ops-pbb','ops-pk'].forEach(id=>document.getElementById(id).value=0);
+    ['ops-ab','ops-r','ops-h','ops-2b','ops-3b','ops-hr','ops-rbi','ops-so','ops-ip','ops-er','ops-ph','ops-pk'].forEach(id=>document.getElementById(id).value=0);
     setSync('connected','Live — synced'); alert(`${playerName} stats saved!`);
   }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
@@ -1700,12 +1691,12 @@ window.openEditPlayer=function(docId){
   document.getElementById('ep-ab').value=g.ab; document.getElementById('ep-r').value=g.r;
   document.getElementById('ep-h').value=g.h; document.getElementById('ep-2b').value=g.d;
   document.getElementById('ep-3b').value=g.t; document.getElementById('ep-hr').value=g.hr;
-  document.getElementById('ep-rbi').value=g.rbi; document.getElementById('ep-bb').value=g.bb;
-  document.getElementById('ep-so').value=g.so; document.getElementById('ep-sb').value=g.sb;
+  document.getElementById('ep-rbi').value=g.rbi;
+  document.getElementById('ep-so').value=g.so;
   document.getElementById('ep-pos').value=g.pos||'';
   document.getElementById('ep-po').value=g.po; document.getElementById('ep-a').value=g.a;
   document.getElementById('ep-ip').value=g.ip; document.getElementById('ep-er').value=g.er;
-  document.getElementById('ep-ph').value=g.ph; document.getElementById('ep-pbb').value=g.pbb;
+  document.getElementById('ep-ph').value=g.ph;
   document.getElementById('ep-pk').value=g.pk; document.getElementById('ep-ppo').value=g.ppo||0;
   document.getElementById('editPlayerModal').classList.add('active');
 }
@@ -1716,12 +1707,12 @@ window.saveEditPlayer=async function(){
     ab:+document.getElementById('ep-ab').value||0,r:+document.getElementById('ep-r').value||0,
     h:+document.getElementById('ep-h').value||0,d:+document.getElementById('ep-2b').value||0,
     t:+document.getElementById('ep-3b').value||0,hr:+document.getElementById('ep-hr').value||0,
-    rbi:+document.getElementById('ep-rbi').value||0,bb:+document.getElementById('ep-bb').value||0,
-    so:+document.getElementById('ep-so').value||0,sb:+document.getElementById('ep-sb').value||0,
+    rbi:+document.getElementById('ep-rbi').value||0,
+    so:+document.getElementById('ep-so').value||0,
     pos:document.getElementById('ep-pos').value||'—',
     po:+document.getElementById('ep-po').value||0,a:+document.getElementById('ep-a').value||0,
     ip:+document.getElementById('ep-ip').value||0,er:+document.getElementById('ep-er').value||0,
-    ph:+document.getElementById('ep-ph').value||0,pbb:+document.getElementById('ep-pbb').value||0,
+    ph:+document.getElementById('ep-ph').value||0,
     pk:+document.getElementById('ep-pk').value||0,
     ppo:+document.getElementById('ep-ppo').value||0};
   setSync('syncing','Saving...');
@@ -1742,12 +1733,13 @@ function renderModal(pid){
   const bs=bStats(pid),fs=fStats(pid),ps2=pStats(pid);
   document.getElementById('mCardBat').innerHTML=[
     ['G',bs.g],['AB',bs.ab],['R',bs.r],['H',bs.h],['2B',bs.d],['3B',bs.t],
-    ['HR',bs.hr],['RBI',bs.rbi],['BB',bs.bb],['SO',bs.so],['SB',bs.sb],
+    ['HR',bs.hr],['RBI',bs.rbi],['SO',bs.so],
     ['AVG',f3(bs.avg)],['OBP',f3(bs.obp)],['SLG',f3(bs.slg)]
   ].map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
   document.getElementById('mCardFld').innerHTML=[['G',fs.g],['PO',fs.po],['A',fs.a],['TC',fs.tc]]
     .map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
-  document.getElementById('mCardPit').innerHTML=[['G',ps2.g],['IP',ps2.ip.toFixed(1)],['ER',ps2.er],['H',ps2.ph],['BB',ps2.pbb],['K',ps2.pk],['Team PO',ps2.ppo],['ERA',f2(ps2.era)]]
+  const doip2=ps2.ip>0?f2(ps2.ppo/ps2.ip):'—';
+  document.getElementById('mCardPit').innerHTML=[['G',ps2.g],['IP',ps2.ip.toFixed(1)],['ER',ps2.er],['H',ps2.ph],['K',ps2.pk],['Team PO',ps2.ppo],['DO/IP',doip2],['ERA',f2(ps2.era)]]
     .map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
 
   const gs=playerStats.filter(g=>g.pid===pid).sort((a,b)=>a.gameNum-b.gameNum);
@@ -1760,7 +1752,7 @@ function renderModal(pid){
     tr.onclick=e=>{if(e.target.tagName==='BUTTON'||e.target.tagName==='SPAN')return;closeModal();showBoxScore(g.gameNum);};
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}·${g.opp}</td>
       <td>${g.ab}</td><td>${g.r}</td><td>${g.h}</td><td>${g.d}</td><td>${g.t}</td><td>${g.hr}</td>
-      <td>${g.rbi}</td><td>${g.bb}</td><td>${g.so}</td><td>${g.sb}</td><td>${avg}</td>
+      <td>${g.rbi}</td><td>${g.so}</td><td>${avg}</td>
       <td>${potg?`<button class="potg-badge" onclick="showBoxScore(${g.gameNum})">⭐</button>`:''}</td>
       <td><button class="edit-row" onclick="openEditPlayer('${g._id}')">✏️</button>
           <span class="delete-row" onclick="delPlayerStat('${g._id}')">🗑</span></td>`;
@@ -1783,9 +1775,10 @@ function renderModal(pid){
   const pBody=document.getElementById('mPitLog'); pBody.innerHTML='';
   pitched.forEach(g=>{
     const tr=document.createElement('tr');
+    const gdoip=g.ip>0?f2((g.ppo||0)/g.ip):'—';
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}·${g.opp}</td>
-      <td>${g.ip.toFixed(1)}</td><td>${g.er}</td><td>${g.ph}</td><td>${g.pbb}</td><td>${g.pk}</td>
-      <td>${g.ip>0?f2((g.er/g.ip)*4):'—'}</td>
+      <td>${g.ip.toFixed(1)}</td><td>${g.er}</td><td>${g.ph}</td><td>${g.pk}</td>
+      <td>${g.ppo||0}</td><td>${gdoip}</td><td>${g.ip>0?f2((g.er/g.ip)*4):'—'}</td>
       <td><button class="edit-row" onclick="openEditPlayer('${g._id}')">✏️</button>
           <span class="delete-row" onclick="delPlayerStat('${g._id}')">🗑</span></td>`;
     pBody.appendChild(tr);
