@@ -1828,34 +1828,6 @@ window.delResult=async function(docId){
 }
 
 // ── ADD/DEL: PLAYER STATS ─────────────────────────────────────────────────
-  if(playerStats.find(g=>g.gameNum===gameNum&&g.pid===pid)){alert(`Stats for this player in Game #${gameNum} already exist.`);return;}
-  const g=gameResults.find(x=>x.gameNum===gameNum);
-  const rec={gameNum,pid,date:g?g.date:today(),opp:g?g.opp:'Unknown',
-    batOrder:+document.getElementById('ps-batorder').value||99,
-    ab:+document.getElementById('ps-ab').value||0,r:+document.getElementById('ps-r').value||0,
-    h:+document.getElementById('ps-h').value||0,d:+document.getElementById('ps-2b').value||0,
-    t:+document.getElementById('ps-3b').value||0,hr:+document.getElementById('ps-hr').value||0,
-    rbi:+document.getElementById('ps-rbi').value||0,
-    so:+document.getElementById('ps-so').value||0,
-    pos:document.getElementById('ps-pos').value||'—',
-    po:+document.getElementById('ps-po').value||0,a:+document.getElementById('ps-a').value||0,
-    ip:+document.getElementById('ps-ip').value||0,er:+document.getElementById('ps-er').value||0,
-    ph:+document.getElementById('ps-ph').value||0,pbb:+document.getElementById('ps-pbb').value||0,
-    pk:+document.getElementById('ps-pk').value||0,
-    ppo:+document.getElementById('ps-ppo').value||0};
-  setSync('syncing','Saving...');
-  try{
-    await addDoc(collection(db,'lw_player_stats'),rec);
-    document.getElementById('ps-batorder').value=1;
-    ['ps-ab','ps-r','ps-h','ps-2b','ps-3b','ps-hr','ps-rbi','ps-so','ps-po','ps-a','ps-ip','ps-er','ps-ph','ps-pk','ps-ppo'].forEach(id=>document.getElementById(id).value=0);
-    document.getElementById('ps-pos').value='';
-    document.getElementById('ps-player').value='';
-    document.getElementById('ps-gamenum').value='';
-    document.getElementById('ps-date').value='';
-    document.getElementById('ps-opp').value='';
-    setSync('connected','Live — synced'); alert(`Stats saved for Game #${gameNum}!`);
-  }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
-}
 window.delPlayerStat=async function(docId){
   if(!requirePassword()) return;
   if(!confirm('Delete this stat entry?')) return;
