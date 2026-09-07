@@ -317,7 +317,7 @@
       <span class="legend-item"><strong>H</strong>Hits</span><span class="legend-item"><strong>2B</strong>Doubles</span>
       <span class="legend-item"><strong>3B</strong>Triples</span><span class="legend-item"><strong>HR</strong>Home Runs</span>
       <span class="legend-item"><strong>RBI</strong>RBI</span><span class="legend-item"><strong>BB</strong>Walks</span>
-      <span class="legend-item"><strong>SB</strong>Stolen Bases</span><span class="legend-item"><strong>AVG</strong>Average</span>
+      <span class="legend-item"><strong>AVG</strong>Average</span>
       <span class="legend-item"><strong>OBP</strong>On-Base%</span><span class="legend-item"><strong>SLG</strong>Slugging%</span>
     </div>
     <div class="table-wrap"><table><thead><tr>
@@ -346,14 +346,18 @@
     <div class="legend">
       <span class="legend-item"><strong>G</strong>Games</span><span class="legend-item"><strong>IP</strong>Innings</span>
       <span class="legend-item"><strong>ER</strong>Earned Runs</span><span class="legend-item"><strong>H</strong>Hits Allowed</span>
-      <span class="legend-item"><strong>BB</strong>Walks</span><span class="legend-item"><strong>K</strong>Strikeouts</span>
+      <span class="legend-item"><strong>K</strong>Strikeouts</span>
+      <span class="legend-item"><strong>Team PO</strong>Team Put Outs while pitching</span>
+      <span class="legend-item"><strong>DO/IP</strong>Defensive Outs per Inning</span>
       <span class="legend-item"><strong>ERA</strong>ERA (per 4 inn)</span>
     </div>
     <div class="table-wrap"><table><thead><tr>
       <th class="name-col" onclick="sortPlayers('pit','name')">Player ⇅</th>
       <th onclick="sortPlayers('pit','g')">G ⇅</th><th onclick="sortPlayers('pit','ip')">IP ⇅</th>
       <th onclick="sortPlayers('pit','er')">ER ⇅</th><th onclick="sortPlayers('pit','ph')">H ⇅</th>
-      <th onclick="sortPlayers('pit','pbb')">BB ⇅</th><th onclick="sortPlayers('pit','pk')">K ⇅</th>
+      <th onclick="sortPlayers('pit','pk')">K ⇅</th>
+      <th onclick="sortPlayers('pit','ppo')">Team PO ⇅</th>
+      <th onclick="sortPlayers('pit','doip')">DO/IP ⇅</th>
       <th onclick="sortPlayers('pit','era')">ERA ⇅</th>
     </tr></thead><tbody id="pitBody"></tbody></table></div>
   </div></div>
@@ -907,7 +911,9 @@ function pStats(pid){
   const gs=playerStats.filter(g=>g.pid===pid&&g.ip>0);
   const s={g:gs.length,ip:0,er:0,ph:0,pbb:0,pk:0,ppo:0};
   gs.forEach(g=>{s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
-  s.era=s.ip>0?(s.er/s.ip)*4:null; return s;
+  s.era=s.ip>0?(s.er/s.ip)*4:null;
+  s.doip=s.ip>0?s.ppo/s.ip:0;
+  return s;
 }
 
 // ── RENDER ALL ────────────────────────────────────────────────────────────
@@ -1098,7 +1104,8 @@ function renderPitching(){
   sortedPlayers('pit').forEach(p=>{ const s=pStats(p.id); const tr=document.createElement('tr'); tr.onclick=()=>openModal(p.id,'mp');
     tr.innerHTML=`<td class="name-cell"><span class="player-num">${p.num}</span>${p.first}</td>
       <td>${s.g}</td><td>${s.ip.toFixed(1)}</td><td>${s.er}</td>
-      <td>${s.ph}</td><td>${s.pbb}</td><td>${s.pk}</td>
+      <td>${s.ph}</td><td>${s.pk}</td>
+      <td>${s.ppo}</td><td class="stat-avg">${s.ip>0?f2(s.ppo/s.ip):'—'}</td>
       <td class="stat-avg">${f2(s.era)}</td>`; body.appendChild(tr); });
 }
 
