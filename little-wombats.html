@@ -451,7 +451,21 @@
     <div class="panel-header" onclick="togglePanel(this)">👤 Log Opponent Player Stats <span class="toggle-icon">▼</span></div>
     <div class="panel-body">
       <div class="form-row">
-        <div class="form-group"><label>Opp Game #</label><select id="ops-game" onchange="onOppGameSelect()"><option value="">-- Select Game --</option></select></div>
+        <div class="form-group">
+          <label>Game Type</label>
+          <select id="ops-game-type" onchange="onOppGameTypeChange()">
+            <option value="lw">Little Wombats Game</option>
+            <option value="opp">Opponent vs Opponent Game</option>
+          </select>
+        </div>
+        <div class="form-group" id="ops-lw-game-wrap">
+          <label>LW Game #</label>
+          <select id="ops-lw-game" onchange="onOppGameSelect()"><option value="">-- Select Game --</option></select>
+        </div>
+        <div class="form-group" id="ops-opp-game-wrap" style="display:none;">
+          <label>Opp Game #</label>
+          <select id="ops-game" onchange="onOppGameSelect()"><option value="">-- Select Game --</option></select>
+        </div>
         <div class="form-group"><label>Which Team</label><select id="ops-which-team"><option value="">-- Select --</option></select></div>
         <div class="form-group"><label>Player Name</label><input type="text" id="ops-name" placeholder="First name"></div>
         <div class="form-group"><label>Jersey #</label><input type="number" id="ops-num" min="0" value="0"></div>
@@ -473,6 +487,7 @@
         <div class="form-group"><label>ER</label><input type="number" id="ops-er" min="0" value="0"></div>
         <div class="form-group"><label>H Allowed</label><input type="number" id="ops-ph" min="0" value="0"></div>
         <div class="form-group"><label>K</label><input type="number" id="ops-pk" min="0" value="0"></div>
+        <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ops-ppo" min="0" value="0" title="Total defensive put outs recorded while this pitcher was on the mound"></div>
       </div>
       <button class="btn btn-primary" onclick="addOppPlayerStat()">+ Save Player Stats</button>
     </div>
@@ -977,6 +992,20 @@ function populateSelects(){
     onOppGameSelect();
   }
 
+  // LW game dropdown for opponent player stats
+  const lwgsel=document.getElementById('ops-lw-game');
+  if(lwgsel){
+    const lwCur=lwgsel.value;
+    lwgsel.innerHTML='<option value="">-- Select LW Game --</option>';
+    [...gameResults].sort((a,b)=>a.gameNum-b.gameNum).forEach(g=>{
+      const res=g.us>g.them?'W':g.us<g.them?'L':'T';
+      const o=document.createElement('option'); o.value=g._id;
+      o.textContent=`Game ${g.gameNum} — ${g.date} vs ${g.opp} (${res} ${g.us}-${g.them})`;
+      lwgsel.appendChild(o);
+    });
+    if(lwCur) lwgsel.value=lwCur;
+  }
+
   // No-teams warning
   const ntmsg=document.getElementById('opp-no-teams-msg');
   if(ntmsg) ntmsg.style.display=oppTeams.length===0?'block':'none';
@@ -1001,15 +1030,35 @@ window.onGameSelect=function(){
   document.getElementById('ps-date').value=g?g.date:'';
   document.getElementById('ps-opp').value=g?g.opp:'';
 }
+window.onOppGameTypeChange=function(){
+  const type=document.getElementById('ops-game-type').value;
+  document.getElementById('ops-lw-game-wrap').style.display=type==='lw'?'':'none';
+  document.getElementById('ops-opp-game-wrap').style.display=type==='opp'?'':'none';
+  document.getElementById('ops-which-team').innerHTML='<option value="">-- Select --</option>';
+  onOppGameSelect();
+}
+
 window.onOppGameSelect=function(){
-  const id=document.getElementById('ops-game').value;
-  const g=oppGames.find(x=>x._id===id);
+  const type=document.getElementById('ops-game-type').value;
   const whichSel=document.getElementById('ops-which-team');
   whichSel.innerHTML='<option value="">-- Select --</option>';
-  if(g){
-    [{id:g.teamAId,name:tName(g.teamAId)},{id:g.teamBId,name:tName(g.teamBId)}].forEach(t=>{
-      const o=document.createElement('option'); o.value=t.id; o.textContent=t.name; whichSel.appendChild(o);
-    });
+
+  if(type==='lw'){
+    const lwGameId=document.getElementById('ops-lw-game').value;
+    const g=gameResults.find(x=>x._id===lwGameId);
+    if(g){
+      // Only show the opponent team (not Little Wombats)
+      const o=document.createElement('option');
+      o.value='opp:'+g.opp; o.textContent=g.opp; whichSel.appendChild(o);
+    }
+  } else {
+    const id=document.getElementById('ops-game').value;
+    const g=oppGames.find(x=>x._id===id);
+    if(g){
+      [{id:g.teamAId,name:tName(g.teamAId)},{id:g.teamBId,name:tName(g.teamBId)}].forEach(t=>{
+        const o=document.createElement('option'); o.value=t.id; o.textContent=t.name; whichSel.appendChild(o);
+      });
+    }
   }
 }
 
@@ -1177,9 +1226,12 @@ window.showBoxScore=function(num){
       <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`; }).join('');
 
   // ── Opponent players (logged via Opponents section) ───────────────────────
-  // Find the matching opp game by date+opp name
+  // Find opponent players logged against this LW game
   const matchOppGame = oppGames.find(og=>og.date===g.date&&(tName(og.teamAId)===g.opp||tName(og.teamBId)===g.opp));
-  const oppGamePlayers = matchOppGame ? oppPlayerStats.filter(x=>x.oppGameId===matchOppGame._id) : [];
+  const oppGamePlayers = oppPlayerStats.filter(x=>
+    (x.lwGameId && gameResults.find(gr=>gr._id===x.lwGameId&&gr.gameNum===num)) ||
+    (matchOppGame && x.oppGameId===matchOppGame._id)
+  );
   const oppPlayerIds = [...new Set(oppGamePlayers.map(x=>x.playerId))];
 
   function oppBatRow(pid){
@@ -1428,7 +1480,7 @@ function renderLeagueLeaders(){
     if(ps2.ip>0) allPit.push({name:p.first,team:'Little Wombats',num:p.num,...ps2,po:fs2.po});
   });
 
-  // Opponent players — aggregate across all games
+  // Opponent players — aggregate across all games (opp vs opp AND LW games)
   const oppPids=[...new Set(oppPlayerStats.map(x=>x.playerId))];
   oppPids.forEach(pid=>{
     const gs=oppPlayerStats.filter(x=>x.playerId===pid);
@@ -1437,8 +1489,8 @@ function renderLeagueLeaders(){
     // find team via game
     const game=oppGames.find(x=>x._id===first.oppGameId);
     const teamName=tName(first.teamId)||'Unknown';
-    const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,bb:0,so:0,sb:0,ip:0,er:0,ph:0,pbb:0,pk:0};
-    gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=g.d;s.t+=g.t;s.hr+=g.hr;s.rbi+=g.rbi;s.bb+=g.bb;s.so+=g.so;s.sb+=g.sb;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;});
+    const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,bb:0,so:0,sb:0,ip:0,er:0,ph:0,pbb:0,pk:0,ppo:0};
+    gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=g.d;s.t+=g.t;s.hr+=g.hr;s.rbi+=g.rbi;s.bb+=g.bb;s.so+=g.so;s.sb+=g.sb;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
     s.avg=s.ab>0?s.h/s.ab:0;
     s.obp=(s.ab+s.bb)>0?(s.h+s.bb)/(s.ab+s.bb):0;
     const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
@@ -1616,17 +1668,40 @@ window.delOppGame=async function(docId){
 // ── ADD: OPPONENT PLAYER STATS ────────────────────────────────────────────
 window.addOppPlayerStat=async function(){
   if(!requirePassword()) return;
-  const oppGameId=document.getElementById('ops-game').value;
-  const teamId=document.getElementById('ops-which-team').value;
+  const gameType=document.getElementById('ops-game-type').value;
+  const teamVal=document.getElementById('ops-which-team').value;
   const playerName=document.getElementById('ops-name').value.trim();
-  if(!oppGameId){alert('Please select an opponent game.');return;}
-  if(!teamId){alert('Please select which team this player is on.');return;}
+
+  if(!teamVal){alert('Please select which team this player is on.');return;}
   if(!playerName){alert('Please enter a player name.');return;}
-  const oppGame=oppGames.find(x=>x._id===oppGameId);
-  // Use a stable playerId based on team + name
+
+  let oppGameId=null, lwGameId=null, lwGameNum=0, teamId='', teamName='';
+
+  if(gameType==='lw'){
+    lwGameId=document.getElementById('ops-lw-game').value;
+    if(!lwGameId){alert('Please select a Little Wombats game.');return;}
+    const lwg=gameResults.find(x=>x._id===lwGameId);
+    lwGameNum=lwg?lwg.gameNum:0;
+    teamName=teamVal.startsWith('opp:')?teamVal.slice(4):teamVal;
+    teamId='lw_opp:'+teamName.toLowerCase().replace(/\s+/g,'_');
+  } else {
+    oppGameId=document.getElementById('ops-game').value;
+    if(!oppGameId){alert('Please select an opponent game.');return;}
+    teamId=teamVal;
+    const oppGame=oppGames.find(x=>x._id===oppGameId);
+    lwGameNum=oppGame?oppGame.gameNum:0;
+  }
+
   const playerId=`${teamId}_${playerName.toLowerCase().replace(/\s+/g,'_')}`;
-  const rec={oppGameId,playerId,playerName,playerNum:+document.getElementById('ops-num').value||0,
-    gameNum:oppGame?oppGame.gameNum:0,teamId,
+  const rec={
+    oppGameId: oppGameId||null,
+    lwGameId: lwGameId||null,
+    lwGameNum,
+    playerId, playerName,
+    playerNum:+document.getElementById('ops-num').value||0,
+    gameNum: lwGameNum,
+    teamId,
+    isLwGame: gameType==='lw',
     ab:+document.getElementById('ops-ab').value||0,r:+document.getElementById('ops-r').value||0,
     h:+document.getElementById('ops-h').value||0,d:+document.getElementById('ops-2b').value||0,
     t:+document.getElementById('ops-3b').value||0,hr:+document.getElementById('ops-hr').value||0,
@@ -1634,13 +1709,14 @@ window.addOppPlayerStat=async function(){
     so:+document.getElementById('ops-so').value||0,
     ip:+document.getElementById('ops-ip').value||0,er:+document.getElementById('ops-er').value||0,
     ph:+document.getElementById('ops-ph').value||0,
-    pk:+document.getElementById('ops-pk').value||0};
+    pk:+document.getElementById('ops-pk').value||0,
+    ppo:+document.getElementById('ops-ppo').value||0};
   setSync('syncing','Saving...');
   try{
     await addDoc(collection(db,'lw_opp_player_stats'),rec);
     document.getElementById('ops-name').value='';
     document.getElementById('ops-num').value=0;
-    ['ops-ab','ops-r','ops-h','ops-2b','ops-3b','ops-hr','ops-rbi','ops-so','ops-ip','ops-er','ops-ph','ops-pk'].forEach(id=>document.getElementById(id).value=0);
+    ['ops-ab','ops-r','ops-h','ops-2b','ops-3b','ops-hr','ops-rbi','ops-so','ops-ip','ops-er','ops-ph','ops-pk','ops-ppo'].forEach(id=>document.getElementById(id).value=0);
     setSync('connected','Live — synced'); alert(`${playerName} stats saved!`);
   }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
