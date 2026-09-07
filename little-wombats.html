@@ -1090,8 +1090,8 @@ window.renderAll = function(){
     lsel.innerHTML='<option value="">-- Select Team --</option>';
     // Little Wombats first
     const lwo=document.createElement('option'); lwo.value='little-wombats'; lwo.textContent='⭐ Little Wombats'; lsel.appendChild(lwo);
-    // Then all opponent teams
-    oppTeams.forEach(t=>{ const o=document.createElement('option'); o.value=t._id; o.textContent=t.name; lsel.appendChild(o); });
+    // Then league opponent teams only
+    oppTeams.filter(t=>t.isLeague!==false).forEach(t=>{ const o=document.createElement('option'); o.value=t._id; o.textContent=t.name; lsel.appendChild(o); });
     if(lcur) lsel.value=lcur;
     if(lsel.value) renderLeagueStats();
   }
