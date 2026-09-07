@@ -283,6 +283,7 @@
   <button class="nav-btn" onclick="showPage('boxscore')">📋 Box Scores</button>
   <button class="nav-btn" onclick="showPage('opponents')">⚔️ Opponents</button>
   <button class="nav-btn" onclick="showPage('standings')">📊 Standings</button>
+  <button class="nav-btn" onclick="showPage('lstats')">📈 League Stats</button>
   <button class="nav-btn" onclick="showPage('leaders')">🏅 League Leaders</button>
   <button class="nav-btn" onclick="showPage('log')">⚾ Log Stats</button>
 </nav>
@@ -606,6 +607,20 @@
     </div>
     <div id="noStandings" class="no-data">No games logged yet.</div>
   </div>
+</div>
+</div>
+
+<!-- ══════════════════════════ LEAGUE STATS PAGE -->
+<div id="page-lstats" class="page">
+<div class="container">
+  <div class="section-title">League Stats</div>
+  <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:16px;">
+    <div class="form-group">
+      <label>Select Team</label>
+      <select id="lstats-team-sel" onchange="renderLeagueStats()" style="min-width:220px;"><option value="">-- Select Team --</option></select>
+    </div>
+  </div>
+  <div id="lstats-content"></div>
 </div>
 </div>
 
@@ -1068,6 +1083,19 @@ window.renderAll = function(){
   renderOpponents();
   renderStandings();
   renderLeagueLeaders();
+  // Populate league stats team selector
+  const lsel=document.getElementById('lstats-team-sel');
+  if(lsel){
+    const lcur=lsel.value;
+    lsel.innerHTML='<option value="">-- Select Team --</option>';
+    // Little Wombats first
+    const lwo=document.createElement('option'); lwo.value='little-wombats'; lwo.textContent='⭐ Little Wombats'; lsel.appendChild(lwo);
+    // Then all opponent teams
+    oppTeams.forEach(t=>{ const o=document.createElement('option'); o.value=t._id; o.textContent=t.name; lsel.appendChild(o); });
+    if(lcur) lsel.value=lcur;
+    if(lsel.value) renderLeagueStats();
+  }
+
   // Re-render roster panel if open
   const rsel=document.getElementById('roster-team-sel');
   if(rsel&&rsel.value) renderRosterPanel();
@@ -1446,6 +1474,180 @@ window.onOppGameSelect=function(){
       });
     }
   }
+}
+
+// ── LEAGUE STATS PAGE ────────────────────────────────────────────────────
+window.renderLeagueStats=function(){
+  const teamId=document.getElementById('lstats-team-sel').value;
+  const content=document.getElementById('lstats-content');
+  if(!teamId){ content.innerHTML=''; return; }
+
+  const isLW = teamId==='little-wombats';
+  const teamObj = isLW ? {name:'Little Wombats'} : oppTeams.find(t=>t._id===teamId);
+  if(!teamObj){ content.innerHTML='<div class="no-data">Team not found.</div>'; return; }
+
+  // ── Build player stat rows ──────────────────────────────────────────────
+  let players = [];
+
+  if(isLW){
+    PLAYERS.forEach(p=>{
+      const b=bStats(p.id), pit=pStats(p.id);
+      players.push({
+        num:p.num, name:p.first,
+        g:b.g, ab:b.ab, r:b.r, h:b.h, d:b.d, t:b.t, hr:b.hr, rbi:b.rbi, so:b.so,
+        avg:b.avg, obp:b.obp, slg:b.slg,
+        pg:pit.g, ip:pit.ip, er:pit.er, ph:pit.ph, pk:pit.pk, ppo:pit.ppo,
+        era:pit.era, doip:pit.ip>0?pit.ppo/pit.ip:0
+      });
+    });
+  } else {
+    // Aggregate opponent player stats
+    const pids=[...new Set(oppPlayerStats.filter(x=>x.teamId===teamId).map(x=>x.playerId))];
+    pids.forEach(pid=>{
+      const gs=oppPlayerStats.filter(x=>x.playerId===pid&&x.teamId===teamId);
+      if(!gs.length) return;
+      const first=gs[0];
+      const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,ip:0,er:0,ph:0,pk:0,ppo:0};
+      gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=(g.d||0);s.t+=(g.t||0);s.hr+=g.hr;s.rbi+=g.rbi;s.so+=g.so;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
+      const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
+      players.push({
+        num:first.playerNum||0, name:first.playerName,
+        g:gs.length, ab:s.ab, r:s.r, h:s.h, d:s.d, t:s.t, hr:s.hr, rbi:s.rbi, so:s.so,
+        avg:s.ab>0?s.h/s.ab:0,
+        obp:(s.ab)>0?s.h/s.ab:0,
+        slg:s.ab>0?tb/s.ab:0,
+        pg:gs.filter(g=>g.ip>0).length, ip:s.ip, er:s.er, ph:s.ph, pk:s.pk, ppo:s.ppo,
+        era:s.ip>0?(s.er/s.ip)*4:null,
+        doip:s.ip>0?s.ppo/s.ip:0
+      });
+    });
+  }
+
+  players.sort((a,b)=>a.num-b.num);
+
+  // ── Team totals ────────────────────────────────────────────────────────
+  const tot={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,ip:0,er:0,ph:0,pk:0,ppo:0};
+  players.forEach(p=>{tot.ab+=p.ab;tot.r+=p.r;tot.h+=p.h;tot.d+=p.d;tot.t+=p.t;tot.hr+=p.hr;tot.rbi+=p.rbi;tot.so+=p.so;tot.ip+=p.ip;tot.er+=p.er;tot.ph+=p.ph;tot.pk+=p.pk;tot.ppo+=p.ppo;});
+  const totTb=(tot.h-tot.d-tot.t-tot.hr)+2*tot.d+3*tot.t+4*tot.hr;
+  const totAvg=tot.ab>0?tot.h/tot.ab:0;
+  const totSlg=tot.ab>0?totTb/tot.ab:0;
+  const totEra=tot.ip>0?(tot.er/tot.ip)*4:null;
+  const totDoip=tot.ip>0?tot.ppo/tot.ip:0;
+
+  // ── Record ─────────────────────────────────────────────────────────────
+  let w=0,l=0,t2=0,runF=0,runA=0;
+  if(isLW){
+    gameResults.forEach(g=>{ if(g.us>g.them)w++;else if(g.us<g.them)l++;else t2++; runF+=g.us;runA+=g.them; });
+  } else {
+    // Games where this team appears as teamA or teamB
+    oppGames.filter(g=>g.teamAId===teamId||g.teamBId===teamId).forEach(g=>{
+      const ourScore=g.teamAId===teamId?g.scoreA:g.scoreB;
+      const theirScore=g.teamAId===teamId?g.scoreB:g.scoreA;
+      if(ourScore>theirScore)w++;else if(ourScore<theirScore)l++;else t2++;
+      runF+=ourScore; runA+=theirScore;
+    });
+    // Also count games vs LW
+    gameResults.filter(g=>g.opp===teamObj.name).forEach(g=>{
+      const ourScore=g.them, theirScore=g.us;
+      if(ourScore>theirScore)w++;else if(ourScore<theirScore)l++;else t2++;
+      runF+=ourScore; runA+=theirScore;
+    });
+  }
+  const gp=w+l+t2;
+  const pct=gp>0?(w+t2*0.5)/gp:0;
+
+  // ── Batting rows ────────────────────────────────────────────────────────
+  const batRows=players.filter(p=>p.ab>0).map(p=>`
+    <tr>
+      <td style="text-align:left;padding-left:12px;font-weight:700;"><span class="player-num">${p.num}</span>${p.name}</td>
+      <td>${p.g}</td><td>${p.ab}</td><td>${p.r}</td><td>${p.h}</td>
+      <td>${p.d}</td><td>${p.t}</td><td>${p.hr}</td><td>${p.rbi}</td><td>${p.so}</td>
+      <td class="stat-avg">${f3(p.avg)}</td><td>${f3(p.slg)}</td>
+    </tr>`).join('');
+
+  const batTotRow=`<tr style="background:var(--gray-light);font-weight:700;border-top:2px solid var(--green-dark);">
+    <td style="text-align:left;padding-left:12px;font-family:'Oswald',sans-serif;letter-spacing:1px;">TEAM TOTALS</td>
+    <td>—</td><td>${tot.ab}</td><td>${tot.r}</td><td>${tot.h}</td>
+    <td>${tot.d}</td><td>${tot.t}</td><td>${tot.hr}</td><td>${tot.rbi}</td><td>${tot.so}</td>
+    <td class="stat-avg">${f3(totAvg)}</td><td>${f3(totSlg)}</td>
+  </tr>`;
+
+  // ── Pitching rows ───────────────────────────────────────────────────────
+  const pitRows=players.filter(p=>p.ip>0).map(p=>`
+    <tr>
+      <td style="text-align:left;padding-left:12px;font-weight:700;"><span class="player-num">${p.num}</span>${p.name}</td>
+      <td>${p.pg}</td><td>${p.ip.toFixed(1)}</td><td>${p.er}</td>
+      <td>${p.ph}</td><td>${p.pk}</td><td>${p.ppo}</td>
+      <td class="stat-avg">${f2(p.doip)}</td><td class="stat-avg">${f2(p.era)}</td>
+    </tr>`).join('');
+
+  const pitTotRow=`<tr style="background:var(--gray-light);font-weight:700;border-top:2px solid var(--green-dark);">
+    <td style="text-align:left;padding-left:12px;font-family:'Oswald',sans-serif;letter-spacing:1px;">TEAM TOTALS</td>
+    <td>—</td><td>${tot.ip.toFixed(1)}</td><td>${tot.er}</td>
+    <td>${tot.ph}</td><td>${tot.pk}</td><td>${tot.ppo}</td>
+    <td class="stat-avg">${f2(totDoip)}</td><td class="stat-avg">${f2(totEra)}</td>
+  </tr>`;
+
+  content.innerHTML=`
+    <!-- Record -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-header" style="cursor:default;">📋 ${teamObj.name} — Season Record</div>
+      <div class="panel-body">
+        <div class="record-bar">
+          <div class="record-box wins"><div class="rec-val">${w}</div><div class="rec-lbl">Wins</div><div class="rec-sub">${gp>0?(pct*100).toFixed(1)+'%':''}</div></div>
+          <div class="record-box losses"><div class="rec-val">${l}</div><div class="rec-lbl">Losses</div></div>
+          <div class="record-box ties"><div class="rec-val">${t2}</div><div class="rec-lbl">Ties</div></div>
+        </div>
+        <div class="stat-grid" style="margin-top:8px;">
+          <div class="stat-card off"><div class="sc-val">${tot.r}</div><div class="sc-lbl">Runs</div>${gp>0?`<div class="sc-avg">${(tot.r/gp).toFixed(1)}/gm</div>`:''}</div>
+          <div class="stat-card off"><div class="sc-val">${tot.h}</div><div class="sc-lbl">Hits</div></div>
+          <div class="stat-card off"><div class="sc-val">${f3(totAvg)}</div><div class="sc-lbl">Team AVG</div></div>
+          <div class="stat-card off"><div class="sc-val">${f3(totSlg)}</div><div class="sc-lbl">Team SLG</div></div>
+          <div class="stat-card def"><div class="sc-val">${runA}</div><div class="sc-lbl">Runs Allowed</div>${gp>0?`<div class="sc-avg">${(runA/gp).toFixed(1)}/gm</div>`:''}</div>
+          <div class="stat-card def"><div class="sc-val">${f2(totEra)}</div><div class="sc-lbl">Team ERA</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batting -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-header" style="cursor:default;">🏏 Batting Stats</div>
+      ${players.filter(p=>p.ab>0).length?`
+      <div class="legend">
+        <span class="legend-item"><strong>G</strong>Games</span><span class="legend-item"><strong>AB</strong>At Bats</span>
+        <span class="legend-item"><strong>R</strong>Runs</span><span class="legend-item"><strong>H</strong>Hits</span>
+        <span class="legend-item"><strong>2B</strong>Doubles</span><span class="legend-item"><strong>3B</strong>Triples</span>
+        <span class="legend-item"><strong>HR</strong>Home Runs</span><span class="legend-item"><strong>RBI</strong>RBI</span>
+        <span class="legend-item"><strong>SO</strong>Strikeouts</span><span class="legend-item"><strong>AVG</strong>Average</span>
+        <span class="legend-item"><strong>SLG</strong>Slugging%</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th style="text-align:left;padding-left:12px;">Player</th>
+          <th>G</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th><th>SLG</th>
+        </tr></thead>
+        <tbody>${batRows}${batTotRow}</tbody>
+      </table></div>`:'<div class="no-data" style="padding:16px;">No batting stats logged yet.</div>'}
+    </div>
+
+    <!-- Pitching -->
+    <div class="panel">
+      <div class="panel-header" style="cursor:default;">⚾ Pitching Stats</div>
+      ${players.filter(p=>p.ip>0).length?`
+      <div class="legend">
+        <span class="legend-item"><strong>G</strong>Games</span><span class="legend-item"><strong>IP</strong>Innings</span>
+        <span class="legend-item"><strong>ER</strong>Earned Runs</span><span class="legend-item"><strong>H</strong>Hits Allowed</span>
+        <span class="legend-item"><strong>K</strong>Strikeouts</span><span class="legend-item"><strong>Team PO</strong>Put Outs while pitching</span>
+        <span class="legend-item"><strong>DO/IP</strong>Def Outs per Inning</span><span class="legend-item"><strong>ERA</strong>ERA (per 4 inn)</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th style="text-align:left;padding-left:12px;">Player</th>
+          <th>G</th><th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th><th>DO/IP</th><th>ERA</th>
+        </tr></thead>
+        <tbody>${pitRows}${pitTotRow}</tbody>
+      </table></div>`:'<div class="no-data" style="padding:16px;">No pitching stats logged yet.</div>'}
+    </div>`;
 }
 
 // ── TEAM STATS ────────────────────────────────────────────────────────────
@@ -2458,7 +2660,7 @@ window.renderPotgDescs=function(selectId,containerId,existingDescs,fallback){
 window.showPage=function(name,gameNum){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['team','players','boxscore','opponents','standings','leaders','log'][i]===name);
+    b.classList.toggle('active',['team','players','boxscore','opponents','standings','lstats','leaders','log'][i]===name);
   });
   document.getElementById('page-'+name).classList.add('active');
   if(name==='boxscore'&&gameNum) setTimeout(()=>showBoxScore(gameNum),50);
