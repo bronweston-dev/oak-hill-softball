@@ -420,6 +420,22 @@
     </div>
   </div>
 
+  <!-- Manage Opponent Rosters -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">👥 Manage Opponent Rosters <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px;">
+        <div class="form-group">
+          <label>Team</label>
+          <select id="roster-team-sel" onchange="renderRosterPanel()" style="min-width:180px;"><option value="">-- Select Team --</option></select>
+        </div>
+      </div>
+      <div id="roster-panel-content">
+        <div class="no-data">Select a team to manage their roster.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Log Opponent Box Score -->
   <div class="panel">
     <div class="panel-header" onclick="togglePanel(this)">📋 Log Opponent Game (Box Score) <span class="toggle-icon">▼</span></div>
@@ -466,11 +482,13 @@
     </div>
   </div>
 
-  <!-- Log Opponent Player Stats -->
+  <!-- Log Opponent Player Stats - Grid -->
   <div class="panel">
     <div class="panel-header" onclick="togglePanel(this)">👤 Log Opponent Player Stats <span class="toggle-icon">▼</span></div>
     <div class="panel-body">
-      <div class="form-row">
+
+      <!-- Game + Team selectors -->
+      <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px;">
         <div class="form-group">
           <label>Game Type</label>
           <select id="ops-game-type" onchange="onOppGameTypeChange()">
@@ -486,30 +504,55 @@
           <label>Opp Game #</label>
           <select id="ops-game" onchange="onOppGameSelect()"><option value="">-- Select Game --</option></select>
         </div>
-        <div class="form-group"><label>Which Team</label><select id="ops-which-team"><option value="">-- Select --</option></select></div>
-        <div class="form-group"><label>Player Name</label><input type="text" id="ops-name" placeholder="First name"></div>
-        <div class="form-group"><label>Jersey #</label><input type="number" id="ops-num" min="0" value="0"></div>
+        <div class="form-group">
+          <label>Which Team</label>
+          <select id="ops-which-team" onchange="buildOppGrids()"><option value="">-- Select --</option></select>
+        </div>
+        <button class="btn btn-secondary" onclick="addOppGridRow()" style="align-self:end;">+ Add Player</button>
+        <button class="btn btn-secondary" onclick="resetOppGrids()" style="align-self:end;">↺ Reset</button>
       </div>
-      <div class="form-divider">🏏 Batting</div>
-      <div class="form-row">
-        <div class="form-group"><label>AB</label><input type="number" id="ops-ab" min="0" value="0"></div>
-        <div class="form-group"><label>R</label><input type="number" id="ops-r" min="0" value="0"></div>
-        <div class="form-group"><label>H</label><input type="number" id="ops-h" min="0" value="0"></div>
-        <div class="form-group"><label>2B</label><input type="number" id="ops-2b" min="0" value="0"></div>
-        <div class="form-group"><label>3B</label><input type="number" id="ops-3b" min="0" value="0"></div>
-        <div class="form-group"><label>HR</label><input type="number" id="ops-hr" min="0" value="0"></div>
-        <div class="form-group"><label>RBI</label><input type="number" id="ops-rbi" min="0" value="0"></div>
-        <div class="form-group"><label>SO</label><input type="number" id="ops-so" min="0" value="0"></div>
+
+      <div id="opp-grid-no-team" style="color:#aaa;font-style:italic;margin-bottom:10px;display:none;">Select a game and team above to begin entering stats.</div>
+
+      <!-- Batting Grid -->
+      <div id="opp-bat-grid-wrap">
+        <div class="form-divider">🏏 Batting</div>
+        <div class="stat-grid-wrap">
+          <table class="stat-grid-table">
+            <thead><tr>
+              <th class="player-col">#</th>
+              <th style="min-width:80px;">Name</th>
+              <th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th>
+              <th>✕</th>
+            </tr></thead>
+            <tbody id="opp-bat-body"></tbody>
+          </table>
+        </div>
+        <div class="grid-save-bar">
+          <button class="btn btn-primary" onclick="saveOppBattingGrid()">💾 Save Batting</button>
+          <span class="grid-status" id="opp-bat-status"></span>
+        </div>
       </div>
-      <div class="form-divider">⚾ Pitching <span style="font-size:.75rem;font-weight:400;color:#888;">(0 IP if did not pitch)</span></div>
-      <div class="form-row">
-        <div class="form-group"><label>IP</label><input type="number" id="ops-ip" min="0" step="0.1" value="0"></div>
-        <div class="form-group"><label>ER</label><input type="number" id="ops-er" min="0" value="0"></div>
-        <div class="form-group"><label>H Allowed</label><input type="number" id="ops-ph" min="0" value="0"></div>
-        <div class="form-group"><label>K</label><input type="number" id="ops-pk" min="0" value="0"></div>
-        <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ops-ppo" min="0" value="0" title="Total defensive put outs recorded while this pitcher was on the mound"></div>
+
+      <!-- Pitching Grid -->
+      <div id="opp-pit-grid-wrap" style="margin-top:16px;">
+        <div class="form-divider">⚾ Pitching <span style="font-size:.75rem;font-weight:400;color:#888;">(0 IP = did not pitch)</span></div>
+        <div class="stat-grid-wrap">
+          <table class="stat-grid-table">
+            <thead><tr>
+              <th class="player-col">#</th>
+              <th style="min-width:80px;">Name</th>
+              <th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th>
+            </tr></thead>
+            <tbody id="opp-pit-body"></tbody>
+          </table>
+        </div>
+        <div class="grid-save-bar">
+          <button class="btn btn-primary" onclick="saveOppPitchingGrid()">💾 Save Pitching</button>
+          <span class="grid-status" id="opp-pit-status"></span>
+        </div>
       </div>
-      <button class="btn btn-primary" onclick="addOppPlayerStat()">+ Save Player Stats</button>
+
     </div>
   </div>
 
@@ -940,6 +983,7 @@ let playerStats   = [];
 let oppTeams      = [];
 let oppGames      = [];
 let oppPlayerStats= [];
+let oppRosters    = [];
 let activePlayer  = null;
 let sortState     = { bat:{k:'num',a:true}, fld:{k:'num',a:true}, pit:{k:'num',a:true} };
 
@@ -977,6 +1021,10 @@ onSnapshot(collection(db,'lw_opp_games'),
 onSnapshot(collection(db,'lw_opp_player_stats'),
   s=>{ oppPlayerStats=s.docs.map(d=>({...d.data(),_id:d.id})); hideLoader(); renderAll(); },
   e=>{ console.error('lw_opp_player_stats',e); hideLoader(); });
+
+onSnapshot(collection(db,'lw_opp_rosters'),
+  s=>{ oppRosters=s.docs.map(d=>({...d.data(),_id:d.id})); renderAll(); },
+  e=>{ console.error('lw_opp_rosters',e); });
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
 function today(){ return new Date().toISOString().slice(0,10); }
@@ -1020,6 +1068,9 @@ window.renderAll = function(){
   renderOpponents();
   renderStandings();
   renderLeagueLeaders();
+  // Re-render roster panel if open
+  const rsel=document.getElementById('roster-team-sel');
+  if(rsel&&rsel.value) renderRosterPanel();
   if(activePlayer) renderModal(activePlayer);
 }
 
@@ -1086,6 +1137,16 @@ function populateSelects(){
       lwgsel.appendChild(o);
     });
     if(lwCur) lwgsel.value=lwCur;
+  }
+
+  // Roster team selector
+  const rsel=document.getElementById('roster-team-sel');
+  if(rsel){
+    const rcur=rsel.value;
+    rsel.innerHTML='<option value="">-- Select Team --</option>';
+    oppTeams.forEach(t=>{ const o=document.createElement('option'); o.value=t._id; o.textContent=t.name; rsel.appendChild(o); });
+    if(rcur) rsel.value=rcur;
+    if(rsel.value) renderRosterPanel();
   }
 
   // No-teams warning
@@ -1970,60 +2031,231 @@ window.delOppGame=async function(docId){
 }
 
 // ── ADD: OPPONENT PLAYER STATS ────────────────────────────────────────────
-window.addOppPlayerStat=async function(){
+// ── ROSTER MANAGEMENT ────────────────────────────────────────────────────
+window.renderRosterPanel=function(){
+  const teamId=document.getElementById('roster-team-sel').value;
+  const container=document.getElementById('roster-panel-content');
+  if(!teamId){ container.innerHTML='<div class="no-data">Select a team to manage their roster.</div>'; return; }
+  const team=oppTeams.find(t=>t._id===teamId);
+  const roster=oppRosters.filter(r=>r.teamId===teamId).sort((a,b)=>a.num-b.num);
+
+  let html=`<div style="margin-bottom:12px;">
+    <div style="font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:2px;color:var(--green-dark);margin-bottom:8px;text-transform:uppercase;">
+      ${team?team.name:''} Roster (${roster.length} players)
+    </div>
+    <table class="stat-grid-table" style="margin-bottom:10px;">
+      <thead><tr>
+        <th style="text-align:left;padding-left:8px;min-width:60px;">Jersey #</th>
+        <th style="text-align:left;padding-left:8px;min-width:140px;">Name</th>
+        <th></th>
+      </tr></thead>
+      <tbody>`;
+  roster.forEach(p=>{
+    html+=`<tr>
+      <td style="text-align:left;padding-left:8px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;">#${p.num}</td>
+      <td style="text-align:left;padding-left:8px;font-weight:700;">${p.name}</td>
+      <td><span class="delete-row" onclick="delRosterPlayer('${p._id}')">🗑</span></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>
+    <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;">
+      <div class="form-group"><label>Jersey #</label><input type="number" id="roster-num" min="0" value="0" style="width:70px;"></div>
+      <div class="form-group"><label>Player Name</label><input type="text" id="roster-name" placeholder="e.g. Aurora B" style="width:160px;"></div>
+      <button class="btn btn-primary" onclick="addRosterPlayer('${teamId}')" style="align-self:end;">+ Add Player</button>
+    </div>
+  </div>`;
+  container.innerHTML=html;
+}
+
+window.addRosterPlayer=async function(teamId){
   if(!requirePassword()) return;
-  const gameType=document.getElementById('ops-game-type').value;
-  const teamVal=document.getElementById('ops-which-team').value;
-  const playerName=document.getElementById('ops-name').value.trim();
-
-  if(!teamVal){alert('Please select which team this player is on.');return;}
-  if(!playerName){alert('Please enter a player name.');return;}
-
-  let oppGameId=null, lwGameId=null, lwGameNum=0, teamId='', teamName='';
-
-  if(gameType==='lw'){
-    lwGameId=document.getElementById('ops-lw-game').value;
-    if(!lwGameId){alert('Please select a Little Wombats game.');return;}
-    const lwg=gameResults.find(x=>x._id===lwGameId);
-    lwGameNum=lwg?lwg.gameNum:0;
-    teamName=teamVal.startsWith('opp:')?teamVal.slice(4):teamVal;
-    teamId='lw_opp:'+teamName.toLowerCase().replace(/\s+/g,'_');
-  } else {
-    oppGameId=document.getElementById('ops-game').value;
-    if(!oppGameId){alert('Please select an opponent game.');return;}
-    teamId=teamVal;
-    const oppGame=oppGames.find(x=>x._id===oppGameId);
-    lwGameNum=oppGame?oppGame.gameNum:0;
+  const num=+document.getElementById('roster-num').value||0;
+  const name=document.getElementById('roster-name').value.trim();
+  if(!name){ alert('Please enter a player name.'); return; }
+  if(oppRosters.find(r=>r.teamId===teamId&&r.name.toLowerCase()===name.toLowerCase())){
+    alert('That player is already on this roster.'); return;
   }
-
-  const playerId=`${teamId}_${playerName.toLowerCase().replace(/\s+/g,'_')}`;
-  const rec={
-    oppGameId: oppGameId||null,
-    lwGameId: lwGameId||null,
-    lwGameNum,
-    playerId, playerName,
-    playerNum:+document.getElementById('ops-num').value||0,
-    gameNum: lwGameNum,
-    teamId,
-    isLwGame: gameType==='lw',
-    ab:+document.getElementById('ops-ab').value||0,r:+document.getElementById('ops-r').value||0,
-    h:+document.getElementById('ops-h').value||0,d:+document.getElementById('ops-2b').value||0,
-    t:+document.getElementById('ops-3b').value||0,hr:+document.getElementById('ops-hr').value||0,
-    rbi:+document.getElementById('ops-rbi').value||0,
-    so:+document.getElementById('ops-so').value||0,
-    ip:+document.getElementById('ops-ip').value||0,er:+document.getElementById('ops-er').value||0,
-    ph:+document.getElementById('ops-ph').value||0,
-    pk:+document.getElementById('ops-pk').value||0,
-    ppo:+document.getElementById('ops-ppo').value||0};
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_opp_player_stats'),rec);
-    document.getElementById('ops-name').value='';
-    document.getElementById('ops-num').value=0;
-    ['ops-ab','ops-r','ops-h','ops-2b','ops-3b','ops-hr','ops-rbi','ops-so','ops-ip','ops-er','ops-ph','ops-pk','ops-ppo'].forEach(id=>document.getElementById(id).value=0);
-    setSync('connected','Live — synced'); alert(`${playerName} stats saved!`);
-  }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
+    await addDoc(collection(db,'lw_opp_rosters'),{teamId,num,name});
+    document.getElementById('roster-name').value='';
+    document.getElementById('roster-num').value=0;
+    setSync('connected','Live — synced');
+  }catch(e){ setSync('error','Save failed'); alert('Error: '+e.message); }
 }
+
+window.delRosterPlayer=async function(docId){
+  if(!requirePassword()) return;
+  if(!confirm('Remove this player from the roster?')) return;
+  setSync('syncing','Deleting...');
+  try{ await deleteDoc(doc(db,'lw_opp_rosters',docId)); setSync('connected','Live — synced'); }
+  catch(e){ setSync('error','Delete failed'); }
+}
+
+// ── OPP PLAYER GRID ──────────────────────────────────────────────────────
+let oppGridRows = []; // [{num, name}]
+
+function getOppContext(){
+  const gameType=document.getElementById('ops-game-type').value;
+  const teamVal=document.getElementById('ops-which-team').value;
+  let oppGameId=null, lwGameId=null, lwGameNum=0, teamId='';
+  if(gameType==='lw'){
+    lwGameId=document.getElementById('ops-lw-game').value;
+    const lwg=gameResults.find(x=>x._id===lwGameId);
+    lwGameNum=lwg?lwg.gameNum:0;
+    teamId='lw_opp:'+(teamVal.startsWith('opp:')?teamVal.slice(4):teamVal).toLowerCase().replace(/\s+/g,'_');
+  } else {
+    oppGameId=document.getElementById('ops-game').value;
+    teamId=teamVal;
+    const og=oppGames.find(x=>x._id===oppGameId);
+    lwGameNum=og?og.gameNum:0;
+  }
+  return {gameType,teamVal,oppGameId,lwGameId,lwGameNum,teamId,isLwGame:gameType==='lw'};
+}
+
+window.buildOppGrids=function(){
+  const {teamVal,teamId,oppGameId,lwGameId}=getOppContext();
+  if(!teamVal){ document.getElementById('opp-grid-no-team').style.display='block'; return; }
+  document.getElementById('opp-grid-no-team').style.display='none';
+
+  // Find existing stats for this game+team
+  const existing=oppPlayerStats.filter(x=>
+    (lwGameId&&x.lwGameId===lwGameId&&x.teamId===teamId)||
+    (oppGameId&&x.oppGameId===oppGameId&&x.teamId===teamId)
+  );
+
+  if(oppGridRows.length===0){
+    if(existing.length>0){
+      // Pre-fill from existing saved stats
+      oppGridRows=existing.map(x=>({num:x.playerNum||0,name:x.playerName||''}));
+    } else {
+      // Pre-fill from registered roster
+      const teamDbId=oppTeams.find(t=>t._id===teamVal)?teamVal:null;
+      const roster=teamDbId?oppRosters.filter(r=>r.teamId===teamDbId).sort((a,b)=>a.num-b.num):[];
+      if(roster.length>0){
+        oppGridRows=roster.map(r=>({num:r.num,name:r.name}));
+      } else {
+        oppGridRows=[{num:0,name:''}];
+      }
+    }
+  }
+  renderOppGrids(existing);
+}
+
+window.addOppGridRow=function(){
+  oppGridRows.push({num:0,name:''});
+  const {oppGameId,lwGameId,teamId}=getOppContext();
+  const existing=oppPlayerStats.filter(x=>
+    (lwGameId&&x.lwGameId===lwGameId&&x.teamId===teamId)||
+    (oppGameId&&x.oppGameId===oppGameId&&x.teamId===teamId)
+  );
+  renderOppGrids(existing);
+}
+window.resetOppGrids=function(){ oppGridRows=[{num:0,name:''}]; buildOppGrids(); }
+window.removeOppRow=function(ri){
+  oppGridRows.splice(ri,1);
+  if(oppGridRows.length===0) oppGridRows=[{num:0,name:''}];
+  buildOppGrids();
+}
+
+function renderOppGrids(existing){
+  const NS='style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"';
+  const batBody=document.getElementById('opp-bat-body'); batBody.innerHTML='';
+  const pitBody=document.getElementById('opp-pit-body'); pitBody.innerHTML='';
+
+  oppGridRows.forEach((row,ri)=>{
+    const ex=existing.find(x=>x.playerName&&x.playerName.toLowerCase()===row.name.toLowerCase()&&x.playerNum==row.num);
+    // Batting row
+    const btr=document.createElement('tr');
+    btr.innerHTML=`
+      <td><input type="number" min="0" value="${row.num}" data-ogi="${ri}" data-of="num" ${NS}></td>
+      <td><input type="text" value="${row.name}" data-ogi="${ri}" data-of="name" placeholder="Name" style="width:75px;padding:3px 2px;font-size:.82rem;"></td>
+      <td><input type="number" min="0" value="${ex?ex.ab:0}" data-ogi="${ri}" data-of="ab" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.r:0}" data-ogi="${ri}" data-of="r" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.h:0}" data-ogi="${ri}" data-of="h" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.d||0:0}" data-ogi="${ri}" data-of="d" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.t||0:0}" data-ogi="${ri}" data-of="t" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.hr:0}" data-ogi="${ri}" data-of="hr" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.rbi:0}" data-ogi="${ri}" data-of="rbi" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.so:0}" data-ogi="${ri}" data-of="so" ${NS}></td>
+      <td><button class="remove-row-btn" onclick="removeOppRow(${ri})">✕</button></td>`;
+    batBody.appendChild(btr);
+
+    // Pitching row
+    const ptr=document.createElement('tr');
+    ptr.innerHTML=`
+      <td style="font-size:.8rem;font-weight:700;">#${row.num}</td>
+      <td style="font-size:.8rem;font-weight:700;">${row.name||'—'}</td>
+      <td><input type="number" min="0" step="0.1" value="${ex?ex.ip:0}" data-ogi="${ri}" data-of="ip" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.er:0}" data-ogi="${ri}" data-of="er" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.ph:0}" data-ogi="${ri}" data-of="ph" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.pk:0}" data-ogi="${ri}" data-of="pk" ${NS}></td>
+      <td><input type="number" min="0" value="${ex?ex.ppo||0:0}" data-ogi="${ri}" data-of="ppo" ${NS}></td>`;
+    pitBody.appendChild(ptr);
+  });
+}
+
+function readOppGrid(){
+  const rows=[];
+  document.querySelectorAll('#opp-bat-body tr').forEach((tr,ri)=>{
+    const get=(f)=>{
+      const el=tr.querySelector(`input[data-ogi="${ri}"][data-of="${f}"]`);
+      if(!el) return f==='name'?'':0;
+      return f==='name'?el.value.trim():(+el.value||0);
+    };
+    // Also read pitching from pit body
+    const ptr=document.querySelectorAll('#opp-pit-body tr')[ri];
+    const getPit=(f)=>{ const el=ptr?ptr.querySelector(`input[data-ogi="${ri}"][data-of="${f}"]`):null; return el?(+el.value||0):0; };
+    rows.push({
+      num:get('num'),name:get('name'),
+      ab:get('ab'),r:get('r'),h:get('h'),d:get('d'),t:get('t'),hr:get('hr'),rbi:get('rbi'),so:get('so'),
+      ip:getPit('ip'),er:getPit('er'),ph:getPit('ph'),pk:getPit('pk'),ppo:getPit('ppo')
+    });
+  });
+  return rows;
+}
+
+async function saveOppGrid(section){
+  if(!requirePassword()) return;
+  const ctx=getOppContext();
+  if(!ctx.teamVal){alert('Please select a team first.');return;}
+  if(!ctx.oppGameId&&!ctx.lwGameId){alert('Please select a game first.');return;}
+  const rows=readOppGrid();
+  const validRows=rows.filter(r=>r.name);
+  if(!validRows.length){alert('Please enter at least one player name.');return;}
+
+  const statusId=section==='bat'?'opp-bat-status':'opp-pit-status';
+  const status=document.getElementById(statusId);
+  status.textContent='Saving...'; status.className='grid-status';
+  setSync('syncing','Saving...');
+  try{
+    for(const row of validRows){
+      const playerId=`${ctx.teamId}_${row.name.toLowerCase().replace(/\s+/g,'_')}`;
+      // Check for existing record
+      const existing=oppPlayerStats.find(x=>x.playerId===playerId&&
+        ((ctx.lwGameId&&x.lwGameId===ctx.lwGameId)||(ctx.oppGameId&&x.oppGameId===ctx.oppGameId)));
+      const rec={
+        oppGameId:ctx.oppGameId||null, lwGameId:ctx.lwGameId||null,
+        lwGameNum:ctx.lwGameNum, playerId, playerName:row.name, playerNum:row.num,
+        gameNum:ctx.lwGameNum, teamId:ctx.teamId, isLwGame:ctx.isLwGame,
+        ab:row.ab,r:row.r,h:row.h,d:row.d,t:row.t,hr:row.hr,rbi:row.rbi,so:row.so,
+        ip:row.ip,er:row.er,ph:row.ph,pk:row.pk,ppo:row.ppo
+      };
+      if(existing){
+        await updateDoc(doc(db,'lw_opp_player_stats',existing._id),rec);
+      } else {
+        await addDoc(collection(db,'lw_opp_player_stats'),rec);
+      }
+      // Sync oppGridRows names/nums
+      oppGridRows=validRows.map(r=>({num:r.num,name:r.name}));
+    }
+    setSync('connected','Live — synced');
+    status.textContent=`✓ ${section==='bat'?'Batting':'Pitching'} saved!`; status.className='grid-status ok';
+  }catch(e){setSync('error','Error');status.textContent='✗ Error: '+e.message;status.className='grid-status err';}
+}
+
+window.saveOppBattingGrid=()=>saveOppGrid('bat');
+window.saveOppPitchingGrid=()=>saveOppGrid('pit');
 
 // ── EDIT GAME RESULT ──────────────────────────────────────────────────────
 window.openEditResult=function(docId){
