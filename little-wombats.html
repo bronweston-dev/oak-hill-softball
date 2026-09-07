@@ -1149,14 +1149,14 @@ function renderBatGrid(gameNum){
         <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:0 4px;">${idx+1}</span>
         <button class="order-btn" onclick="moveBatRow(${p.id},1,${gameNum})">▼</button>
       </td>
-      <td><input type="number" min="0" value="${ex?ex.ab:0}" data-field="ab" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.r:0}" data-field="r" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.h:0}" data-field="h" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.d:0}" data-field="d" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.t:0}" data-field="t" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.hr:0}" data-field="hr" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.rbi:0}" data-field="rbi" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.so:0}" data-field="so" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.ab:0}" data-field="ab" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.r:0}" data-field="r" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.h:0}" data-field="h" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.d:0}" data-field="d" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.t:0}" data-field="t" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.hr:0}" data-field="hr" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.rbi:0}" data-field="rbi" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.so:0}" data-field="so" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
       <td><button class="remove-row-btn" title="Remove from game" onclick="removeBatRow(${p.id},${gameNum})">✕</button></td>`;
     body.appendChild(tr);
   });
@@ -1169,9 +1169,9 @@ function renderFldGrid(gameNum){
     const tr=document.createElement('tr'); tr.dataset.pid=p.id;
     tr.innerHTML=`
       <td class="player-name-td"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>
-      <td><input type="text" value="${ex?ex.pos||'':''}" data-field="pos" class="bg" data-pid="${p.id}" placeholder="SS"></td>
-      <td><input type="number" min="0" value="${ex?ex.po:0}" data-field="po" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.a:0}" data-field="a" class="bg" data-pid="${p.id}"></td>`;
+      <td><input type="text" value="${ex?ex.pos||'':''}" data-field="pos" class="bg" data-pid="${p.id}" placeholder="SS" style="width:42px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.po:0}" data-field="po" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.a:0}" data-field="a" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>`;
     body.appendChild(tr);
   });
 }
@@ -1183,11 +1183,11 @@ function renderPitGrid(gameNum){
     const tr=document.createElement('tr'); tr.dataset.pid=p.id;
     tr.innerHTML=`
       <td class="player-name-td"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>
-      <td><input type="number" min="0" step="0.1" value="${ex?ex.ip:0}" data-field="ip" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.er:0}" data-field="er" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.ph:0}" data-field="ph" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.pk:0}" data-field="pk" class="bg" data-pid="${p.id}"></td>
-      <td><input type="number" min="0" value="${ex?ex.ppo||0:0}" data-field="ppo" class="bg" data-pid="${p.id}"></td>`;
+      <td><input type="number" min="0" step="0.1" value="${ex?ex.ip:0}" data-field="ip" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.er:0}" data-field="er" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.ph:0}" data-field="ph" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.pk:0}" data-field="pk" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="number" min="0" value="${ex?ex.ppo||0:0}" data-field="ppo" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>`;
     body.appendChild(tr);
   });
 }
