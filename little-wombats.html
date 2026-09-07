@@ -638,47 +638,93 @@
   </div>
 
   <div class="section-title">Log Player Stats for a Game</div>
-  <div class="panel">
-    <div class="panel-header" onclick="togglePanel(this)">👧 Add Player Game Stats <span class="toggle-icon">▼</span></div>
-    <div class="panel-body">
-      <div id="ps-no-games-msg" style="display:none;background:#fff3cd;border:2px solid var(--gold-dark);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--green-dark);">
+
+  <!-- Game selector shared by all three grids -->
+  <div class="panel" style="margin-bottom:16px;">
+    <div class="panel-body" style="padding:14px 20px;">
+      <div id="ps-no-games-msg" style="display:none;background:#fff3cd;border:2px solid var(--gold-dark);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--green-dark);">
         ⚠️ No game results logged yet. Please log a Team Game Result first.
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>Game #</label><select id="ps-gamenum" onchange="onGameSelect()"><option value="">-- Select Game --</option></select></div>
-        <div class="form-group"><label>Player</label><select id="ps-player"></select></div>
-        <div class="form-group"><label>Bat Order #</label><input type="number" id="ps-batorder" min="1" max="20" value="1"></div>
-        <div class="form-group"><label>Date</label><input type="text" id="ps-date" readonly style="background:#e8e8e8;color:#555;"></div>
-        <div class="form-group"><label>Opponent</label><input type="text" id="ps-opp" readonly style="background:#e8e8e8;color:#555;"></div>
+      <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;">
+        <div class="form-group">
+          <label>Game #</label>
+          <select id="ps-gamenum" onchange="onGameSelect()" style="min-width:260px;"><option value="">-- Select Game --</option></select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="text" id="ps-date" readonly style="background:#e8e8e8;color:#555;width:110px;">
+        </div>
+        <div class="form-group">
+          <label>Opponent</label>
+          <input type="text" id="ps-opp" readonly style="background:#e8e8e8;color:#555;width:140px;">
+        </div>
+        <button class="btn btn-secondary" onclick="resetGrids()" style="align-self:end;">↺ Reset All Grids</button>
       </div>
-      <div class="form-divider">🏏 Batting</div>
-      <div class="form-row">
-        <div class="form-group"><label>AB</label><input type="number" id="ps-ab" min="0" value="0"></div>
-        <div class="form-group"><label>R</label><input type="number" id="ps-r" min="0" value="0"></div>
-        <div class="form-group"><label>H</label><input type="number" id="ps-h" min="0" value="0"></div>
-        <div class="form-group"><label>2B</label><input type="number" id="ps-2b" min="0" value="0"></div>
-        <div class="form-group"><label>3B</label><input type="number" id="ps-3b" min="0" value="0"></div>
-        <div class="form-group"><label>HR</label><input type="number" id="ps-hr" min="0" value="0"></div>
-        <div class="form-group"><label>RBI</label><input type="number" id="ps-rbi" min="0" value="0"></div>
-        <div class="form-group"><label>SO</label><input type="number" id="ps-so" min="0" value="0"></div>
-      </div>
-      <div class="form-divider">🧤 Fielding</div>
-      <div class="form-row">
-        <div class="form-group"><label>Position</label><input type="text" id="ps-pos" placeholder="e.g. SS, P, CF"></div>
-        <div class="form-group"><label>PO</label><input type="number" id="ps-po" min="0" value="0"></div>
-        <div class="form-group"><label>A</label><input type="number" id="ps-a" min="0" value="0"></div>
-      </div>
-      <div class="form-divider">⚾ Pitching <span style="font-size:.75rem;font-weight:400;color:#888;">(0 IP if did not pitch)</span></div>
-      <div class="form-row">
-        <div class="form-group"><label>IP</label><input type="number" id="ps-ip" min="0" step="0.1" value="0"></div>
-        <div class="form-group"><label>ER</label><input type="number" id="ps-er" min="0" value="0"></div>
-        <div class="form-group"><label>H Allowed</label><input type="number" id="ps-ph" min="0" value="0"></div>
-        <div class="form-group"><label>K</label><input type="number" id="ps-pk" min="0" value="0"></div>
-        <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ps-ppo" min="0" value="0" title="Total defensive put outs recorded by the team while this pitcher was on the mound"></div>
-      </div>
-      <button class="btn btn-primary" onclick="addPlayerStats()">+ Save Player Game Stats</button>
     </div>
   </div>
+
+  <!-- BATTING GRID -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">🏏 Batting Stats <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="stat-grid-wrap">
+        <table class="stat-grid-table" id="bat-grid">
+          <thead><tr>
+            <th class="player-col">Player</th>
+            <th>Order</th>
+            <th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th>
+            <th>✕</th>
+          </tr></thead>
+          <tbody id="bat-grid-body"></tbody>
+        </table>
+      </div>
+      <div class="grid-save-bar">
+        <button class="btn btn-primary" onclick="saveBattingGrid()">💾 Save Batting</button>
+        <span class="grid-status" id="bat-grid-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIELDING GRID -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">🧤 Fielding Stats <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="stat-grid-wrap">
+        <table class="stat-grid-table" id="fld-grid">
+          <thead><tr>
+            <th class="player-col">Player</th>
+            <th>Pos</th><th>PO</th><th>A</th>
+          </tr></thead>
+          <tbody id="fld-grid-body"></tbody>
+        </table>
+      </div>
+      <div class="grid-save-bar">
+        <button class="btn btn-primary" onclick="saveFieldingGrid()">💾 Save Fielding</button>
+        <span class="grid-status" id="fld-grid-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PITCHING GRID -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">⚾ Pitching Stats <span style="font-size:.75rem;font-weight:400;color:rgba(255,255,255,.7);">(0 IP = did not pitch)</span> <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="stat-grid-wrap">
+        <table class="stat-grid-table" id="pit-grid">
+          <thead><tr>
+            <th class="player-col">Player</th>
+            <th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th>
+          </tr></thead>
+          <tbody id="pit-grid-body"></tbody>
+        </table>
+      </div>
+      <div class="grid-save-bar">
+        <button class="btn btn-primary" onclick="savePitchingGrid()">💾 Save Pitching</button>
+        <span class="grid-status" id="pit-grid-status"></span>
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -1029,6 +1075,203 @@ window.onGameSelect=function(){
   const g=gameResults.find(x=>x.gameNum===num);
   document.getElementById('ps-date').value=g?g.date:'';
   document.getElementById('ps-opp').value=g?g.opp:'';
+  buildGrids(num);
+}
+
+// ── GRID STATE ────────────────────────────────────────────────────────────
+let gridPlayers = []; // ordered list of {id,num,first} for active game
+
+function buildGrids(gameNum){
+  // Start with full roster in order 1-12, load existing stats if any
+  const existing = playerStats.filter(x=>x.gameNum===gameNum).sort((a,b)=>(a.batOrder||99)-(b.batOrder||99));
+  if(existing.length>0){
+    // Use existing batting order, only include players with entries
+    gridPlayers = existing.map(e=>PLAYERS.find(p=>p.id===e.pid)).filter(Boolean);
+    // Add any players not yet entered at the end
+    PLAYERS.forEach(p=>{ if(!gridPlayers.find(x=>x.id===p.id)) gridPlayers.push(p); });
+  } else {
+    gridPlayers = [...PLAYERS];
+  }
+  renderBatGrid(gameNum);
+  renderFldGrid(gameNum);
+  renderPitGrid(gameNum);
+  // Clear status messages
+  ['bat-grid-status','fld-grid-status','pit-grid-status'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent='';el.className='grid-status';} });
+}
+
+function getExisting(gameNum, pid){ return playerStats.find(x=>x.gameNum===gameNum&&x.pid===pid); }
+
+function renderBatGrid(gameNum){
+  const body=document.getElementById('bat-grid-body'); body.innerHTML='';
+  gridPlayers.forEach((p,idx)=>{
+    const ex=getExisting(gameNum,p.id);
+    const tr=document.createElement('tr'); tr.dataset.pid=p.id;
+    tr.innerHTML=`
+      <td class="player-name-td"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>
+      <td style="white-space:nowrap;">
+        <button class="order-btn" onclick="moveBatRow(${p.id},-1,${gameNum})">▲</button>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:0 4px;">${idx+1}</span>
+        <button class="order-btn" onclick="moveBatRow(${p.id},1,${gameNum})">▼</button>
+      </td>
+      <td><input type="number" min="0" value="${ex?ex.ab:0}" data-field="ab" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.r:0}" data-field="r" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.h:0}" data-field="h" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.d:0}" data-field="d" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.t:0}" data-field="t" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.hr:0}" data-field="hr" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.rbi:0}" data-field="rbi" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.so:0}" data-field="so" class="bg" data-pid="${p.id}"></td>
+      <td><button class="remove-row-btn" title="Remove from game" onclick="removeBatRow(${p.id},${gameNum})">✕</button></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function renderFldGrid(gameNum){
+  const body=document.getElementById('fld-grid-body'); body.innerHTML='';
+  gridPlayers.forEach(p=>{
+    const ex=getExisting(gameNum,p.id);
+    const tr=document.createElement('tr'); tr.dataset.pid=p.id;
+    tr.innerHTML=`
+      <td class="player-name-td"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>
+      <td><input type="text" value="${ex?ex.pos||'':''}" data-field="pos" class="bg" data-pid="${p.id}" placeholder="SS"></td>
+      <td><input type="number" min="0" value="${ex?ex.po:0}" data-field="po" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.a:0}" data-field="a" class="bg" data-pid="${p.id}"></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function renderPitGrid(gameNum){
+  const body=document.getElementById('pit-grid-body'); body.innerHTML='';
+  gridPlayers.forEach(p=>{
+    const ex=getExisting(gameNum,p.id);
+    const tr=document.createElement('tr'); tr.dataset.pid=p.id;
+    tr.innerHTML=`
+      <td class="player-name-td"><span class="player-num" style="font-size:.8rem;">${p.num}</span>${p.first}</td>
+      <td><input type="number" min="0" step="0.1" value="${ex?ex.ip:0}" data-field="ip" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.er:0}" data-field="er" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.ph:0}" data-field="ph" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.pk:0}" data-field="pk" class="bg" data-pid="${p.id}"></td>
+      <td><input type="number" min="0" value="${ex?ex.ppo||0:0}" data-field="ppo" class="bg" data-pid="${p.id}"></td>`;
+    body.appendChild(tr);
+  });
+}
+
+window.moveBatRow=function(pid,dir,gameNum){
+  const idx=gridPlayers.findIndex(p=>p.id===pid);
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=gridPlayers.length) return;
+  const tmp=gridPlayers[idx]; gridPlayers[idx]=gridPlayers[newIdx]; gridPlayers[newIdx]=tmp;
+  renderBatGrid(gameNum); renderFldGrid(gameNum); renderPitGrid(gameNum);
+}
+
+window.removeBatRow=function(pid,gameNum){
+  gridPlayers=gridPlayers.filter(p=>p.id!==pid);
+  renderBatGrid(gameNum); renderFldGrid(gameNum); renderPitGrid(gameNum);
+}
+
+window.resetGrids=function(){
+  const num=parseInt(document.getElementById('ps-gamenum').value);
+  if(!num) return;
+  gridPlayers=[...PLAYERS];
+  renderBatGrid(num); renderFldGrid(num); renderPitGrid(num);
+}
+
+function getGridVal(pid,field,isNum=true){
+  const el=document.querySelector(`input.bg[data-pid="${pid}"][data-field="${field}"]`);
+  if(!el) return isNum?0:'';
+  return isNum?(+el.value||0):el.value.trim();
+}
+
+// ── SAVE BATTING GRID ─────────────────────────────────────────────────────
+window.saveBattingGrid=async function(){
+  if(!requirePassword()) return;
+  const gameNum=parseInt(document.getElementById('ps-gamenum').value);
+  if(!gameNum){alert('Please select a game first.');return;}
+  const g=gameResults.find(x=>x.gameNum===gameNum);
+  if(!g){alert('Game not found.');return;}
+  setSync('syncing','Saving...');
+  const status=document.getElementById('bat-grid-status');
+  status.textContent='Saving...'; status.className='grid-status';
+  try{
+    for(let i=0;i<gridPlayers.length;i++){
+      const p=gridPlayers[i], pid=p.id, batOrder=i+1;
+      const existing=getExisting(gameNum,pid);
+      const rec={gameNum,pid,date:g.date,opp:g.opp,batOrder,
+        ab:getGridVal(pid,'ab'),r:getGridVal(pid,'r'),h:getGridVal(pid,'h'),
+        d:getGridVal(pid,'d'),t:getGridVal(pid,'t'),hr:getGridVal(pid,'hr'),
+        rbi:getGridVal(pid,'rbi'),so:getGridVal(pid,'so')};
+      if(existing){
+        await updateDoc(doc(db,'lw_player_stats',existing._id),rec);
+      } else {
+        // Only save if any batting stat > 0
+        const hasStats=rec.ab||rec.r||rec.h||rec.d||rec.t||rec.hr||rec.rbi||rec.so;
+        if(hasStats) await addDoc(collection(db,'lw_player_stats'),{...rec,pos:'',po:0,a:0,ip:0,er:0,ph:0,pk:0,ppo:0});
+      }
+    }
+    setSync('connected','Live — synced');
+    status.textContent='✓ Batting saved!'; status.className='grid-status ok';
+  }catch(e){setSync('error','Error');status.textContent='✗ Error: '+e.message;status.className='grid-status err';}
+}
+
+// ── SAVE FIELDING GRID ────────────────────────────────────────────────────
+window.saveFieldingGrid=async function(){
+  if(!requirePassword()) return;
+  const gameNum=parseInt(document.getElementById('ps-gamenum').value);
+  if(!gameNum){alert('Please select a game first.');return;}
+  const g=gameResults.find(x=>x.gameNum===gameNum);
+  if(!g){alert('Game not found.');return;}
+  setSync('syncing','Saving...');
+  const status=document.getElementById('fld-grid-status');
+  status.textContent='Saving...'; status.className='grid-status';
+  try{
+    for(const p of gridPlayers){
+      const pid=p.id;
+      const existing=getExisting(gameNum,pid);
+      const pos=getGridVal(pid,'pos',false), po=getGridVal(pid,'po'), a=getGridVal(pid,'a');
+      if(existing){
+        await updateDoc(doc(db,'lw_player_stats',existing._id),{pos,po,a});
+      } else {
+        const hasStats=po||a||pos;
+        if(hasStats){
+          const batOrder=gridPlayers.indexOf(p)+1;
+          await addDoc(collection(db,'lw_player_stats'),{gameNum,pid,date:g.date,opp:g.opp,batOrder,
+            ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,pos,po,a,ip:0,er:0,ph:0,pk:0,ppo:0});
+        }
+      }
+    }
+    setSync('connected','Live — synced');
+    status.textContent='✓ Fielding saved!'; status.className='grid-status ok';
+  }catch(e){setSync('error','Error');status.textContent='✗ Error: '+e.message;status.className='grid-status err';}
+}
+
+// ── SAVE PITCHING GRID ────────────────────────────────────────────────────
+window.savePitchingGrid=async function(){
+  if(!requirePassword()) return;
+  const gameNum=parseInt(document.getElementById('ps-gamenum').value);
+  if(!gameNum){alert('Please select a game first.');return;}
+  const g=gameResults.find(x=>x.gameNum===gameNum);
+  if(!g){alert('Game not found.');return;}
+  setSync('syncing','Saving...');
+  const status=document.getElementById('pit-grid-status');
+  status.textContent='Saving...'; status.className='grid-status';
+  try{
+    for(const p of gridPlayers){
+      const pid=p.id;
+      const existing=getExisting(gameNum,pid);
+      const ip=getGridVal(pid,'ip'),er=getGridVal(pid,'er'),ph=getGridVal(pid,'ph'),pk=getGridVal(pid,'pk'),ppo=getGridVal(pid,'ppo');
+      if(existing){
+        await updateDoc(doc(db,'lw_player_stats',existing._id),{ip,er,ph,pk,ppo});
+      } else {
+        if(ip>0){
+          const batOrder=gridPlayers.indexOf(p)+1;
+          await addDoc(collection(db,'lw_player_stats'),{gameNum,pid,date:g.date,opp:g.opp,batOrder,
+            ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,pos:'',po:0,a:0,ip,er,ph,pk,ppo});
+        }
+      }
+    }
+    setSync('connected','Live — synced');
+    status.textContent='✓ Pitching saved!'; status.className='grid-status ok';
+  }catch(e){setSync('error','Error');status.textContent='✗ Error: '+e.message;status.className='grid-status err';}
 }
 window.onOppGameTypeChange=function(){
   const type=document.getElementById('ops-game-type').value;
@@ -1569,11 +1812,6 @@ window.delResult=async function(docId){
 }
 
 // ── ADD/DEL: PLAYER STATS ─────────────────────────────────────────────────
-window.addPlayerStats=async function(){
-  if(!requirePassword()) return;
-  const gameNum=parseInt(document.getElementById('ps-gamenum').value);
-  const pid=parseInt(document.getElementById('ps-player').value);
-  if(!gameNum){alert('Please select a Game.');return;} if(!pid){alert('Please select a player.');return;}
   if(playerStats.find(g=>g.gameNum===gameNum&&g.pid===pid)){alert(`Stats for this player in Game #${gameNum} already exist.`);return;}
   const g=gameResults.find(x=>x.gameNum===gameNum);
   const rec={gameNum,pid,date:g?g.date:today(),opp:g?g.opp:'Unknown',
