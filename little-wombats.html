@@ -552,7 +552,8 @@
         <div><div class="bs-section-title" style="margin-bottom:8px;">RBI Leaders</div><div id="ll-rbi"></div></div>
         <div><div class="bs-section-title" style="margin-bottom:8px;">Home Run Leaders</div><div id="ll-hr"></div></div>
 
-        <div><div class="bs-section-title" style="margin-bottom:8px;">OBP Leaders</div><div id="ll-obp"></div></div>
+        <div><div class="bs-section-title" style="margin-bottom:8px;">Doubles Leaders</div><div id="ll-2b"></div></div>
+        <div><div class="bs-section-title" style="margin-bottom:8px;">SLG% Leaders</div><div id="ll-slg"></div></div>
       </div>
     </div>
   </div>
@@ -1471,7 +1472,8 @@ function renderLeagueLeaders(){
   document.getElementById('ll-hits').innerHTML=leaderList(allBat,'h');
   document.getElementById('ll-rbi').innerHTML=leaderList(allBat,'rbi');
   document.getElementById('ll-hr').innerHTML=leaderList(allBat,'hr');
-  document.getElementById('ll-obp').innerHTML=leaderList(allBat,'obp');
+  document.getElementById('ll-2b').innerHTML=leaderList(allBat,'d');
+  document.getElementById('ll-slg').innerHTML=leaderList(allBat,'slg');
   // Calculate DO/IP using team PO while pitching (ppo field)
   allPit.forEach(p=>{ p.doip = p.ip>0 ? (p.ppo||0)/p.ip : 0; });
   document.getElementById('ll-era').innerHTML=leaderList(allPit,'era',true);
