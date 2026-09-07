@@ -1736,6 +1736,8 @@ function renderStandings(){
 
   // Opponent teams from lw_opp_games
   oppGames.forEach(g=>{
+    if(!g.teamAId||!g.teamBId) return; // skip incomplete games
+    if(g.teamAId.startsWith('lw_opp:')||g.teamBId.startsWith('lw_opp:')) return; // skip LW-game opponent entries
     const aRec = getTeam(g.teamAId, tName(g.teamAId));
     const bRec = getTeam(g.teamBId, tName(g.teamBId));
     // Team A result
@@ -1754,10 +1756,14 @@ function renderStandings(){
     });
   });
 
-  // Only show league teams in standings (but their records include all games)
-  const rows = Object.values(teamRecords).filter(r=>
-    r.id==='little-wombats' || oppTeams.find(t=>t._id===r.id&&t.isLeague!==false)
-  );
+  // Only show league teams in standings — must be LW or a known team with isLeague not false
+  const rows = Object.values(teamRecords).filter(r=>{
+    if(r.id==='little-wombats') return true;
+    const team = oppTeams.find(t=>t._id===r.id);
+    if(!team) return false; // unknown/undefined team — exclude
+    if(team.isLeague===false) return false; // explicitly non-league — exclude
+    return true;
+  });
   rows.forEach(r=>{
     const gp=r.w+r.l+r.t;
     r.pct = gp>0 ? (r.w+(r.t*0.5))/gp : 0;
@@ -1811,6 +1817,7 @@ function renderLeagueLeaders(){
     const gs=oppPlayerStats.filter(x=>x.playerId===pid);
     if(!gs.length) return;
     const first=gs[0];
+    if(!first.teamId||first.teamId.startsWith('lw_opp:')) return; // skip pseudo-teamIds
     // find team via game
     const game=oppGames.find(x=>x._id===first.oppGameId);
     const teamName=tName(first.teamId)||'Unknown';
