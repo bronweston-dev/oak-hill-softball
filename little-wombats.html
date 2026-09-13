@@ -2444,15 +2444,16 @@ function renderOppGrids(existing){
 
 function readOppGrid(){
   const rows=[];
-  document.querySelectorAll('#opp-bat-body tr').forEach((tr,ri)=>{
+  const batRows=document.querySelectorAll('#opp-bat-body tr');
+  const pitRows=document.querySelectorAll('#opp-pit-body tr');
+  batRows.forEach((tr,ri)=>{
     const get=(f)=>{
-      const el=tr.querySelector(`input[data-ogi="${ri}"][data-of="${f}"]`);
+      const el=tr.querySelector(`input[data-of="${f}"]`);
       if(!el) return f==='name'?'':0;
       return f==='name'?el.value.trim():(+el.value||0);
     };
-    // Also read pitching from pit body
-    const ptr=document.querySelectorAll('#opp-pit-body tr')[ri];
-    const getPit=(f)=>{ const el=ptr?ptr.querySelector(`input[data-ogi="${ri}"][data-of="${f}"]`):null; return el?(+el.value||0):0; };
+    const ptr=pitRows[ri];
+    const getPit=(f)=>{ const el=ptr?ptr.querySelector(`input[data-of="${f}"]`):null; return el?(+el.value||0):0; };
     rows.push({
       num:get('num'),name:get('name'),
       ab:get('ab'),r:get('r'),h:get('h'),d:get('d'),t:get('t'),hr:get('hr'),rbi:get('rbi'),so:get('so'),
@@ -2463,13 +2464,14 @@ function readOppGrid(){
 }
 
 async function saveOppGrid(section){
+  // Read grid values BEFORE password prompt so DOM isn't disrupted
+  const rows=readOppGrid();
+  const validRows=rows.filter(r=>r.name);
+  if(!validRows.length){alert('Please enter at least one player name.');return;}
   if(!requirePassword()) return;
   const ctx=getOppContext();
   if(!ctx.teamVal){alert('Please select a team first.');return;}
   if(!ctx.oppGameId&&!ctx.lwGameId){alert('Please select a game first.');return;}
-  const rows=readOppGrid();
-  const validRows=rows.filter(r=>r.name);
-  if(!validRows.length){alert('Please enter at least one player name.');return;}
 
   const statusId=section==='bat'?'opp-bat-status':'opp-pit-status';
   const status=document.getElementById(statusId);
