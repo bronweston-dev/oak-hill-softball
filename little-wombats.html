@@ -1349,21 +1349,24 @@ window.saveBattingGrid=async function(){
   const g=gameResults.find(x=>x.gameNum===gameNum);
   if(!g){alert('Game not found.');return;}
 
-  // Read ALL values from DOM upfront before any async calls
+  // Read ALL values from DOM by iterating table rows directly
+  const tableRows=document.querySelectorAll('#bat-grid-body tr');
   const rows=[];
-  for(let i=0;i<gridPlayers.length;i++){
-    const p=gridPlayers[i], pid=p.id;
-    const getVal=(field)=>{
-      const el=document.querySelector(`input.bg[data-pid="${pid}"][data-field="${field}"]`);
-      return el?(+el.value||0):0;
-    };
+  tableRows.forEach((tr,i)=>{
+    const pid=parseInt(tr.dataset.pid);
+    if(!pid) return;
+    const p=PLAYERS.find(x=>x.id===pid);
+    if(!p) return;
+    const inputs=tr.querySelectorAll('input.bg');
+    const vals={};
+    inputs.forEach(inp=>{ vals[inp.dataset.field]=+inp.value||0; });
     const rec={gameNum,pid,date:g.date,opp:g.opp,batOrder:i+1,
-      ab:getVal('ab'),r:getVal('r'),h:getVal('h'),
-      d:getVal('d'),t:getVal('t'),hr:getVal('hr'),
-      rbi:getVal('rbi'),so:getVal('so')};
+      ab:vals.ab||0,r:vals.r||0,h:vals.h||0,
+      d:vals.d||0,t:vals.t||0,hr:vals.hr||0,
+      rbi:vals.rbi||0,so:vals.so||0};
     const hasStats=rec.ab||rec.r||rec.h||rec.d||rec.t||rec.hr||rec.rbi||rec.so;
     rows.push({rec,pid,hasStats,existing:getExisting(gameNum,pid)});
-  }
+  });
 
   setSync('syncing','Saving...');
   const status=document.getElementById('bat-grid-status');
@@ -1429,22 +1432,24 @@ window.savePitchingGrid=async function(){
   const g=gameResults.find(x=>x.gameNum===gameNum);
   if(!g){alert('Game not found.');return;}
 
-  // Read all pitching values from DOM upfront
-  const pitSnapshot=gridPlayers.map((p,i)=>{
-    const pid=p.id;
-    const getVal=(field)=>{
-      const el=document.querySelector(`input.bg[data-pid="${pid}"][data-field="${field}"]`);
-      return el?(+el.value||0):0;
-    };
-    return {p,pid,batOrder:i+1,existing:getExisting(gameNum,pid),
-      ip:getVal('ip'),er:getVal('er'),ph:getVal('ph'),pk:getVal('pk'),ppo:getVal('ppo')};
+  // Read all pitching values by iterating table rows directly
+  const pitTableRows=document.querySelectorAll('#pit-grid-body tr');
+  const pitSnapshot=[];
+  pitTableRows.forEach((tr,i)=>{
+    const pid=parseInt(tr.dataset.pid);
+    if(!pid) return;
+    const inputs=tr.querySelectorAll('input.bg');
+    const vals={};
+    inputs.forEach(inp=>{ vals[inp.dataset.field]=+inp.value||0; });
+    pitSnapshot.push({pid,batOrder:i+1,existing:getExisting(gameNum,pid),
+      ip:vals.ip||0,er:vals.er||0,ph:vals.ph||0,pk:vals.pk||0,ppo:vals.ppo||0});
   });
 
   setSync('syncing','Saving...');
   const status=document.getElementById('pit-grid-status');
   status.textContent='Saving...'; status.className='grid-status';
   try{
-    for(const {p,pid,batOrder,existing,ip,er,ph,pk,ppo} of pitSnapshot){
+    for(const {pid,batOrder,existing,ip,er,ph,pk,ppo} of pitSnapshot){
       if(existing){
         await updateDoc(doc(db,'lw_player_stats',existing._id),{ip,er,ph,pk,ppo});
       } else if(ip>0){
