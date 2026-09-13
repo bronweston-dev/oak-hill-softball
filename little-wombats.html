@@ -1288,14 +1288,24 @@ function renderFldGrid(gameNum){
 }
 
 window.addFldPosRow=function(pid,gameNum){
+  // Save current input values into fldPositions before re-rendering
+  document.querySelectorAll('input[data-fpid]').forEach(inp=>{
+    const fpid=parseInt(inp.dataset.fpid), ri=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
+    if(!fldPositions[fpid]||!fldPositions[fpid][ri]) return;
+    fldPositions[fpid][ri][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
+  });
   if(!fldPositions[pid]) fldPositions[pid]=[];
   fldPositions[pid].push({pos:'',inn:0,po:0,a:0});
   renderFldGrid(gameNum);
 }
 window.removeFldPosRow=function(pid,ri,gameNum){
-  if(fldPositions[pid] && fldPositions[pid].length>1){
-    fldPositions[pid].splice(ri,1);
-  }
+  // Save current input values before re-rendering
+  document.querySelectorAll('input[data-fpid]').forEach(inp=>{
+    const fpid=parseInt(inp.dataset.fpid), rowIdx=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
+    if(!fldPositions[fpid]||!fldPositions[fpid][rowIdx]) return;
+    fldPositions[fpid][rowIdx][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
+  });
+  if(fldPositions[pid]&&fldPositions[pid].length>1) fldPositions[pid].splice(ri,1);
   renderFldGrid(gameNum);
 }
 
@@ -1316,6 +1326,12 @@ function renderPitGrid(gameNum){
 }
 
 window.moveBatRow=function(pid,dir,gameNum){
+  // Save current fielding input values before re-rendering
+  document.querySelectorAll('input[data-fpid]').forEach(inp=>{
+    const fpid=parseInt(inp.dataset.fpid), ri=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
+    if(!fldPositions[fpid]||!fldPositions[fpid][ri]) return;
+    fldPositions[fpid][ri][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
+  });
   const idx=gridPlayers.findIndex(p=>p.id===pid);
   const newIdx=idx+dir;
   if(newIdx<0||newIdx>=gridPlayers.length) return;
@@ -1324,6 +1340,11 @@ window.moveBatRow=function(pid,dir,gameNum){
 }
 
 window.removeBatRow=function(pid,gameNum){
+  document.querySelectorAll('input[data-fpid]').forEach(inp=>{
+    const fpid=parseInt(inp.dataset.fpid), ri=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
+    if(!fldPositions[fpid]||!fldPositions[fpid][ri]) return;
+    fldPositions[fpid][ri][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
+  });
   gridPlayers=gridPlayers.filter(p=>p.id!==pid);
   renderBatGrid(gameNum); renderFldGrid(gameNum); renderPitGrid(gameNum);
 }
@@ -2389,7 +2410,18 @@ window.buildOppGrids=function(){
   renderOppGrids(existing);
 }
 
+function saveOppGridToState(){
+  document.querySelectorAll('#opp-bat-body tr').forEach((tr,ri)=>{
+    if(!oppGridRows[ri]) return;
+    const numEl=tr.querySelector('input[data-of="num"]');
+    const nameEl=tr.querySelector('input[data-of="name"]');
+    if(numEl) oppGridRows[ri].num=+numEl.value||0;
+    if(nameEl) oppGridRows[ri].name=nameEl.value.trim();
+  });
+}
+
 window.addOppGridRow=function(){
+  saveOppGridToState();
   oppGridRows.push({num:0,name:''});
   const {oppGameId,lwGameId,teamId}=getOppContext();
   const existing=oppPlayerStats.filter(x=>
@@ -2400,6 +2432,7 @@ window.addOppGridRow=function(){
 }
 window.resetOppGrids=function(){ oppGridRows=[{num:0,name:''}]; buildOppGrids(); }
 window.removeOppRow=function(ri){
+  saveOppGridToState();
   oppGridRows.splice(ri,1);
   if(oppGridRows.length===0) oppGridRows=[{num:0,name:''}];
   buildOppGrids();
