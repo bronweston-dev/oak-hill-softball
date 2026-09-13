@@ -1487,6 +1487,7 @@ window.onOppGameTypeChange=function(){
   document.getElementById('ops-lw-game-wrap').style.display=type==='lw'?'':'none';
   document.getElementById('ops-opp-game-wrap').style.display=type==='opp'?'':'none';
   document.getElementById('ops-which-team').innerHTML='<option value="">-- Select --</option>';
+  oppGridRows=[]; // reset so roster reloads
   onOppGameSelect();
 }
 
@@ -1494,6 +1495,7 @@ window.onOppGameSelect=function(){
   const type=document.getElementById('ops-game-type').value;
   const whichSel=document.getElementById('ops-which-team');
   whichSel.innerHTML='<option value="">-- Select --</option>';
+  oppGridRows=[]; // reset so roster reloads fresh for new game
 
   if(type==='lw'){
     const lwGameId=document.getElementById('ops-lw-game').value;
@@ -2392,20 +2394,15 @@ window.buildOppGrids=function(){
     (oppGameId&&x.oppGameId===oppGameId&&x.teamId===teamId)
   );
 
-  if(oppGridRows.length===0){
-    if(existing.length>0){
-      // Pre-fill from existing saved stats
-      oppGridRows=existing.map(x=>({num:x.playerNum||0,name:x.playerName||''}));
-    } else {
-      // Pre-fill from registered roster
-      const teamDbId=oppTeams.find(t=>t._id===teamVal)?teamVal:null;
-      const roster=teamDbId?oppRosters.filter(r=>r.teamId===teamDbId).sort((a,b)=>a.num-b.num):[];
-      if(roster.length>0){
-        oppGridRows=roster.map(r=>({num:r.num,name:r.name}));
-      } else {
-        oppGridRows=[{num:0,name:''}];
-      }
-    }
+  // Always rebuild oppGridRows fresh for the selected game+team
+  if(existing.length>0){
+    // Pre-fill from existing saved stats
+    oppGridRows=existing.map(x=>({num:x.playerNum||0,name:x.playerName||''}));
+  } else {
+    // Pre-fill from registered roster
+    const teamDbId=oppTeams.find(t=>t._id===teamVal)?teamVal:null;
+    const roster=teamDbId?oppRosters.filter(r=>r.teamId===teamDbId).sort((a,b)=>a.num-b.num):[];
+    oppGridRows=roster.length>0 ? roster.map(r=>({num:r.num,name:r.name})) : [{num:0,name:''}];
   }
   renderOppGrids(existing);
 }
