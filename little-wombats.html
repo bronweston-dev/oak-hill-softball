@@ -1586,8 +1586,8 @@ window.renderLeagueStats=function(){
       if(ourScore>theirScore)w++;else if(ourScore<theirScore)l++;else t2++;
       runF+=ourScore; runA+=theirScore;
     });
-    // Also count games vs LW
-    gameResults.filter(g=>g.opp===teamObj.name).forEach(g=>{
+    // Also count games vs LW (from lw_game_results, opponent perspective)
+    gameResults.filter(g=>g.opp.toLowerCase()===teamObj.name.toLowerCase()).forEach(g=>{
       const ourScore=g.them, theirScore=g.us;
       if(ourScore>theirScore)w++;else if(ourScore<theirScore)l++;else t2++;
       runF+=ourScore; runA+=theirScore;
@@ -2037,6 +2037,15 @@ function renderStandings(){
     rec.h+=b.h; rec.ab+=b.ab; rec.rbi+=b.rbi; rec.d+=b.d; rec.t2+=b.t; rec.hr+=b.hr; rec.po+=f.po;
   });
 
+  // Count LW game results from the opponent's perspective
+  gameResults.forEach(g=>{
+    const oppTeam=oppTeams.find(t=>t.name.toLowerCase()===g.opp.toLowerCase());
+    if(!oppTeam) return; // opponent not registered
+    const rec=getTeam(oppTeam._id, oppTeam.name);
+    if(g.them>g.us) rec.w++; else if(g.them<g.us) rec.l++; else rec.t++;
+    rec.r+=g.them; rec.ra+=g.us;
+  });
+
   // Opponent teams from lw_opp_games
   oppGames.forEach(g=>{
     if(!g.teamAId||!g.teamBId) return; // skip incomplete games
@@ -2125,10 +2134,21 @@ function renderLeagueLeaders(){
     const gs=oppPlayerStats.filter(x=>x.playerId===pid);
     if(!gs.length) return;
     const first=gs[0];
-    if(!first.teamId||first.teamId.startsWith('lw_opp:')) return; // skip pseudo-teamIds
-    // find team via game
-    const game=oppGames.find(x=>x._id===first.oppGameId);
-    const teamName=tName(first.teamId)||'Unknown';
+    if(!first.teamId) return; // skip entries with no teamId
+    // Resolve team name — lw_opp: prefix means it's from a LW game, extract name from prefix or find by ID
+    let teamName='Unknown';
+    if(first.teamId.startsWith('lw_opp:')){
+      // Extract team name from the stored teamId e.g. 'lw_opp:golden_sparks' -> find matching oppTeam by name
+      const slug=first.teamId.slice(7); // remove 'lw_opp:'
+      const found=oppTeams.find(t=>t.name.toLowerCase().replace(/\s+/g,'_')===slug);
+      teamName=found?found.name:first.playerName?gs[0].playerName.split('_')[0]:'Unknown';
+      // If player is from a non-league team, skip league leaders
+      if(!found||found.isLeague===false) return;
+    } else {
+      const foundTeam=oppTeams.find(t=>t._id===first.teamId);
+      if(!foundTeam||foundTeam.isLeague===false) return; // skip non-league
+      teamName=foundTeam.name;
+    }
     const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,bb:0,so:0,sb:0,ip:0,er:0,ph:0,pbb:0,pk:0,ppo:0};
     gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=g.d;s.t+=g.t;s.hr+=g.hr;s.rbi+=g.rbi;s.bb+=g.bb;s.so+=g.so;s.sb+=g.sb;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
     s.avg=s.ab>0?s.h/s.ab:0;
