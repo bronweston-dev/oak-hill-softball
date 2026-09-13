@@ -369,7 +369,7 @@
       <span class="legend-item"><strong>ER</strong>Earned Runs</span><span class="legend-item"><strong>H</strong>Hits Allowed</span>
       <span class="legend-item"><strong>K</strong>Strikeouts</span>
       <span class="legend-item"><strong>DO/IP</strong>Defensive Outs per Inning</span>
-      <span class="legend-item"><strong>ERA</strong>ERA (per 4 inn)</span>
+      <span class="legend-item"><strong>ERA</strong>ERA (per 3 inn)</span>
     </div>
     <div class="table-wrap"><table><thead><tr>
       <th class="name-col" onclick="sortPlayers('pit','name')">Player ⇅</th>
@@ -1069,7 +1069,7 @@ function pStats(pid){
   const gs=playerStats.filter(g=>g.pid===pid&&g.ip>0);
   const s={g:gs.length,ip:0,er:0,ph:0,pbb:0,pk:0,ppo:0};
   gs.forEach(g=>{s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pbb+=g.pbb;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
-  s.era=s.ip>0?(s.er/s.ip)*4:null;
+  s.era=s.ip>0?(s.er/s.ip)*3:null;
   s.doip=s.ip>0?s.ppo/s.ip:0;
   return s;
 }
@@ -1555,7 +1555,7 @@ window.renderLeagueStats=function(){
         obp:(s.ab)>0?s.h/s.ab:0,
         slg:s.ab>0?tb/s.ab:0,
         pg:gs.filter(g=>g.ip>0).length, ip:s.ip, er:s.er, ph:s.ph, pk:s.pk, ppo:s.ppo,
-        era:s.ip>0?(s.er/s.ip)*4:null,
+        era:s.ip>0?(s.er/s.ip)*3:null,
         doip:s.ip>0?s.ppo/s.ip:0
       });
     });
@@ -1569,7 +1569,7 @@ window.renderLeagueStats=function(){
   const totTb=(tot.h-tot.d-tot.t-tot.hr)+2*tot.d+3*tot.t+4*tot.hr;
   const totAvg=tot.ab>0?tot.h/tot.ab:0;
   const totSlg=tot.ab>0?totTb/tot.ab:0;
-  const totEra=tot.ip>0?(tot.er/tot.ip)*4:null;
+  const totEra=tot.ip>0?(tot.er/tot.ip)*3:null;
   const totDoip=tot.ip>0?tot.ppo/tot.ip:0;
 
   // ── Record ─────────────────────────────────────────────────────────────
@@ -1676,7 +1676,7 @@ window.renderLeagueStats=function(){
         <span class="legend-item"><strong>G</strong>Games</span><span class="legend-item"><strong>IP</strong>Innings</span>
         <span class="legend-item"><strong>ER</strong>Earned Runs</span><span class="legend-item"><strong>H</strong>Hits Allowed</span>
         <span class="legend-item"><strong>K</strong>Strikeouts</span><span class="legend-item"><strong>Team PO</strong>Put Outs while pitching</span>
-        <span class="legend-item"><strong>DO/IP</strong>Def Outs per Inning</span><span class="legend-item"><strong>ERA</strong>ERA (per 4 inn)</span>
+        <span class="legend-item"><strong>DO/IP</strong>Def Outs per Inning</span><span class="legend-item"><strong>ERA</strong>ERA (per 3 inn)</span>
       </div>
       <div class="table-wrap"><table>
         <thead><tr>
@@ -1849,7 +1849,7 @@ window.showBoxScore=function(num){
   const pitchers=lineup.filter(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); return gs&&gs.ip>0; });
   const pitRows=pitchers.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id);
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
-      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`; }).join('');
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*3):'—'}</td></tr>`; }).join('');
 
   // ── Opponent players (logged via Opponents section) ───────────────────────
   // Find opponent players logged against this LW game
@@ -1870,7 +1870,7 @@ window.showBoxScore=function(num){
   function oppPitRow(pid){
     const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
-      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*3):'—'}</td></tr>`;
   }
   const oppBatRows = oppPlayerIds.map(oppBatRow).join('');
   const oppPitRows = oppPlayerIds.map(oppPitRow).filter(Boolean).join('');
@@ -1953,7 +1953,7 @@ window.showOppBoxScore=function(oppGameId){
   function pitRow(pid){
     const gs=gPlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
-      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*4):'—'}</td></tr>`;
+      <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*3):'—'}</td></tr>`;
   }
   function teamDivBat(name){ return `<tr style="background:var(--green-dark);"><td colspan="10" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
   function teamDivPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
@@ -2133,7 +2133,7 @@ function renderLeagueLeaders(){
     s.obp=(s.ab+s.bb)>0?(s.h+s.bb)/(s.ab+s.bb):0;
     const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
     s.slg=s.ab>0?tb/s.ab:0;
-    s.era=s.ip>0?(s.er/s.ip)*4:null;
+    s.era=s.ip>0?(s.er/s.ip)*3:null;
     if(s.ab>0) allBat.push({name:first.playerName,team:teamName,num:first.playerNum,...s});
     if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,...s,po:s.po||0});
   });
@@ -2677,7 +2677,7 @@ function renderModal(pid){
     const gdoip=g.ip>0?f2((g.ppo||0)/g.ip):'—';
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}·${g.opp}</td>
       <td>${g.ip.toFixed(1)}</td><td>${g.er}</td><td>${g.ph}</td><td>${g.pk}</td>
-      <td>${g.ppo||0}</td><td>${gdoip}</td><td>${g.ip>0?f2((g.er/g.ip)*4):'—'}</td>
+      <td>${g.ppo||0}</td><td>${gdoip}</td><td>${g.ip>0?f2((g.er/g.ip)*3):'—'}</td>
       <td><button class="edit-row" onclick="openEditPlayer('${g._id}')">✏️</button>
           <span class="delete-row" onclick="delPlayerStat('${g._id}')">🗑</span></td>`;
     pBody.appendChild(tr);
