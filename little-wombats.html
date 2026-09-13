@@ -2400,7 +2400,15 @@ window.buildOppGrids=function(){
     oppGridRows=existing.map(x=>({num:x.playerNum||0,name:x.playerName||''}));
   } else {
     // Pre-fill from registered roster
-    const teamDbId=oppTeams.find(t=>t._id===teamVal)?teamVal:null;
+    // For LW games teamVal is 'opp:TeamName' — find team by name instead
+    let teamDbId=null;
+    if(teamVal.startsWith('opp:')){
+      const oppName=teamVal.slice(4);
+      const found=oppTeams.find(t=>t.name===oppName);
+      teamDbId=found?found._id:null;
+    } else {
+      teamDbId=oppTeams.find(t=>t._id===teamVal)?teamVal:null;
+    }
     const roster=teamDbId?oppRosters.filter(r=>r.teamId===teamDbId).sort((a,b)=>a.num-b.num):[];
     oppGridRows=roster.length>0 ? roster.map(r=>({num:r.num,name:r.name})) : [{num:0,name:''}];
   }
