@@ -983,11 +983,11 @@ const PLAYERS = [
   {id:3,  num:3,  first:'Cora'},
   {id:4,  num:4,  first:'Isla'},
   {id:5,  num:5,  first:'Riley'},
-  {id:10,  num:10,  first:'Ellen'},
+  {id:6,  num:6,  first:'Ellen'},
   {id:7,  num:7,  first:'Stevie'},
   {id:8,  num:8,  first:'Evelyn'},
   {id:9,  num:9,  first:'Harper'},
-  {id:6, num:6, first:'Rosalie'},
+  {id:10, num:10, first:'Rosalie'},
   {id:11, num:11, first:'Weslyn'},
   {id:12, num:12, first:'Vaani'},
 ];
@@ -1348,27 +1348,36 @@ window.saveBattingGrid=async function(){
   if(!gameNum){alert('Please select a game first.');return;}
   const g=gameResults.find(x=>x.gameNum===gameNum);
   if(!g){alert('Game not found.');return;}
+
+  // Read ALL values from DOM upfront before any async calls
+  const rows=[];
+  for(let i=0;i<gridPlayers.length;i++){
+    const p=gridPlayers[i], pid=p.id;
+    const getVal=(field)=>{
+      const el=document.querySelector(`input.bg[data-pid="${pid}"][data-field="${field}"]`);
+      return el?(+el.value||0):0;
+    };
+    const rec={gameNum,pid,date:g.date,opp:g.opp,batOrder:i+1,
+      ab:getVal('ab'),r:getVal('r'),h:getVal('h'),
+      d:getVal('d'),t:getVal('t'),hr:getVal('hr'),
+      rbi:getVal('rbi'),so:getVal('so')};
+    const hasStats=rec.ab||rec.r||rec.h||rec.d||rec.t||rec.hr||rec.rbi||rec.so;
+    rows.push({rec,pid,hasStats,existing:getExisting(gameNum,pid)});
+  }
+
   setSync('syncing','Saving...');
   const status=document.getElementById('bat-grid-status');
   status.textContent='Saving...'; status.className='grid-status';
   try{
-    for(let i=0;i<gridPlayers.length;i++){
-      const p=gridPlayers[i], pid=p.id, batOrder=i+1;
-      const existing=getExisting(gameNum,pid);
-      const rec={gameNum,pid,date:g.date,opp:g.opp,batOrder,
-        ab:getGridVal(pid,'ab'),r:getGridVal(pid,'r'),h:getGridVal(pid,'h'),
-        d:getGridVal(pid,'d'),t:getGridVal(pid,'t'),hr:getGridVal(pid,'hr'),
-        rbi:getGridVal(pid,'rbi'),so:getGridVal(pid,'so')};
+    for(const {rec,hasStats,existing} of rows){
       if(existing){
         await updateDoc(doc(db,'lw_player_stats',existing._id),rec);
-      } else {
-        // Only save if any batting stat > 0
-        const hasStats=rec.ab||rec.r||rec.h||rec.d||rec.t||rec.hr||rec.rbi||rec.so;
-        if(hasStats) await addDoc(collection(db,'lw_player_stats'),{...rec,pos:'',po:0,a:0,ip:0,er:0,ph:0,pk:0,ppo:0});
+      } else if(hasStats){
+        await addDoc(collection(db,'lw_player_stats'),{...rec,pos:'',po:0,a:0,positions:[],ip:0,er:0,ph:0,pk:0,ppo:0});
       }
     }
     setSync('connected','Live — synced');
-    status.textContent='✓ Batting saved!'; status.className='grid-status ok';
+    status.textContent=`✓ Batting saved! (${rows.filter(r=>r.hasStats||r.existing).length} players)`; status.className='grid-status ok';
   }catch(e){setSync('error','Error');status.textContent='✗ Error: '+e.message;status.className='grid-status err';}
 }
 
@@ -1380,34 +1389,31 @@ window.saveFieldingGrid=async function(){
   const g=gameResults.find(x=>x.gameNum===gameNum);
   if(!g){alert('Game not found.');return;}
 
-  // Read current values from inputs into fldPositions
+  // Read all fielding values from DOM upfront
   document.querySelectorAll('input[data-fpid]').forEach(inp=>{
     const pid=parseInt(inp.dataset.fpid), ri=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
-    if(!fldPositions[pid]) return;
-    if(!fldPositions[pid][ri]) return;
+    if(!fldPositions[pid]||!fldPositions[pid][ri]) return;
     fldPositions[pid][ri][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
   });
+  const fldSnapshot = gridPlayers.map(p=>({
+    p, existing:getExisting(gameNum,p.id),
+    positions:(fldPositions[p.id]||[]).filter(r=>r.pos||r.po||r.a||r.inn),
+    batOrder:gridPlayers.indexOf(p)+1
+  }));
 
   setSync('syncing','Saving...');
   const status=document.getElementById('fld-grid-status');
   status.textContent='Saving...'; status.className='grid-status';
   try{
-    for(const p of gridPlayers){
-      const pid=p.id;
-      const positions=(fldPositions[pid]||[]).filter(r=>r.pos||r.po||r.a||r.inn);
-      // Aggregate totals for backward compat
+    for(const {p,existing,positions,batOrder} of fldSnapshot){
       const po=positions.reduce((s,r)=>s+r.po,0);
       const a=positions.reduce((s,r)=>s+r.a,0);
       const pos=positions.map(r=>r.pos).filter(Boolean).join('/');
-      const existing=getExisting(gameNum,pid);
       if(existing){
         await updateDoc(doc(db,'lw_player_stats',existing._id),{positions,pos,po,a});
-      } else {
-        if(positions.length>0){
-          const batOrder=gridPlayers.indexOf(p)+1;
-          await addDoc(collection(db,'lw_player_stats'),{gameNum,pid,date:g.date,opp:g.opp,batOrder,
-            ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,positions,pos,po,a,ip:0,er:0,ph:0,pk:0,ppo:0});
-        }
+      } else if(positions.length>0){
+        await addDoc(collection(db,'lw_player_stats'),{gameNum,pid:p.id,date:g.date,opp:g.opp,batOrder,
+          ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,positions,pos,po,a,ip:0,er:0,ph:0,pk:0,ppo:0});
       }
     }
     setSync('connected','Live — synced');
@@ -1422,22 +1428,28 @@ window.savePitchingGrid=async function(){
   if(!gameNum){alert('Please select a game first.');return;}
   const g=gameResults.find(x=>x.gameNum===gameNum);
   if(!g){alert('Game not found.');return;}
+
+  // Read all pitching values from DOM upfront
+  const pitSnapshot=gridPlayers.map((p,i)=>{
+    const pid=p.id;
+    const getVal=(field)=>{
+      const el=document.querySelector(`input.bg[data-pid="${pid}"][data-field="${field}"]`);
+      return el?(+el.value||0):0;
+    };
+    return {p,pid,batOrder:i+1,existing:getExisting(gameNum,pid),
+      ip:getVal('ip'),er:getVal('er'),ph:getVal('ph'),pk:getVal('pk'),ppo:getVal('ppo')};
+  });
+
   setSync('syncing','Saving...');
   const status=document.getElementById('pit-grid-status');
   status.textContent='Saving...'; status.className='grid-status';
   try{
-    for(const p of gridPlayers){
-      const pid=p.id;
-      const existing=getExisting(gameNum,pid);
-      const ip=getGridVal(pid,'ip'),er=getGridVal(pid,'er'),ph=getGridVal(pid,'ph'),pk=getGridVal(pid,'pk'),ppo=getGridVal(pid,'ppo');
+    for(const {p,pid,batOrder,existing,ip,er,ph,pk,ppo} of pitSnapshot){
       if(existing){
         await updateDoc(doc(db,'lw_player_stats',existing._id),{ip,er,ph,pk,ppo});
-      } else {
-        if(ip>0){
-          const batOrder=gridPlayers.indexOf(p)+1;
-          await addDoc(collection(db,'lw_player_stats'),{gameNum,pid,date:g.date,opp:g.opp,batOrder,
-            ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,pos:'',po:0,a:0,ip,er,ph,pk,ppo});
-        }
+      } else if(ip>0){
+        await addDoc(collection(db,'lw_player_stats'),{gameNum,pid,date:g.date,opp:g.opp,batOrder,
+          ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,pos:'',po:0,a:0,positions:[],ip,er,ph,pk,ppo});
       }
     }
     setSync('connected','Live — synced');
