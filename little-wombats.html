@@ -850,6 +850,40 @@
   </div>
 </div>
 
+<!-- OPPONENT PLAYER MODAL -->
+<div class="modal-overlay" id="oppPlayerModal" onclick="closeOppModalBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div><h2 id="oppModalName"></h2><p id="oppModalTeam"></p></div>
+      <button class="modal-close" onclick="closeOppModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tab-bar">
+        <button class="modal-tab-btn active" onclick="switchOppModalTab('omb')">🏏 Batting</button>
+        <button class="modal-tab-btn" onclick="switchOppModalTab('omp')">⚾ Pitching</button>
+      </div>
+      <div id="modal-omb" class="modal-tab-content active">
+        <div class="card-stats" id="oppMCardBat"></div>
+        <div class="log-title">BATTING GAME LOG</div>
+        <div class="table-wrap"><table class="log-table">
+          <thead><tr><th>Gm</th><th>Date</th><th>Opp</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th></tr></thead>
+          <tbody id="oppMBatLog"></tbody>
+        </table></div>
+        <div id="oppMNoBat" class="no-data" style="display:none">No batting stats yet.</div>
+      </div>
+      <div id="modal-omp" class="modal-tab-content">
+        <div class="card-stats" id="oppMCardPit"></div>
+        <div class="log-title">PITCHING GAME LOG</div>
+        <div class="table-wrap"><table class="log-table">
+          <thead><tr><th>Gm</th><th>Date</th><th>Opp</th><th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th><th>DO/IP</th><th>ERA</th></tr></thead>
+          <tbody id="oppMPitLog"></tbody>
+        </table></div>
+        <div id="oppMNoPit" class="no-data" style="display:none">No pitching stats yet.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- EDIT GAME RESULT MODAL -->
 <div class="edit-modal-overlay" id="editResultModal" onclick="closeEditResultOnBg(event)">
   <div class="edit-modal">
@@ -979,17 +1013,17 @@ function requirePassword(){
 // ── PLAYERS ───────────────────────────────────────────────────────────────
 const PLAYERS = [
   {id:1,  num:1,  first:'Mae'},
-  {id:2,  num:2,  first:'Elfie'},
-  {id:3,  num:3,  first:'Cora'},
-  {id:4,  num:4,  first:'Isla'},
-  {id:5,  num:5,  first:'Riley'},
-  {id:6,  num:6,  first:'Ellen'},
-  {id:7,  num:7,  first:'Stevie'},
-  {id:8,  num:8,  first:'Evelyn'},
-  {id:9,  num:9,  first:'Harper'},
-  {id:10, num:10, first:'Rosalie'},
-  {id:11, num:11, first:'Weslyn'},
-  {id:12, num:12, first:'Vaani'},
+  {id:2,  num:8,  first:'Elfie'},
+  {id:3,  num:2,  first:'Cora'},
+  {id:4,  num:5,  first:'Isla'},
+  {id:5,  num:3,  first:'Riley'},
+  {id:6,  num:10, first:'Ellen'},
+  {id:7,  num:4,  first:'Stevie'},
+  {id:8,  num:11, first:'Evelyn'},
+  {id:9,  num:12, first:'Harper'},
+  {id:10, num:6,  first:'Rosalie'},
+  {id:11, num:7,  first:'Weslyn'},
+  {id:12, num:9,  first:'Vaani'},
 ];
 
 // ── DATA ──────────────────────────────────────────────────────────────────
@@ -1534,7 +1568,7 @@ window.renderLeagueStats=function(){
     PLAYERS.forEach(p=>{
       const b=bStats(p.id), pit=pStats(p.id);
       players.push({
-        num:p.num, name:p.first,
+        num:p.num, name:p.first, pid:p.id,
         g:b.g, ab:b.ab, r:b.r, h:b.h, d:b.d, t:b.t, hr:b.hr, rbi:b.rbi, so:b.so,
         avg:b.avg, obp:b.obp, slg:b.slg,
         pg:pit.g, ip:pit.ip, er:pit.er, ph:pit.ph, pk:pit.pk, ppo:pit.ppo,
@@ -1556,7 +1590,7 @@ window.renderLeagueStats=function(){
       gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=(g.d||0);s.t+=(g.t||0);s.hr+=g.hr;s.rbi+=g.rbi;s.so+=g.so;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
       const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
       players.push({
-        num:first.playerNum||0, name:first.playerName,
+        num:first.playerNum||0, name:first.playerName, playerId:pid,
         g:gs.length, ab:s.ab, r:s.r, h:s.h, d:s.d, t:s.t, hr:s.hr, rbi:s.rbi, so:s.so,
         avg:s.ab>0?s.h/s.ab:0,
         obp:(s.ab)>0?s.h/s.ab:0,
@@ -1604,7 +1638,11 @@ window.renderLeagueStats=function(){
   // ── Batting rows ────────────────────────────────────────────────────────
   const batRows=players.filter(p=>p.ab>0).map(p=>`
     <tr>
-      <td style="text-align:left;padding-left:12px;font-weight:700;"><span class="player-num">${p.num}</span>${p.name}</td>
+      <td style="text-align:left;padding-left:12px;font-weight:700;">
+        ${p.pid
+          ? `<span style="cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openModal(${p.pid})"><span class="player-num">${p.num}</span>${p.name}</span>`
+          : `<span style="cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${p.playerId}')"><span class="player-num">${p.num}</span>${p.name}</span>`}
+      </td>
       <td>${p.g}</td><td>${p.ab}</td><td>${p.r}</td><td>${p.h}</td>
       <td>${p.d}</td><td>${p.t}</td><td>${p.hr}</td><td>${p.rbi}</td><td>${p.so}</td>
       <td class="stat-avg">${f3(p.avg)}</td><td>${f3(p.slg)}</td>
@@ -1620,7 +1658,11 @@ window.renderLeagueStats=function(){
   // ── Pitching rows ───────────────────────────────────────────────────────
   const pitRows=players.filter(p=>p.ip>0).map(p=>`
     <tr>
-      <td style="text-align:left;padding-left:12px;font-weight:700;"><span class="player-num">${p.num}</span>${p.name}</td>
+      <td style="text-align:left;padding-left:12px;font-weight:700;">
+        ${p.pid
+          ? `<span style="cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openModal(${p.pid})"><span class="player-num">${p.num}</span>${p.name}</span>`
+          : `<span style="cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${p.playerId}')"><span class="player-num">${p.num}</span>${p.name}</span>`}
+      </td>
       <td>${p.pg}</td><td>${p.ip.toFixed(1)}</td><td>${p.er}</td>
       <td>${p.ph}</td><td>${p.pk}</td><td>${p.ppo}</td>
       <td class="stat-avg">${f2(p.doip)}</td><td class="stat-avg">${f2(p.era)}</td>
@@ -2132,9 +2174,9 @@ function renderLeagueLeaders(){
   PLAYERS.forEach(p=>{
     const s=bStats(p.id);
     const ps2=pStats(p.id);
-    if(s.ab>0) allBat.push({name:p.first,team:'Little Wombats',num:p.num,...s});
+    if(s.ab>0) allBat.push({name:p.first,team:'Little Wombats',num:p.num,pid:p.id,...s});
     const fs2=fStats(p.id);
-    if(ps2.ip>0) allPit.push({name:p.first,team:'Little Wombats',num:p.num,...ps2,po:fs2.po});
+    if(ps2.ip>0) allPit.push({name:p.first,team:'Little Wombats',num:p.num,pid:p.id,...ps2,po:fs2.po});
   });
 
   // Opponent players — aggregate across all games (opp vs opp AND LW games)
@@ -2165,8 +2207,8 @@ function renderLeagueLeaders(){
     const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
     s.slg=s.ab>0?tb/s.ab:0;
     s.era=s.ip>0?(s.er/s.ip)*3:null;
-    if(s.ab>0) allBat.push({name:first.playerName,team:teamName,num:first.playerNum,...s});
-    if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,...s,po:s.po||0});
+    if(s.ab>0) allBat.push({name:first.playerName,team:teamName,num:first.playerNum,playerId:pid,...s});
+    if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,playerId:pid,...s,po:s.po||0});
   });
 
   function leaderList(arr, key, asc=false, limit=20){
@@ -2175,10 +2217,13 @@ function renderLeagueLeaders(){
     return sorted.slice(0,limit).map((x,i)=>{
       const rankCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
       const val=key==='avg'||key==='obp'||key==='slg'?f3(x[key]):key==='era'||key==='doip'?f2(x[key]):(key==='ip'?x[key].toFixed(1):x[key]);
+      const nameEl=x.pid
+        ? `<span style="flex:1;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openModal(${x.pid})">${x.name}</span>`
+        : `<span style="flex:1;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${x.playerId}')">${x.name}</span>`;
       return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eee;">
         <span class="rank-num ${rankCls}">${i+1}</span>
         <span class="player-num" style="background:var(--green-dark)">${x.num}</span>
-        <span style="flex:1;font-weight:700">${x.name}</span>
+        ${nameEl}
         <span style="font-size:.75rem;color:#777;margin-right:4px">${x.team}</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--green-dark)">${val}</span>
       </div>`;
@@ -2654,6 +2699,103 @@ window.saveEditPlayer=async function(){
 }
 window.closeEditPlayer=()=>document.getElementById('editPlayerModal').classList.remove('active');
 window.closeEditPlayerOnBg=e=>{if(e.target===document.getElementById('editPlayerModal'))closeEditPlayer();};
+
+// ── OPPONENT PLAYER MODAL ─────────────────────────────────────────────────
+window.openOppModal=function(playerId){
+  // Find all stats for this player
+  const gs=oppPlayerStats.filter(x=>x.playerId===playerId);
+  if(!gs.length) return;
+  const first=gs[0];
+
+  // Resolve team name
+  let teamName='Unknown';
+  if(first.teamId&&first.teamId.startsWith('lw_opp:')){
+    const slug=first.teamId.slice(7);
+    const found=oppTeams.find(t=>t.name.toLowerCase().replace(/\s+/g,'_')===slug);
+    teamName=found?found.name:slug;
+  } else {
+    teamName=tName(first.teamId);
+  }
+
+  document.getElementById('oppModalName').textContent=`#${first.playerNum||'—'} ${first.playerName}`;
+  document.getElementById('oppModalTeam').textContent=teamName.toUpperCase()+' · 6U SOFTBALL';
+  document.getElementById('oppPlayerModal').classList.add('active');
+  switchOppModalTab('omb');
+  renderOppModal(playerId, gs, teamName);
+}
+
+function renderOppModal(playerId, gs, teamName){
+  // Aggregate career stats
+  const bat={g:gs.length,ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0};
+  const pit={g:0,ip:0,er:0,ph:0,pk:0,ppo:0};
+  gs.forEach(g=>{
+    bat.ab+=g.ab||0; bat.r+=g.r||0; bat.h+=g.h||0; bat.d+=g.d||0;
+    bat.t+=g.t||0; bat.hr+=g.hr||0; bat.rbi+=g.rbi||0; bat.so+=g.so||0;
+    if(g.ip>0){ pit.g++; pit.ip+=g.ip; pit.er+=g.er||0; pit.ph+=g.ph||0; pit.pk+=g.pk||0; pit.ppo+=g.ppo||0; }
+  });
+  bat.avg=bat.ab>0?bat.h/bat.ab:0;
+  const tb=(bat.h-bat.d-bat.t-bat.hr)+2*bat.d+3*bat.t+4*bat.hr;
+  bat.slg=bat.ab>0?tb/bat.ab:0;
+  pit.era=pit.ip>0?(pit.er/pit.ip)*3:null;
+  pit.doip=pit.ip>0?pit.ppo/pit.ip:0;
+
+  // Batting card
+  document.getElementById('oppMCardBat').innerHTML=[
+    ['G',bat.g],['AB',bat.ab],['R',bat.r],['H',bat.h],
+    ['2B',bat.d],['3B',bat.t],['HR',bat.hr],['RBI',bat.rbi],['SO',bat.so],
+    ['AVG',f3(bat.avg)],['SLG',f3(bat.slg)]
+  ].map(([l,v])=>`<div class="card-stat"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
+
+  // Pitching card
+  document.getElementById('oppMCardPit').innerHTML=[
+    ['G',pit.g],['IP',pit.ip.toFixed(1)],['ER',pit.er],
+    ['H',pit.ph],['K',pit.pk],['Team PO',pit.ppo],
+    ['DO/IP',f2(pit.doip)],['ERA',f2(pit.era)]
+  ].map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
+
+  // Batting log
+  const bBody=document.getElementById('oppMBatLog'); bBody.innerHTML='';
+  gs.forEach(g=>{
+    const avg=g.ab>0?f3(g.h/g.ab):'.---';
+    // Resolve game context
+    const lwg=gameResults.find(x=>x._id===g.lwGameId||x.gameNum===g.gameNum);
+    const oppg=oppGames.find(x=>x._id===g.oppGameId);
+    const date=g.date||(lwg?lwg.date:oppg?oppg.date:'—');
+    const vsTeam=g.isLwGame?'Little Wombats':(oppg?`${tName(oppg.teamAId)} vs ${tName(oppg.teamBId)}`:'—');
+    const gNum=g.gameNum||g.lwGameNum||'—';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong>G${gNum}</strong></td><td>${date}</td><td style="font-size:.8rem;">${vsTeam}</td>
+      <td>${g.ab||0}</td><td>${g.r||0}</td><td>${g.h||0}</td><td>${g.d||0}</td><td>${g.t||0}</td>
+      <td>${g.hr||0}</td><td>${g.rbi||0}</td><td>${g.so||0}</td><td>${avg}</td>`;
+    bBody.appendChild(tr);
+  });
+  document.getElementById('oppMNoBat').style.display=gs.length?'none':'block';
+
+  // Pitching log
+  const pitched=gs.filter(g=>g.ip>0);
+  const pBody=document.getElementById('oppMPitLog'); pBody.innerHTML='';
+  pitched.forEach(g=>{
+    const oppg=oppGames.find(x=>x._id===g.oppGameId);
+    const date=g.date||(oppg?oppg.date:'—');
+    const vsTeam=g.isLwGame?'Little Wombats':(oppg?`${tName(oppg.teamAId)} vs ${tName(oppg.teamBId)}`:'—');
+    const gNum=g.gameNum||g.lwGameNum||'—';
+    const doip=g.ip>0?f2((g.ppo||0)/g.ip):'—';
+    const era=g.ip>0?f2((g.er/g.ip)*3):'—';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong>G${gNum}</strong></td><td>${date}</td><td style="font-size:.8rem;">${vsTeam}</td>
+      <td>${g.ip.toFixed(1)}</td><td>${g.er||0}</td><td>${g.ph||0}</td><td>${g.pk||0}</td>
+      <td>${g.ppo||0}</td><td>${doip}</td><td>${era}</td>`;
+    pBody.appendChild(tr);
+  });
+  document.getElementById('oppMNoPit').style.display=pitched.length?'none':'block';
+}
+
+window.closeOppModal=()=>document.getElementById('oppPlayerModal').classList.remove('active');
+window.closeOppModalBg=e=>{if(e.target===document.getElementById('oppPlayerModal'))closeOppModal();};
+window.switchOppModalTab=function(name){
+  ['omb','omp'].forEach(t=>document.getElementById('modal-'+t).classList.toggle('active',t===name));
+  document.querySelectorAll('#oppPlayerModal .modal-tab-btn').forEach((b,i)=>b.classList.toggle('active',['omb','omp'][i]===name));
+}
 
 // ── PLAYER MODAL ──────────────────────────────────────────────────────────
 window.openModal=function(pid,tab='mb'){
