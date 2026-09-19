@@ -1632,8 +1632,10 @@ window.renderLeagueStats=function(){
       const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,ip:0,er:0,ph:0,pk:0,ppo:0};
       gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=(g.d||0);s.t+=(g.t||0);s.hr+=g.hr;s.rbi+=g.rbi;s.so+=g.so;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
       const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
+      const latestRec=gs.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+      const latestNumR=latestRec?latestRec.playerNum||0:first.playerNum||0;
       players.push({
-        num:first.playerNum||0, name:first.playerName, playerId:pid,
+        num:latestNumR, name:first.playerName, playerId:pid,
         g:gs.length, ab:s.ab, r:s.r, h:s.h, d:s.d, t:s.t, hr:s.hr, rbi:s.rbi, so:s.so,
         avg:s.ab>0?s.h/s.ab:0,
         obp:(s.ab)>0?s.h/s.ab:0,
@@ -2259,8 +2261,11 @@ function renderLeagueLeaders(){
     const tb=(s.h-s.d-s.t-s.hr)+2*s.d+3*s.t+4*s.hr;
     s.slg=s.ab>0?tb/s.ab:0;
     s.era=s.ip>0?(s.er/s.ip)*3:null;
-    if(s.ab>0) allBat.push({name:first.playerName,team:teamName,num:first.playerNum,playerId:pid,...s});
-    if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:first.playerNum,playerId:pid,...s,po:s.po||0});
+    // Use most recently dated game's jersey number
+    const latestGs=gs.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+    const latestNum=latestGs?latestGs.playerNum||0:first.playerNum||0;
+    if(s.ab>0) allBat.push({name:first.playerName,team:teamName,num:latestNum,playerId:pid,...s});
+    if(s.ip>0) allPit.push({name:first.playerName,team:teamName,num:latestNum,playerId:pid,...s,po:s.po||0});
   });
 
   function leaderList(arr, key, asc=false, limit=20){
@@ -2579,7 +2584,7 @@ function renderOppGrids(existing){
   const pitBody=document.getElementById('opp-pit-body'); pitBody.innerHTML='';
 
   oppGridRows.forEach((row,ri)=>{
-    const ex=existing.find(x=>x.playerName&&x.playerName.toLowerCase()===row.name.toLowerCase()&&x.playerNum==row.num);
+    const ex=existing.find(x=>x.playerName&&x.playerName.toLowerCase()===row.name.toLowerCase());
     // Batting row
     const btr=document.createElement('tr');
     btr.innerHTML=`
