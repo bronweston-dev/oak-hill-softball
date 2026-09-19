@@ -1251,7 +1251,9 @@ let fldPositions = {}; // {pid: [{pos,inn,po,a}]}
 function buildGrids(gameNum){
   const existing = playerStats.filter(x=>x.gameNum===gameNum).sort((a,b)=>(a.batOrder||99)-(b.batOrder||99));
   if(existing.length>0){
+    // Use saved batting order to sort players
     gridPlayers = existing.map(e=>PLAYERS.find(p=>p.id===e.pid)).filter(Boolean);
+    // Add any players not yet entered at the end
     PLAYERS.forEach(p=>{ if(!gridPlayers.find(x=>x.id===p.id)) gridPlayers.push(p); });
   } else {
     gridPlayers = [...PLAYERS];
@@ -2520,8 +2522,10 @@ window.buildOppGrids=function(){
 
   // Always rebuild oppGridRows fresh for the selected game+team
   if(existing.length>0){
-    // Pre-fill from existing saved stats
-    oppGridRows=existing.map(x=>({num:x.playerNum||0,name:x.playerName||''}));
+    // Pre-fill from existing saved stats, sorted by batting order
+    oppGridRows=existing
+      .sort((a,b)=>(a.batOrder||99)-(b.batOrder||99))
+      .map(x=>({num:x.playerNum||0,name:x.playerName||'',batOrder:x.batOrder||99}));
   } else {
     // Pre-fill from registered roster
     // For LW games teamVal is 'opp:TeamName' — find team by name instead
@@ -2534,7 +2538,7 @@ window.buildOppGrids=function(){
       teamDbId=oppTeams.find(t=>t._id===teamVal)?teamVal:null;
     }
     const roster=teamDbId?oppRosters.filter(r=>r.teamId===teamDbId).sort((a,b)=>a.num-b.num):[];
-    oppGridRows=roster.length>0 ? roster.map(r=>({num:r.num,name:r.name})) : [{num:0,name:''}];
+    oppGridRows=roster.length>0 ? roster.map((r,i)=>({num:r.num,name:r.name,batOrder:i+1})) : [{num:0,name:'',batOrder:1}];
   }
   renderOppGrids(existing);
 }
