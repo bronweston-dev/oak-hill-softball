@@ -523,6 +523,7 @@
             <thead><tr>
               <th class="player-col">#</th>
               <th style="min-width:80px;">Name</th>
+              <th>Bat#</th>
               <th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th>
               <th>✕</th>
             </tr></thead>
@@ -2494,8 +2495,10 @@ function saveOppGridToState(){
     if(!oppGridRows[ri]) return;
     const numEl=tr.querySelector('input[data-of="num"]');
     const nameEl=tr.querySelector('input[data-of="name"]');
+    const batEl=tr.querySelector('input[data-of="batOrder"]');
     if(numEl) oppGridRows[ri].num=+numEl.value||0;
     if(nameEl) oppGridRows[ri].name=nameEl.value.trim();
+    if(batEl) oppGridRows[ri].batOrder=+batEl.value||ri+1;
   });
 }
 
@@ -2529,6 +2532,7 @@ function renderOppGrids(existing){
     btr.innerHTML=`
       <td><input type="number" min="0" value="${row.num}" data-ogi="${ri}" data-of="num" ${NS}></td>
       <td><input type="text" value="${row.name}" data-ogi="${ri}" data-of="name" placeholder="Name" style="width:75px;padding:3px 2px;font-size:.82rem;"></td>
+      <td><input type="number" min="1" value="${ex?ex.batOrder||ri+1:ri+1}" data-ogi="${ri}" data-of="batOrder" ${NS}></td>
       <td><input type="number" min="0" value="${ex?ex.ab:0}" data-ogi="${ri}" data-of="ab" ${NS}></td>
       <td><input type="number" min="0" value="${ex?ex.r:0}" data-ogi="${ri}" data-of="r" ${NS}></td>
       <td><input type="number" min="0" value="${ex?ex.h:0}" data-ogi="${ri}" data-of="h" ${NS}></td>
@@ -2567,7 +2571,7 @@ function readOppGrid(){
     const ptr=pitRows[ri];
     const getPit=(f)=>{ const el=ptr?ptr.querySelector(`input[data-of="${f}"]`):null; return el?(+el.value||0):0; };
     rows.push({
-      num:get('num'),name:get('name'),
+      num:get('num'),name:get('name'),batOrder:get('batOrder')||ri+1,
       ab:get('ab'),r:get('r'),h:get('h'),d:get('d'),t:get('t'),hr:get('hr'),rbi:get('rbi'),so:get('so'),
       ip:getPit('ip'),er:getPit('er'),ph:getPit('ph'),pk:getPit('pk'),ppo:getPit('ppo')
     });
@@ -2599,6 +2603,7 @@ async function saveOppGrid(section){
         oppGameId:ctx.oppGameId||null, lwGameId:ctx.lwGameId||null,
         lwGameNum:ctx.lwGameNum, playerId, playerName:row.name, playerNum:row.num,
         gameNum:ctx.lwGameNum, teamId:ctx.teamId, isLwGame:ctx.isLwGame,
+        batOrder:row.batOrder||ri+1,
         ab:row.ab,r:row.r,h:row.h,d:row.d,t:row.t,hr:row.hr,rbi:row.rbi,so:row.so,
         ip:row.ip,er:row.er,ph:row.ph,pk:row.pk,ppo:row.ppo
       };
