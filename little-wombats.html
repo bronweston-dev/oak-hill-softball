@@ -737,7 +737,12 @@
           <label>Opponent</label>
           <input type="text" id="ps-opp" readonly style="background:#e8e8e8;color:#555;width:140px;">
         </div>
-        <button class="btn btn-secondary" onclick="resetGrids()" style="align-self:end;">↺ Reset All Grids</button>
+        <button class="btn btn-secondary" onclick="resetGrids()" style="align-self:end;">↺ All Players</button>
+        <div class="form-group" style="align-self:end;">
+          <select id="readd-player-sel" onchange="readdPlayer()" style="font-family:'Oswald',sans-serif;font-size:.82rem;padding:6px 8px;border:2px solid var(--gray);border-radius:6px;">
+            <option value="">+ Add player back</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -1295,6 +1300,7 @@ function renderBatGrid(gameNum){
       <td><button class="remove-row-btn" title="Remove from game" onclick="removeBatRow(${p.id},${gameNum})">✕</button></td>`;
     body.appendChild(tr);
   });
+  updateReaddDropdown();
 }
 
 function renderFldGrid(gameNum){
@@ -1375,14 +1381,48 @@ window.moveBatRow=function(pid,dir,gameNum){
   renderBatGrid(gameNum); renderFldGrid(gameNum); renderPitGrid(gameNum);
 }
 
-window.removeBatRow=function(pid,gameNum){
+window.removeBatRow=async function(pid,gameNum){
+  // Save current fielding values first
   document.querySelectorAll('input[data-fpid]').forEach(inp=>{
     const fpid=parseInt(inp.dataset.fpid), ri=parseInt(inp.dataset.ri), ff=inp.dataset.ff;
     if(!fldPositions[fpid]||!fldPositions[fpid][ri]) return;
     fldPositions[fpid][ri][ff] = ff==='pos' ? inp.value.trim() : (+inp.value||0);
   });
+  // If this player has a saved record for this game, delete it from Firebase
+  const existing=getExisting(gameNum,pid);
+  if(existing){
+    const p=PLAYERS.find(x=>x.id===pid);
+    if(!confirm(`Remove ${p?p.first:'player'} from Game #${gameNum}? This will delete their saved stats for this game.`)) return;
+    if(!requirePassword()) return;
+    try{
+      await deleteDoc(doc(db,'lw_player_stats',existing._id));
+    }catch(e){ alert('Error deleting stats: '+e.message); return; }
+  }
   gridPlayers=gridPlayers.filter(p=>p.id!==pid);
+  delete fldPositions[pid];
   renderBatGrid(gameNum); renderFldGrid(gameNum); renderPitGrid(gameNum);
+}
+
+window.readdPlayer=function(){
+  const sel=document.getElementById('readd-player-sel');
+  const pid=parseInt(sel.value); if(!pid) return;
+  const p=PLAYERS.find(x=>x.id===pid); if(!p) return;
+  if(!gridPlayers.find(x=>x.id===pid)){
+    gridPlayers.push(p);
+    fldPositions[pid]=[{pos:'',inn:0,po:0,a:0}];
+  }
+  sel.value='';
+  const gameNum=parseInt(document.getElementById('ps-gamenum').value);
+  renderBatGrid(gameNum); renderFldGrid(gameNum); renderPitGrid(gameNum);
+}
+
+function updateReaddDropdown(){
+  const sel=document.getElementById('readd-player-sel');
+  if(!sel) return;
+  const missing=PLAYERS.filter(p=>!gridPlayers.find(x=>x.id===p.id));
+  sel.innerHTML='<option value="">+ Add player back</option>';
+  missing.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=`#${p.num} ${p.first}`; sel.appendChild(o); });
+  sel.style.display=missing.length?'':'none';
 }
 
 window.resetGrids=function(){
@@ -1909,6 +1949,11 @@ window.showBoxScore=function(num){
     (matchOppGame && x.oppGameId===matchOppGame._id)
   );
   const oppPlayerIds = [...new Set(oppGamePlayers.map(x=>x.playerId))];
+  // Sort opponent players by batting order
+  const oppSorted = oppPlayerIds
+    .map(pid=>({pid, batOrder:oppGamePlayers.find(x=>x.playerId===pid)?.batOrder||99}))
+    .sort((a,b)=>a.batOrder-b.batOrder)
+    .map(x=>x.pid);
 
   function oppBatRow(pid){
     const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs) return '';
@@ -1922,8 +1967,8 @@ window.showBoxScore=function(num){
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*3):'—'}</td></tr>`;
   }
-  const oppBatRows = oppPlayerIds.map(oppBatRow).join('');
-  const oppPitRows = oppPlayerIds.map(oppPitRow).filter(Boolean).join('');
+  const oppBatRows = oppSorted.map(oppBatRow).join('');
+  const oppPitRows = oppSorted.map(oppPitRow).filter(Boolean).join('');
 
   // ── Section headers with team name dividers ───────────────────────────────
   function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="11" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
@@ -1990,8 +2035,12 @@ window.showOppBoxScore=function(oppGameId){
 
   // Player stats split by team
   const gPlayers=oppPlayerStats.filter(x=>x.oppGameId===oppGameId);
-  const aPlayers=[...new Set(gPlayers.filter(x=>x.teamId===g.teamAId).map(x=>x.playerId))];
-  const bPlayers=[...new Set(gPlayers.filter(x=>x.teamId===g.teamBId).map(x=>x.playerId))];
+  // Sort each team's players by batting order
+  const sortByBatOrder=(pids,stats)=>pids
+    .map(pid=>({pid,batOrder:stats.find(x=>x.playerId===pid)?.batOrder||99}))
+    .sort((a,b)=>a.batOrder-b.batOrder).map(x=>x.pid);
+  const aPlayers=sortByBatOrder([...new Set(gPlayers.filter(x=>x.teamId===g.teamAId).map(x=>x.playerId))],gPlayers);
+  const bPlayers=sortByBatOrder([...new Set(gPlayers.filter(x=>x.teamId===g.teamBId).map(x=>x.playerId))],gPlayers);
 
   function batRow(pid){
     const gs=gPlayers.find(x=>x.playerId===pid); if(!gs) return '';
