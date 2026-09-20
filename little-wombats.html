@@ -2225,7 +2225,7 @@ function renderStandings(){
       <td>${r.r}</td><td>${r.ra}</td>
       <td>${r.h}</td><td>${r.rbi}</td>
       <td>${f3(r.avg)}</td><td>${f3(r.slg)}</td><td>${r.oo}</td>
-      <td>${r.po}</td>`;
+      <td>${isLW?r.po:'<span style="color:#aaa;font-size:.8rem;">N/A</span>'}</td>`;
     body.appendChild(tr);
   });
   document.getElementById('noStandings').style.display=rows.length?'none':'block';
@@ -2281,7 +2281,11 @@ function renderLeagueLeaders(){
   });
 
   function leaderList(arr, key, asc=false, limit=20){
-    const sorted=[...arr].filter(x=>x[key]!==null&&x[key]!==undefined&&!isNaN(x[key]));
+    const sorted=[...arr].filter(x=>{
+      if(x[key]===null||x[key]===undefined||isNaN(x[key])) return false;
+      if(!asc && x[key]===0) return false; // hide zeros for counting stats (HR, 2B, etc)
+      return true;
+    });
     sorted.sort((a,b)=>asc?(a[key]-b[key]):(b[key]-a[key]));
     return sorted.slice(0,limit).map((x,i)=>{
       const rankCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
