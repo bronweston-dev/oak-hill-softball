@@ -1977,7 +1977,8 @@ window.showBoxScore=function(num){
   function oppBatRow(pid){
     const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs) return '';
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
-    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+    const normId=normalizePlayerId(gs);
+    return `<tr><td style="padding-left:12px;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${normId}')">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td></td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td>
       <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td><td>—</td></tr>`;
   }
@@ -2064,7 +2065,8 @@ window.showOppBoxScore=function(oppGameId){
   function batRow(pid){
     const gs=gPlayers.find(x=>x.playerId===pid); if(!gs) return '';
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
-    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+    const normId=normalizePlayerId(gs);
+    return `<tr><td style="padding-left:12px;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${normId}')">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td><td>${gs.t||0}</td>
       <td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`;
   }
