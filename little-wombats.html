@@ -1312,6 +1312,7 @@ function renderBatGrid(gameNum){
       <td><input type="number" min="0" value="${ex?ex.hr:0}" data-field="hr" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
       <td><input type="number" min="0" value="${ex?ex.rbi:0}" data-field="rbi" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
       <td><input type="number" min="0" value="${ex?ex.so:0}" data-field="so" class="bg" data-pid="${p.id}" style="width:36px;padding:3px 1px;font-size:.82rem;text-align:center;"></td>
+      <td><input type="url" data-field="ytplay" class="bg" data-pid="${p.id}" value="${ex&&ex.ytPlay?ex.ytPlay:''}" placeholder="youtube.com/..." style="width:120px;padding:3px 2px;font-size:.78rem;border:1px solid var(--gray);border-radius:3px;background:var(--gray-light);"></td>
       <td><button class="remove-row-btn" title="Remove from game" onclick="removeBatRow(${p.id},${gameNum})">✕</button></td>`;
     body.appendChild(tr);
   });
@@ -1947,7 +1948,8 @@ window.showBoxScore=function(num){
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---'; const potgGm=g.potgIds&&g.potgIds.includes(p.id);
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}${potgGm?' ⭐':''}</td>
       <td>${gs.batOrder||''}</td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d}</td>
-      <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`; }).join('');
+      <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td>
+      <td>${gs.ytPlay?`<a href="${gs.ytPlay}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;background:#ff0000;color:white;font-family:'Oswald',sans-serif;font-size:.65rem;letter-spacing:1px;padding:2px 6px;border-radius:3px;text-decoration:none;font-weight:700;">▶</a>`:'—'}</td></tr>`; }).join('');
 
   const fldRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
@@ -1977,7 +1979,7 @@ window.showBoxScore=function(num){
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td></td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td>
-      <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`;
+      <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td><td>—</td></tr>`;
   }
   function oppPitRow(pid){
     const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
@@ -1988,7 +1990,7 @@ window.showBoxScore=function(num){
   const oppPitRows = oppSorted.map(oppPitRow).filter(Boolean).join('');
 
   // ── Section headers with team name dividers ───────────────────────────────
-  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="11" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
+  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="12" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerFld(name){ return `<tr style="background:var(--green-dark);"><td colspan="5" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
 
@@ -2011,7 +2013,7 @@ window.showBoxScore=function(num){
     </div>
     <div class="bs-section"><div class="bs-section-title">Batting</div>
       ${hasBatStats?`<div class="table-wrap"><table class="bs-table"><thead><tr>
-        <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th>
+        <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th><th>🎬</th>
       </tr></thead><tbody>
         ${lineup.length?teamDivider('Little Wombats')+batRows:''}
         ${oppBatRows?teamDivider(g.opp)+oppBatRows:''}
