@@ -1087,6 +1087,14 @@ function f3(n){ if(n===null||n===undefined||isNaN(n)) return '—'; return n.toF
 function f2(n){ if(n===null||n===undefined||isNaN(n)) return '—'; return n.toFixed(2); }
 function pName(id){ const p=PLAYERS.find(x=>x.id===id); return p?p.first:'?'; }
 function tName(id){ const t=oppTeams.find(x=>x._id===id); return t?t.name:'?'; }
+function normalizePlayerId(stat){
+  // Always resolve to team-name-slug based playerId so LW game and opp vs opp records merge
+  if(!stat.teamId||stat.teamId.startsWith('lw_opp:')) return stat.playerId;
+  const t=oppTeams.find(x=>x._id===stat.teamId);
+  if(!t) return stat.playerId;
+  const slug=t.name.toLowerCase().replace(/\s+/g,'_');
+  return stat.playerId.replace(stat.teamId+'_', slug+'_');
+}
 
 // ── STAT CALCS ────────────────────────────────────────────────────────────
 function bStats(pid){
@@ -1624,17 +1632,9 @@ window.renderLeagueStats=function(){
     const slug=teamObj2?teamObj2.name.toLowerCase().replace(/\s+/g,'_'):'';
     const lwPseudoId='lw_opp:'+slug;
     const allOppStats=oppPlayerStats.filter(x=>x.teamId===teamId||x.teamId===lwPseudoId);
-    // Normalize playerIds to name-slug-based so records from different game types merge
-    function normPid(stat){
-      if(!stat.teamId||stat.teamId.startsWith('lw_opp:')) return stat.playerId;
-      const t2=oppTeams.find(x=>x._id===stat.teamId);
-      if(!t2) return stat.playerId;
-      const sl=t2.name.toLowerCase().replace(/\s+/g,'_');
-      return stat.playerId.replace(stat.teamId+'_',sl+'_');
-    }
-    const pids=[...new Set(allOppStats.map(x=>normPid(x)))];
+    const pids=[...new Set(allOppStats.map(x=>normalizePlayerId(x)))];
     pids.forEach(pid=>{
-      const gs=allOppStats.filter(x=>normPid(x)===pid);
+      const gs=allOppStats.filter(x=>normalizePlayerId(x)===pid);
       if(!gs.length) return;
       const first=gs[0];
       const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,ip:0,er:0,ph:0,pk:0,ppo:0};
@@ -2242,14 +2242,6 @@ function renderLeagueLeaders(){
   });
 
   // Opponent players — aggregate across all games (opp vs opp AND LW games)
-  // Normalize playerIds — resolve real teamId-based playerIds to name-slug-based ones
-  function normalizePlayerId(stat){
-    if(!stat.teamId||stat.teamId.startsWith('lw_opp:')) return stat.playerId;
-    const t=oppTeams.find(x=>x._id===stat.teamId);
-    if(!t) return stat.playerId;
-    const slug=t.name.toLowerCase().replace(/\s+/g,'_');
-    return stat.playerId.replace(stat.teamId+'_', slug+'_');
-  }
   const oppPids=[...new Set(oppPlayerStats.map(x=>normalizePlayerId(x)))];
   oppPids.forEach(pid=>{
     const gs=oppPlayerStats.filter(x=>normalizePlayerId(x)===pid);
@@ -2787,8 +2779,8 @@ window.closeEditPlayerOnBg=e=>{if(e.target===document.getElementById('editPlayer
 
 // ── OPPONENT PLAYER MODAL ─────────────────────────────────────────────────
 window.openOppModal=function(playerId){
-  // Find all stats for this player
-  const gs=oppPlayerStats.filter(x=>x.playerId===playerId);
+  // Find all stats for this player across all game types using normalized playerId
+  const gs=oppPlayerStats.filter(x=>normalizePlayerId(x)===playerId);
   if(!gs.length) return;
   const first=gs[0];
 
