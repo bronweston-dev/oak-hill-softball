@@ -757,6 +757,7 @@
             <th class="player-col">Player</th>
             <th>Order</th>
             <th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th>
+            <th style="min-width:120px;">🎬 Key Play URL</th>
             <th>✕</th>
           </tr></thead>
           <tbody id="bat-grid-body"></tbody>
@@ -1469,12 +1470,12 @@ window.saveBattingGrid=async function(){
     const p=PLAYERS.find(x=>x.id===pid);
     if(!p) return;
     const inputs=tr.querySelectorAll('input.bg');
-    const vals={};
-    inputs.forEach(inp=>{ vals[inp.dataset.field]=+inp.value||0; });
+    const vals={ytplay:''};
+    inputs.forEach(inp=>{ if(inp.dataset.field==='ytplay') vals.ytplay=inp.value.trim(); else vals[inp.dataset.field]=+inp.value||0; });
     const rec={gameNum,pid,date:g.date,opp:g.opp,batOrder:i+1,
       ab:vals.ab||0,r:vals.r||0,h:vals.h||0,
       d:vals.d||0,t:vals.t||0,hr:vals.hr||0,
-      rbi:vals.rbi||0,so:vals.so||0};
+      rbi:vals.rbi||0,so:vals.so||0,ytPlay:vals.ytplay||''};
     const hasStats=rec.ab||rec.r||rec.h||rec.d||rec.t||rec.hr||rec.rbi||rec.so;
     rows.push({rec,pid,hasStats,existing:getExisting(gameNum,pid)});
   });
