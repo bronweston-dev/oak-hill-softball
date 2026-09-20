@@ -1089,7 +1089,11 @@ function pName(id){ const p=PLAYERS.find(x=>x.id===id); return p?p.first:'?'; }
 function tName(id){ const t=oppTeams.find(x=>x._id===id); return t?t.name:'?'; }
 function normalizePlayerId(stat){
   // Always resolve to team-name-slug based playerId so LW game and opp vs opp records merge
-  if(!stat.teamId||stat.teamId.startsWith('lw_opp:')) return stat.playerId;
+  if(!stat.teamId) return stat.playerId;
+  if(stat.teamId.startsWith('lw_opp:')){
+    // Convert lw_opp:golden_sparks_aurora_b → golden_sparks_aurora_b
+    return stat.playerId.replace(/^lw_opp:/,'');
+  }
   const t=oppTeams.find(x=>x._id===stat.teamId);
   if(!t) return stat.playerId;
   const slug=t.name.toLowerCase().replace(/\s+/g,'_');
@@ -2661,9 +2665,14 @@ async function saveOppGrid(section){
   setSync('syncing','Saving...');
   try{
     for(const row of validRows){
-      // Always use team name slug for playerId so opp-vs-opp and LW game records share the same ID
+      // Always use team name slug for playerId so all game types share the same ID
       const teamNameSlug=(()=>{
-        if(ctx.teamId.startsWith('lw_opp:')) return ctx.teamId.slice(7);
+        if(ctx.teamId.startsWith('lw_opp:')){
+          // Find the real team by name
+          const oppName=ctx.teamId.slice(7).replace(/_/g,' ');
+          const found=oppTeams.find(t=>t.name.toLowerCase().replace(/\s+/g,'_')===ctx.teamId.slice(7));
+          return found?found.name.toLowerCase().replace(/\s+/g,'_'):ctx.teamId.slice(7);
+        }
         const t=oppTeams.find(x=>x._id===ctx.teamId);
         return t?t.name.toLowerCase().replace(/\s+/g,'_'):ctx.teamId;
       })();
