@@ -8,11 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green:#5bb8e8; --green-dark:#1a3a6b; --green-light:#82ccee;
-    --gold:#e8e832; --gold-dark:#c9c900;
-    --white:#fff; --gray-light:#f0f6ff; --gray:#c8d4e8; --text:#0a1a3a;
-    --blue:#5bb8e8; --red:#d63a5a;
-    --shadow:0 4px 24px rgba(26,58,107,0.18);
+    --green:#4a6b1a; --green-dark:#2d5016; --green-light:#6a8f2a;
+    --gold:#c8a22a; --gold-dark:#a07818;
+    --white:#fff; --gray-light:#f5f7f0; --gray:#c8d4b8; --text:#1a2a0a;
+    --blue:#4a6b1a; --red:#c0392b;
+    --shadow:0 4px 24px rgba(45,80,22,0.18);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Roboto Condensed',sans-serif;background:var(--green-dark);background-image:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,0.015) 40px,rgba(255,255,255,0.015) 80px);color:var(--text);min-height:100vh;}
@@ -87,7 +87,7 @@
   thead th:hover{background:var(--green);}
   thead th.name-col{text-align:left;padding-left:14px;}
   tbody tr{border-bottom:1px solid var(--gray-light);transition:background .15s;cursor:pointer;}
-  tbody tr:hover{background:#f0f6ff;}
+  tbody tr:hover{background:#f5f7f0;}
   tbody td{padding:9px 8px;text-align:center;color:var(--text);}
   .name-cell{text-align:left;padding-left:14px;font-weight:700;}
   .player-num{display:inline-block;background:var(--green-dark);color:var(--gold);font-family:'Bebas Neue',sans-serif;border-radius:4px;padding:1px 6px;margin-right:6px;font-size:.95rem;}
@@ -144,7 +144,7 @@
   .linescore-cell.header{background:var(--green-dark);color:var(--gold);font-family:'Oswald',sans-serif;font-size:.75rem;letter-spacing:1px;}
   .linescore-cell.team-name{background:var(--gray-light);font-weight:700;font-family:'Oswald',sans-serif;font-size:.8rem;text-align:left;padding-left:10px;min-width:100px;flex:2;}
   .linescore-cell.total{background:var(--gray-light);font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;}
-  .linescore-cell.our-run{background:#f0f6ff;}
+  .linescore-cell.our-run{background:#f5f7f0;}
   .bs-table{width:100%;border-collapse:collapse;font-size:.85rem;}
   .bs-table th{background:var(--green-dark);color:var(--gold);font-family:'Oswald',sans-serif;font-size:.72rem;letter-spacing:1px;padding:8px 6px;text-align:center;text-transform:uppercase;}
   .bs-table th:first-child{text-align:left;padding-left:12px;}
@@ -199,7 +199,7 @@
   .log-table th:first-child{text-align:left;padding-left:10px;}
   .log-table td{padding:7px;text-align:center;border-bottom:1px solid var(--gray-light);}
   .log-table td:first-child{text-align:left;padding-left:10px;font-weight:700;}
-  .log-table tr:hover td{background:#f0f6ff;}
+  .log-table tr:hover td{background:#f5f7f0;}
 
   /* EDIT MODAL */
   .edit-modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,26,58,0.88);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
@@ -232,7 +232,7 @@
   .stat-grid-table th.player-col{text-align:left;padding-left:8px;min-width:90px;}
   .stat-grid-table td{padding:3px 2px;text-align:center;border-bottom:1px solid var(--gray-light);vertical-align:middle;}
   .stat-grid-table td.player-name-td{text-align:left;padding-left:6px;font-weight:700;font-size:.8rem;white-space:nowrap;}
-  .stat-grid-table tr:hover td{background:#f0fff4;}
+  .stat-grid-table tr:hover td{background:#f5f7f0;}
   .stat-grid-table input[type=number]{width:36px;padding:3px 1px;border:1px solid var(--gray);border-radius:3px;font-family:'Roboto Condensed',sans-serif;font-size:.82rem;text-align:center;background:var(--gray-light);}
   .stat-grid-table input[type=number]:focus{outline:none;border-color:var(--green);background:white;}
   .stat-grid-table input[type=text]{width:42px;padding:3px 1px;border:1px solid var(--gray);border-radius:3px;font-family:'Roboto Condensed',sans-serif;font-size:.82rem;text-align:center;background:var(--gray-light);}
