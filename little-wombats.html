@@ -2049,23 +2049,28 @@ window.showBoxScore=function(num){
     (x.lwGameId && gameResults.find(gr=>gr._id===x.lwGameId&&gr.gameNum===num)) ||
     (matchOppGame && x.oppGameId===matchOppGame._id)
   );
-  const oppPlayerIds = [...new Set(oppGamePlayers.map(x=>x.playerId))];
+  // Deduplicate by normalized playerId, keep most recent record per player
+  const oppNormMap={};
+  oppGamePlayers.forEach(x=>{
+    const norm=normalizePlayerId(x);
+    if(!oppNormMap[norm]||((x.date||'')>(oppNormMap[norm].date||''))) oppNormMap[norm]=x;
+  });
+  const oppPlayerIds=Object.keys(oppNormMap);
   // Sort opponent players by batting order
   const oppSorted = oppPlayerIds
-    .map(pid=>({pid, batOrder:oppGamePlayers.find(x=>x.playerId===pid)?.batOrder||99}))
+    .map(pid=>({pid, batOrder:oppNormMap[pid]?.batOrder||99}))
     .sort((a,b)=>a.batOrder-b.batOrder)
     .map(x=>x.pid);
 
-  function oppBatRow(pid){
-    const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs) return '';
+  function oppBatRow(normId){
+    const gs=oppNormMap[normId]; if(!gs) return '';
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
-    const normId=normalizePlayerId(gs);
     return `<tr><td style="padding-left:12px;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${normId}')">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td></td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td>
       <td>${gs.t||0}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td><td>—</td></tr>`;
   }
-  function oppPitRow(pid){
-    const gs=oppGamePlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
+  function oppPitRow(normId){
+    const gs=oppNormMap[normId]; if(!gs||!gs.ip) return '';
     return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*3):'—'}</td></tr>`;
   }
@@ -2135,35 +2140,44 @@ window.showOppBoxScore=function(oppGameId){
   const runsA=[0,1,2,3].map(i=>`<div class="linescore-cell">${innA[i]||0}</div>`).join('');
   const runsB=[0,1,2,3].map(i=>`<div class="linescore-cell">${innB[i]||0}</div>`).join('');
 
-  // Player stats split by team
+  // Player stats split by team — deduplicate by normalized playerId
   const gPlayers=oppPlayerStats.filter(x=>x.oppGameId===oppGameId);
+  function buildNormMap(teamId){
+    const map={};
+    gPlayers.filter(x=>x.teamId===teamId).forEach(x=>{
+      const norm=normalizePlayerId(x);
+      if(!map[norm]||((x.date||'')>(map[norm].date||''))) map[norm]=x;
+    });
+    return map;
+  }
+  const aMap=buildNormMap(g.teamAId);
+  const bMap=buildNormMap(g.teamBId);
   // Sort each team's players by batting order
-  const sortByBatOrder=(pids,stats)=>pids
-    .map(pid=>({pid,batOrder:stats.find(x=>x.playerId===pid)?.batOrder||99}))
+  const sortByBatOrder=(normMap)=>Object.keys(normMap)
+    .map(pid=>({pid,batOrder:normMap[pid]?.batOrder||99}))
     .sort((a,b)=>a.batOrder-b.batOrder).map(x=>x.pid);
-  const aPlayers=sortByBatOrder([...new Set(gPlayers.filter(x=>x.teamId===g.teamAId).map(x=>x.playerId))],gPlayers);
-  const bPlayers=sortByBatOrder([...new Set(gPlayers.filter(x=>x.teamId===g.teamBId).map(x=>x.playerId))],gPlayers);
+  const aPlayers=sortByBatOrder(aMap);
+  const bPlayers=sortByBatOrder(bMap);
 
-  function batRow(pid){
-    const gs=gPlayers.find(x=>x.playerId===pid); if(!gs) return '';
+  function batRow(normId,normMap){
+    const gs=normMap[normId]; if(!gs) return '';
     const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
-    const normId=normalizePlayerId(gs);
     return `<tr><td style="padding-left:12px;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${normId}')">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d||0}</td><td>${gs.t||0}</td>
       <td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`;
   }
-  function pitRow(pid){
-    const gs=gPlayers.find(x=>x.playerId===pid); if(!gs||!gs.ip) return '';
-    return `<tr><td style="padding-left:12px;font-weight:700;">#${gs.playerNum||'—'} ${gs.playerName}</td>
+  function pitRow(normId,normMap){
+    const gs=normMap[normId]; if(!gs||!gs.ip) return '';
+    return `<tr><td style="padding-left:12px;font-weight:700;cursor:pointer;color:var(--green-dark);text-decoration:underline;" onclick="openOppModal('${normId}')">#${gs.playerNum||'—'} ${gs.playerName}</td>
       <td>${gs.ip.toFixed(1)}</td><td>${gs.er}</td><td>${gs.ph}</td><td>${gs.pk}</td><td>${gs.ip>0?f2((gs.er/gs.ip)*3):'—'}</td></tr>`;
   }
   function teamDivBat(name){ return `<tr style="background:var(--green-dark);"><td colspan="10" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
   function teamDivPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);">${name}</td></tr>`; }
 
-  const aBatRows=aPlayers.map(batRow).join('');
-  const bBatRows=bPlayers.map(batRow).join('');
-  const aPitRows=aPlayers.map(pitRow).filter(Boolean).join('');
-  const bPitRows=bPlayers.map(pitRow).filter(Boolean).join('');
+  const aBatRows=aPlayers.map(pid=>batRow(pid,aMap)).join('');
+  const bBatRows=bPlayers.map(pid=>batRow(pid,bMap)).join('');
+  const aPitRows=aPlayers.map(pid=>pitRow(pid,aMap)).filter(Boolean).join('');
+  const bPitRows=bPlayers.map(pid=>pitRow(pid,bMap)).filter(Boolean).join('');
   const hasBat=aBatRows||bBatRows;
   const hasPit=aPitRows||bPitRows;
 
