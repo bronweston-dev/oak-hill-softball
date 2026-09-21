@@ -1777,7 +1777,7 @@ window.renderLeagueStats=function(){
     </div>
 
     <!-- Pitching -->
-    <div class="panel">
+    <div class="panel" style="margin-bottom:16px;">
       <div class="panel-header" style="cursor:default;">⚾ Pitching Stats</div>
       ${players.filter(p=>p.ip>0).length?`
       <div class="legend">
@@ -1793,6 +1793,60 @@ window.renderLeagueStats=function(){
         </tr></thead>
         <tbody>${pitRows}${pitTotRow}</tbody>
       </table></div>`:'<div class="no-data" style="padding:16px;">No pitching stats logged yet.</div>'}
+    </div>
+
+    <!-- Game Results -->
+    <div class="panel">
+      <div class="panel-header" style="cursor:default;">📋 Game Results</div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th style="text-align:left;padding-left:12px;">Game</th>
+          <th>Date</th><th>Opponent</th><th>Result</th><th>Score</th>
+        </tr></thead>
+        <tbody>
+          ${(()=>{
+            let rows='';
+            if(isLW){
+              [...gameResults].sort((a,b)=>a.gameNum-b.gameNum).forEach(g=>{
+                const diff=g.us-g.them;
+                const res=diff>0?'W':diff<0?'L':'T';
+                const rcls=diff>0?'result-w':diff<0?'result-l':'result-t';
+                rows+=`<tr style="cursor:pointer" onclick="showBoxScore(${g.gameNum})">
+                  <td style="text-align:left;padding-left:12px;font-weight:700;">G${g.gameNum}</td>
+                  <td>${g.date}</td><td>vs ${g.opp}</td>
+                  <td><span class="${rcls}">${res}</span></td>
+                  <td>${g.us}–${g.them}</td>
+                </tr>`;
+              });
+            } else {
+              // All games involving this team
+              const allGames=[];
+              oppGames.filter(g=>g.teamAId===teamId||g.teamBId===teamId).forEach(g=>{
+                const ourScore=g.teamAId===teamId?g.scoreA:g.scoreB;
+                const theirScore=g.teamAId===teamId?g.scoreB:g.scoreA;
+                const opp=g.teamAId===teamId?tName(g.teamBId):tName(g.teamAId);
+                allGames.push({date:g.date,opp,us:ourScore,them:theirScore,id:g._id,type:'opp'});
+              });
+              gameResults.filter(g=>g.opp.toLowerCase()===teamObj.name.toLowerCase()).forEach(g=>{
+                allGames.push({date:g.date,opp:'Little Wombats',us:g.them,them:g.us,gameNum:g.gameNum,type:'lw'});
+              });
+              allGames.sort((a,b)=>a.date.localeCompare(b.date)).forEach(g=>{
+                const diff=g.us-g.them;
+                const res=diff>0?'W':diff<0?'L':'T';
+                const rcls=diff>0?'result-w':diff<0?'result-l':'result-t';
+                const click=g.type==='lw'?`showBoxScore(${g.gameNum})`:`showOppBoxScore('${g.id}')`;
+                rows+=`<tr style="cursor:pointer" onclick="${click}">
+                  <td style="text-align:left;padding-left:12px;font-weight:700;">${g.date}</td>
+                  <td>${g.date}</td><td>vs ${g.opp}</td>
+                  <td><span class="${rcls}">${res}</span></td>
+                  <td>${g.us}–${g.them}</td>
+                </tr>`;
+              });
+            }
+            return rows||'<tr><td colspan="5" class="no-data">No games logged yet.</td></tr>';
+          })()}
+        </tbody>
+      </table></div>
     </div>`;
 }
 
