@@ -2630,10 +2630,13 @@ window.buildOppGrids=function(){
 
   // Always rebuild oppGridRows fresh for the selected game+team
   if(existing.length>0){
-    // Pre-fill from existing saved stats, sorted by batting order
-    oppGridRows=existing
-      .sort((a,b)=>(a.batOrder||99)-(b.batOrder||99))
-      .map(x=>({num:x.playerNum||0,name:x.playerName||'',batOrder:x.batOrder||99}));
+    // Pre-fill from existing saved stats — deduplicate by player name (keep most recent)
+    const seen={};
+    existing.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(x=>{
+      const key=x.playerName.toLowerCase();
+      if(!seen[key]) seen[key]={num:x.playerNum||0,name:x.playerName||'',batOrder:x.batOrder||99};
+    });
+    oppGridRows=Object.values(seen).sort((a,b)=>(a.batOrder||99)-(b.batOrder||99));
   } else {
     // Pre-fill from registered roster
     // For LW games teamVal is 'opp:TeamName' — find team by name instead
@@ -2768,9 +2771,12 @@ async function saveOppGrid(section){
         return t?t.name.toLowerCase().replace(/\s+/g,'_'):ctx.teamId;
       })();
       const playerId=`${teamNameSlug}_${row.name.toLowerCase().replace(/\s+/g,'_')}`
-      // Check for existing record
-      const existing=oppPlayerStats.find(x=>x.playerId===playerId&&
-        ((ctx.lwGameId&&x.lwGameId===ctx.lwGameId)||(ctx.oppGameId&&x.oppGameId===ctx.oppGameId)));
+      // Check for existing record — match by normalized playerId to handle old format records
+      const existing=oppPlayerStats.find(x=>{
+        const normX=normalizePlayerId(x);
+        const gameMatch=(ctx.lwGameId&&x.lwGameId===ctx.lwGameId)||(ctx.oppGameId&&x.oppGameId===ctx.oppGameId);
+        return gameMatch&&(normX===playerId||x.playerId===playerId);
+      });
       const rec={
         oppGameId:ctx.oppGameId||null, lwGameId:ctx.lwGameId||null,
         lwGameNum:ctx.lwGameNum, playerId, playerName:row.name, playerNum:row.num,
