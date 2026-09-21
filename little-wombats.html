@@ -2973,9 +2973,15 @@ function renderOppModal(playerId, gs, teamName){
     ['DO/IP',f2(pit.doip)],['ERA',f2(pit.era)]
   ].map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
 
-  // Batting log — sorted by date
+  // Batting log — sorted by date (resolve from game if not on stat record)
   const bBody=document.getElementById('oppMBatLog'); bBody.innerHTML='';
-  [...gs].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(g=>{
+  const resolveDate=g=>{
+    if(g.date) return g.date;
+    const lwg=gameResults.find(x=>x._id===g.lwGameId);
+    const oppg=oppGames.find(x=>x._id===g.oppGameId);
+    return lwg?lwg.date:oppg?oppg.date:'';
+  };
+  [...gs].sort((a,b)=>resolveDate(a).localeCompare(resolveDate(b))).forEach(g=>{
     const avg=g.ab>0?f3(g.h/g.ab):'.---';
     // Resolve game context
     const lwg=gameResults.find(x=>x._id===g.lwGameId||x.gameNum===g.gameNum);
@@ -2992,7 +2998,7 @@ function renderOppModal(playerId, gs, teamName){
   document.getElementById('oppMNoBat').style.display=gs.length?'none':'block';
 
   // Pitching log — sorted by date
-  const pitched=gs.filter(g=>g.ip>0).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const pitched=gs.filter(g=>g.ip>0).sort((a,b)=>resolveDate(a).localeCompare(resolveDate(b)));
   const pBody=document.getElementById('oppMPitLog'); pBody.innerHTML='';
   pitched.forEach(g=>{
     const oppg=oppGames.find(x=>x._id===g.oppGameId);
@@ -3037,7 +3043,10 @@ function renderModal(pid){
   document.getElementById('mCardPit').innerHTML=[['G',ps2.g],['IP',ps2.ip.toFixed(1)],['ER',ps2.er],['H',ps2.ph],['K',ps2.pk],['Team PO',ps2.ppo],['DO/IP',doip2],['ERA',f2(ps2.era)]]
     .map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
 
-  const gs=playerStats.filter(g=>g.pid===pid).sort((a,b)=>a.date.localeCompare(b.date));
+  const gs=playerStats.filter(g=>g.pid===pid).sort((a,b)=>{
+    if(a.date&&b.date) return a.date.localeCompare(b.date);
+    return a.gameNum-b.gameNum;
+  });
   const bBody=document.getElementById('mBatLog'); bBody.innerHTML='';
   gs.forEach(g=>{
     const avg=g.ab>0?f3(g.h/g.ab):'.---';
