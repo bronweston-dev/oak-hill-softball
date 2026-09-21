@@ -1609,6 +1609,21 @@ window.onOppGameSelect=function(){
 }
 
 // ── LEAGUE STATS PAGE ────────────────────────────────────────────────────
+// ── LEAGUE STATS SORT STATE ──────────────────────────────────────────────
+let lstatsBatSort={key:'avg',asc:false};
+let lstatsPitSort={key:'era',asc:true};
+
+window.sortLeagueBat=function(key){
+  if(lstatsBatSort.key===key) lstatsBatSort.asc=!lstatsBatSort.asc;
+  else { lstatsBatSort.key=key; lstatsBatSort.asc=false; }
+  renderLeagueStats();
+}
+window.sortLeaguePit=function(key){
+  if(lstatsPitSort.key===key) lstatsPitSort.asc=!lstatsPitSort.asc;
+  else { lstatsPitSort.key=key; lstatsPitSort.asc=(key==='era'||key==='doip'); }
+  renderLeagueStats();
+}
+
 window.renderLeagueStats=function(){
   const teamId=document.getElementById('lstats-team-sel').value;
   const content=document.getElementById('lstats-content');
@@ -1695,7 +1710,12 @@ window.renderLeagueStats=function(){
   const pct=gp>0?(w+t2*0.5)/gp:0;
 
   // ── Batting rows ────────────────────────────────────────────────────────
-  const batRows=players.filter(p=>p.ab>0).map(p=>`
+  // Sort batting players
+  const batSorted=players.filter(p=>p.ab>0).slice().sort((a,b)=>{
+    const v=lstatsBatSort.asc?(a[lstatsBatSort.key]||0)-(b[lstatsBatSort.key]||0):(b[lstatsBatSort.key]||0)-(a[lstatsBatSort.key]||0);
+    return v;
+  });
+  const batRows=batSorted.map(p=>`
     <tr>
       <td style="text-align:left;padding-left:12px;font-weight:700;">
         ${p.pid
@@ -1715,7 +1735,12 @@ window.renderLeagueStats=function(){
   </tr>`;
 
   // ── Pitching rows ───────────────────────────────────────────────────────
-  const pitRows=players.filter(p=>p.ip>0).map(p=>`
+  // Sort pitching players
+  const pitSorted=players.filter(p=>p.ip>0).slice().sort((a,b)=>{
+    const aVal=a[lstatsPitSort.key]??99999, bVal=b[lstatsPitSort.key]??99999;
+    return lstatsPitSort.asc?aVal-bVal:bVal-aVal;
+  });
+  const pitRows=pitSorted.map(p=>`
     <tr>
       <td style="text-align:left;padding-left:12px;font-weight:700;">
         ${p.pid
@@ -1770,7 +1795,8 @@ window.renderLeagueStats=function(){
       <div class="table-wrap"><table>
         <thead><tr>
           <th style="text-align:left;padding-left:12px;">Player</th>
-          <th>G</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th><th>SLG</th>
+          ${['g','ab','r','h','d','t','hr','rbi','so'].map(k=>`<th onclick="sortLeagueBat('${k}')" style="cursor:pointer;">${{g:'G',ab:'AB',r:'R',h:'H',d:'2B',t:'3B',hr:'HR',rbi:'RBI',so:'SO'}[k]}${lstatsBatSort.key===k?(lstatsBatSort.asc?' ▲':' ▼'):''}</th>`).join('')}
+          ${['avg','slg'].map(k=>`<th onclick="sortLeagueBat('${k}')" style="cursor:pointer;">${{avg:'AVG',slg:'SLG'}[k]}${lstatsBatSort.key===k?(lstatsBatSort.asc?' ▲':' ▼'):''}</th>`).join('')}
         </tr></thead>
         <tbody>${batRows}${batTotRow}</tbody>
       </table></div>`:'<div class="no-data" style="padding:16px;">No batting stats logged yet.</div>'}
@@ -1789,7 +1815,8 @@ window.renderLeagueStats=function(){
       <div class="table-wrap"><table>
         <thead><tr>
           <th style="text-align:left;padding-left:12px;">Player</th>
-          <th>G</th><th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th><th>DO/IP</th><th>ERA</th>
+          ${['pg','ip','er','ph','pk','ppo'].map(k=>`<th onclick="sortLeaguePit('${k}')" style="cursor:pointer;">${{pg:'G',ip:'IP',er:'ER',ph:'H',pk:'K',ppo:'Team PO'}[k]}${lstatsPitSort.key===k?(lstatsPitSort.asc?' ▲':' ▼'):''}</th>`).join('')}
+          ${['doip','era'].map(k=>`<th onclick="sortLeaguePit('${k}')" style="cursor:pointer;">${{doip:'DO/IP',era:'ERA'}[k]}${lstatsPitSort.key===k?(lstatsPitSort.asc?' ▲':' ▼'):''}</th>`).join('')}
         </tr></thead>
         <tbody>${pitRows}${pitTotRow}</tbody>
       </table></div>`:'<div class="no-data" style="padding:16px;">No pitching stats logged yet.</div>'}
@@ -1800,8 +1827,9 @@ window.renderLeagueStats=function(){
       <div class="panel-header" style="cursor:default;">📋 Game Results</div>
       <div class="table-wrap"><table>
         <thead><tr>
-          <th style="text-align:left;padding-left:12px;">Game</th>
-          <th>Date</th><th>Opponent</th><th>Result</th><th>Score</th>
+          <th style="text-align:left;padding-left:12px;">${isLW?'Game':'Date'}</th>
+          <th>${isLW?'Date':'Opponent'}</th>${isLW?'<th>Opponent</th>':''}
+          <th>Result</th><th>Score</th>
         </tr></thead>
         <tbody>
           ${(()=>{
@@ -1837,7 +1865,7 @@ window.renderLeagueStats=function(){
                 const click=g.type==='lw'?`showBoxScore(${g.gameNum})`:`showOppBoxScore('${g.id}')`;
                 rows+=`<tr style="cursor:pointer" onclick="${click}">
                   <td style="text-align:left;padding-left:12px;font-weight:700;">${g.date}</td>
-                  <td>${g.date}</td><td>vs ${g.opp}</td>
+                  <td>vs ${g.opp}</td>
                   <td><span class="${rcls}">${res}</span></td>
                   <td>${g.us}–${g.them}</td>
                 </tr>`;
