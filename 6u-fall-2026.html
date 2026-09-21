@@ -1393,8 +1393,15 @@ window.renderLeagueStats=function(){
     const allOppStats=oppPlayerStats.filter(x=>x.teamId===teamId||x.teamId===lwPseudoId);
     const pids=[...new Set(allOppStats.map(x=>normalizePlayerId(x)))];
     pids.forEach(pid=>{
-      const gs=allOppStats.filter(x=>normalizePlayerId(x)===pid);
-      if(!gs.length) return;
+      const allGs=allOppStats.filter(x=>normalizePlayerId(x)===pid);
+      if(!allGs.length) return;
+      // Deduplicate per game — keep most recent record per game
+      const gameMap={};
+      allGs.forEach(x=>{
+        const gameKey=x.oppGameId||x.lwGameId||'none';
+        if(!gameMap[gameKey]||((x.date||'')>(gameMap[gameKey].date||''))) gameMap[gameKey]=x;
+      });
+      const gs=Object.values(gameMap);
       const first=gs[0];
       const s={ab:0,r:0,h:0,d:0,t:0,hr:0,rbi:0,so:0,ip:0,er:0,ph:0,pk:0,ppo:0};
       gs.forEach(g=>{s.ab+=g.ab;s.r+=g.r;s.h+=g.h;s.d+=(g.d||0);s.t+=(g.t||0);s.hr+=g.hr;s.rbi+=g.rbi;s.so+=g.so;s.ip+=g.ip;s.er+=g.er;s.ph+=g.ph;s.pk+=g.pk;s.ppo+=(g.ppo||0);});
@@ -2013,18 +2020,28 @@ function renderStandings(){
     bRec.r+=g.scoreB; bRec.ra+=g.scoreA;
   });
 
-  // Opponent player stats aggregated per team
-  // Handle both real teamId (opp vs opp games) and lw_opp: pseudo-teamIds (LW games)
+  // Opponent player stats aggregated per team — deduplicate by normalized playerId per game
   oppTeams.forEach(t=>{
     if(!t._id||!t.name) return;
     const rec = getTeam(t._id, t.name);
     const slug = t.name.toLowerCase().replace(/\s+/g,'_');
     const lwPseudoId = 'lw_opp:'+slug;
-    // Collect stats from both real teamId and lw_opp: pseudo-teamId
-    oppPlayerStats.filter(x=>x.teamId===t._id||x.teamId===lwPseudoId).forEach(s=>{
+    // Collect all stats for this team
+    const teamStats=oppPlayerStats.filter(x=>x.teamId===t._id||x.teamId===lwPseudoId);
+    // Deduplicate per game by normalized playerId — keep most recent record
+    const gamePlayerMap={};
+    teamStats.forEach(s=>{
+      const gameKey=(s.oppGameId||s.lwGameId||'none');
+      const normId=normalizePlayerId(s);
+      const key=`${gameKey}_${normId}`;
+      if(!gamePlayerMap[key]||((s.date||'')>(gamePlayerMap[key].date||'')))
+        gamePlayerMap[key]=s;
+    });
+    Object.values(gamePlayerMap).forEach(s=>{
       rec.h+=s.h||0; rec.ab+=s.ab||0; rec.rbi+=s.rbi||0; rec.d+=s.d||0; rec.t2+=s.t||0; rec.hr+=s.hr||0;
     });
   });
+
 
   // Only show league teams in standings — must be LW or a known team with isLeague not false
   const rows = Object.values(teamRecords).filter(r=>{
@@ -2084,8 +2101,15 @@ function renderLeagueLeaders(){
   // Opponent players — aggregate across all games (opp vs opp AND LW games)
   const oppPids=[...new Set(oppPlayerStats.map(x=>normalizePlayerId(x)))];
   oppPids.forEach(pid=>{
-    const gs=oppPlayerStats.filter(x=>normalizePlayerId(x)===pid);
-    if(!gs.length) return;
+    const allGs=oppPlayerStats.filter(x=>normalizePlayerId(x)===pid);
+    if(!allGs.length) return;
+    // Deduplicate per game — keep most recent record per game
+    const gameMap={};
+    allGs.forEach(x=>{
+      const gameKey=x.oppGameId||x.lwGameId||'none';
+      if(!gameMap[gameKey]||((x.date||'')>(gameMap[gameKey].date||''))) gameMap[gameKey]=x;
+    });
+    const gs=Object.values(gameMap);
     const first=gs[0];
     if(!first.teamId) return; // skip entries with no teamId
     // Resolve team name — lw_opp: prefix means it's from a LW game, extract name from prefix or find by ID
