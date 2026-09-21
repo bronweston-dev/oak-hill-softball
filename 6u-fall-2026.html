@@ -1737,8 +1737,8 @@ window.showBoxScore=function(num){
 
   // ── LW players ──────────────────────────────────────────────────────────
   const batRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
-    const avg=gs.ab>0?f3(gs.h/gs.ab):'.---'; const potgGm=g.potgIds&&g.potgIds.includes(p.id);
-    return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}${potgGm?' ⭐':''}</td>
+    const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
+    return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
       <td>${gs.batOrder||''}</td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d}</td>
       <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td>
 </tr>`; }).join('');
@@ -1787,11 +1787,7 @@ window.showBoxScore=function(num){
   function teamDividerFld(name){ return `<tr style="background:var(--green-dark);"><td colspan="5" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
 
-  const potgIds_bs=g.potgIds||[], potgDescs_bs=g.potgDescs||{};
-  const potgSection=potgIds_bs.length?`<div class="potg-section"><div class="potg-title">⭐ Player of the Game</div>
-    <div class="potg-chips">${potgIds_bs.map(id=>`<div class="potg-chip">⭐ ${pName(id)}</div>`).join('')}</div>
-    ${potgIds_bs.map(id=>`<div style="margin-top:10px"><div style="font-family:'Oswald',sans-serif;font-size:.8rem;letter-spacing:1.5px;color:var(--green-dark);margin-bottom:4px">⭐ ${pName(id)}</div><div class="potg-desc">${potgDescs_bs[id]||'No description.'}</div></div>`).join('')}
-    </div>`:'';
+
 
   const hasBatStats = lineup.length||oppBatRows;
   const hasFldStats = lineup.length;
@@ -1826,7 +1822,6 @@ window.showBoxScore=function(num){
         ${pitchers.length?teamDividerPit('Little Wombats')+pitRows:''}
         ${oppPitRows?teamDividerPit(g.opp)+oppPitRows:''}
       </tbody></table></div></div>`:''}
-    ${potgSection}
   </div>`;
 }
 
