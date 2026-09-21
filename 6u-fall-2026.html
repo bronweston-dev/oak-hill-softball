@@ -2703,9 +2703,15 @@ function renderOppModal(playerId, gs, teamName){
     ['DO/IP',f2(pit.doip)],['ERA',f2(pit.era)]
   ].map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
 
-  // Batting log
+  // Batting log — sorted by date (resolve from game if not on stat record)
   const bBody=document.getElementById('oppMBatLog'); bBody.innerHTML='';
-  gs.forEach(g=>{
+  const resolveDate=g=>{
+    if(g.date) return g.date;
+    const lwg=gameResults.find(x=>x._id===g.lwGameId);
+    const oppg=oppGames.find(x=>x._id===g.oppGameId);
+    return lwg?lwg.date:oppg?oppg.date:'';
+  };
+  [...gs].sort((a,b)=>resolveDate(a).localeCompare(resolveDate(b))).forEach(g=>{
     const avg=g.ab>0?f3(g.h/g.ab):'.---';
     // Resolve game context
     const lwg=gameResults.find(x=>x._id===g.lwGameId||x.gameNum===g.gameNum);
@@ -2721,8 +2727,8 @@ function renderOppModal(playerId, gs, teamName){
   });
   document.getElementById('oppMNoBat').style.display=gs.length?'none':'block';
 
-  // Pitching log
-  const pitched=gs.filter(g=>g.ip>0);
+  // Pitching log — sorted by date
+  const pitched=gs.filter(g=>g.ip>0).sort((a,b)=>resolveDate(a).localeCompare(resolveDate(b)));
   const pBody=document.getElementById('oppMPitLog'); pBody.innerHTML='';
   pitched.forEach(g=>{
     const oppg=oppGames.find(x=>x._id===g.oppGameId);
