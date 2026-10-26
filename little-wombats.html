@@ -479,6 +479,19 @@
           </div>
         </div>
       </div>
+      <div class="form-row" style="margin-top:8px;">
+        <div class="form-group">
+          <label>Playoff Bracket Game</label>
+          <select id="og-bracketgame">
+            <option value="">— Not a playoff game —</option>
+            <option value="G1">Game 1 (11/3 · LW vs GS)</option>
+            <option value="G2">Game 2 (11/5 · NN vs Winner G1)</option>
+            <option value="G3">Game 3 (11/7 · Losers)</option>
+            <option value="G4">Game 4 (11/8 · Losers Final)</option>
+            <option value="G5">Game 5 (11/10 · Championship)</option>
+          </select>
+        </div>
+      </div>
       <button class="btn btn-primary" onclick="addOppGame()">+ Save Opponent Game</button>
     </div>
   </div>
@@ -2769,13 +2782,15 @@ window.addOppGame=async function(){
   const scoreB=+document.getElementById('og-score-b').value||0;
   const inningsA=[1,2,3,4,5].map(i=>+document.getElementById(`og-a${i}`).value||0);
   const inningsB=[1,2,3,4,5].map(i=>+document.getElementById(`og-b${i}`).value||0);
+  const bracketGame=document.getElementById('og-bracketgame').value||null;
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_opp_games'),{gameNum,teamAId,teamBId,date,scoreA,scoreB,inningsA,inningsB});
+    await addDoc(collection(db,'lw_opp_games'),{gameNum,teamAId,teamBId,date,scoreA,scoreB,inningsA,inningsB,bracketGame});
     ['og-score-a','og-score-b','og-num'].forEach(id=>document.getElementById(id).value=0);
     [1,2,3,4,5].forEach(i=>{document.getElementById(`og-a${i}`).value=0;document.getElementById(`og-b${i}`).value=0;});
     document.getElementById('og-team-a').value='';
     document.getElementById('og-team-b').value='';
+    document.getElementById('og-bracketgame').value='';
     setSync('connected','Live — synced'); alert(`Opponent Game #${gameNum} saved!`);
   }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
