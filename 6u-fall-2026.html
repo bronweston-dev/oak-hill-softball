@@ -597,9 +597,125 @@
     </div>
     <div id="noStandings" class="no-data">No games logged yet.</div>
   </div>
-</div>
-</div>
 
+  <!-- PLAYOFF BRACKET -->
+  <div class="section-title" style="margin-top:32px;">🏆 Fall 2026 Playoffs — Double Elimination</div>
+  <div class="panel" style="padding:24px 20px;">
+    <style>
+      .bracket-wrap{overflow-x:auto;padding-bottom:8px;}
+      .bracket{display:grid;grid-template-columns:220px 40px 220px 40px 220px 40px 220px 40px 220px;align-items:center;min-width:780px;gap:0;}
+      .b-game{background:var(--gray-light);border:2px solid var(--green-dark);border-radius:10px;padding:10px 12px;min-width:200px;}
+      .b-game .b-label{font-family:'Oswald',sans-serif;font-size:.7rem;letter-spacing:1.5px;color:var(--green-dark);margin-bottom:6px;text-transform:uppercase;}
+      .b-game .b-date{font-size:.72rem;color:#666;margin-bottom:8px;}
+      .b-game .b-team{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;margin-bottom:4px;font-size:.88rem;font-weight:600;}
+      .b-game .b-team:last-child{margin-bottom:0;}
+      .b-team.lw{background:rgba(45,80,22,.12);color:var(--green-dark);}
+      .b-team.gs{background:rgba(200,162,42,.12);color:#7a6010;}
+      .b-team.nn{background:rgba(80,0,120,.08);color:#4a006e;}
+      .b-team.tbd{color:#999;font-style:italic;font-weight:400;}
+      .b-team .seed{display:inline-block;width:18px;height:18px;border-radius:50%;font-size:.65rem;font-weight:700;text-align:center;line-height:18px;margin-right:2px;flex-shrink:0;}
+      .b-team.lw .seed{background:var(--green-dark);color:white;}
+      .b-team.gs .seed{background:#c8a22a;color:white;}
+      .b-team.nn .seed{background:#4a006e;color:white;}
+      .b-connector{display:flex;align-items:center;justify-content:center;height:100%;color:#bbb;font-size:1.1rem;}
+      .b-col-label{text-align:center;font-family:'Oswald',sans-serif;font-size:.75rem;letter-spacing:1px;color:var(--green-dark);padding:0 4px 12px;grid-column:span 1;}
+      .b-spacer{height:100%;}
+      .b-winner{border-color:var(--gold);background:linear-gradient(135deg,rgba(200,162,42,.08),rgba(200,162,42,.03));}
+      .b-champ{border-color:var(--gold);border-width:3px;background:linear-gradient(135deg,rgba(200,162,42,.15),rgba(200,162,42,.05));box-shadow:0 4px 18px rgba(200,162,42,.25);}
+      .b-champ .b-label{color:var(--gold-dark);font-size:.78rem;}
+      .b-note{font-size:.72rem;color:#888;margin-top:6px;font-style:italic;}
+      .b-vs{text-align:center;font-size:.7rem;font-weight:700;color:#aaa;letter-spacing:1px;}
+      @media(max-width:700px){.bracket{min-width:700px;}}
+    </style>
+
+    <p style="font-size:.82rem;color:#666;margin:0 0 20px;">
+      <strong>Seeding:</strong>
+      <img src="neon-nightmare-logo.png" alt="" style="height:20px;width:20px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'"><span style="color:#4a006e;font-weight:700;">Neon Nightmare</span> — bye (1st seed) &nbsp;|&nbsp;
+      <img src="little-wombats-logo.png" alt="" style="height:20px;width:20px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'"><span style="color:var(--green-dark);font-weight:700;">Little Wombats</span> &nbsp;|&nbsp;
+      <img src="golden-sparks-logo.png" alt="" style="height:20px;width:20px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:3px;" onerror="this.style.display='none'"><span style="color:#7a6010;font-weight:700;">Golden Sparks</span>
+    </p>
+
+    <div class="bracket-wrap">
+    <div class="bracket">
+
+      <!-- Col headers -->
+      <div class="b-col-label">Winners Bracket</div>
+      <div></div>
+      <div class="b-col-label">Winners Final</div>
+      <div></div>
+      <div class="b-col-label">Losers Bracket</div>
+      <div></div>
+      <div class="b-col-label">Losers Final</div>
+      <div></div>
+      <div class="b-col-label">🏆 Championship</div>
+
+      <!-- Row 1: Game 1 top, connector, NN bye middle, spacer, spacer, spacer, spacer, spacer, spacer -->
+      <div class="b-game">
+        <div class="b-label">Game 1 — Winners</div>
+        <div class="b-date">📅 Mon 11/3 · 5:45 PM</div>
+        <div class="b-team lw"><span class="seed">2</span><img src="little-wombats-logo.png" alt="" style="height:20px;width:20px;object-fit:contain;border-radius:50%;margin-right:4px;vertical-align:middle;" onerror="this.style.display='none'">Little Wombats</div>
+        <div class="b-vs">vs</div>
+        <div class="b-team gs"><span class="seed">3</span><img src="golden-sparks-logo.png" alt="" style="height:20px;width:20px;object-fit:contain;border-radius:50%;margin-right:4px;vertical-align:middle;" onerror="this.style.display='none'">Golden Sparks</div>
+      </div>
+      <div class="b-connector">→</div>
+
+      <!-- Game 2 -->
+      <div class="b-game">
+        <div class="b-label">Game 2 — Winners Final</div>
+        <div class="b-date">📅 Thu 11/5 · 5:45 PM</div>
+        <div class="b-team nn"><span class="seed">1</span><img src="neon-nightmare-logo.png" alt="" style="height:20px;width:20px;object-fit:contain;border-radius:50%;margin-right:4px;vertical-align:middle;" onerror="this.style.display='none'">Neon Nightmare <span style="font-size:.68rem;font-weight:400;margin-left:4px;">(bye)</span></div>
+        <div class="b-vs">vs</div>
+        <div class="b-team tbd">Winner of Game 1</div>
+      </div>
+      <div class="b-connector">↘</div>
+
+      <!-- Game 3 -->
+      <div class="b-game">
+        <div class="b-label">Game 3 — Losers Bracket</div>
+        <div class="b-date">📅 Sat 11/7 · 10:00 AM</div>
+        <div class="b-team tbd">Loser of Game 1</div>
+        <div class="b-vs">vs</div>
+        <div class="b-team tbd">Loser of Game 2</div>
+      </div>
+      <div class="b-connector">→</div>
+
+      <!-- Game 4 -->
+      <div class="b-game">
+        <div class="b-label">Game 4 — Losers Final</div>
+        <div class="b-date">📅 Sun 11/8 · 1:00 PM</div>
+        <div class="b-team tbd">Winner of Game 2</div>
+        <div class="b-vs">vs</div>
+        <div class="b-team tbd">Winner of Game 3</div>
+        <div class="b-note">If Game 3 winner wins → Game 5</div>
+      </div>
+      <div class="b-connector">→</div>
+
+      <!-- Game 5 Championship -->
+      <div class="b-game b-champ">
+        <div class="b-label">⭐ Game 5 — Championship</div>
+        <div class="b-date">📅 Mon 11/10 · 5:30 PM</div>
+        <div class="b-team tbd">Winner of Game 2</div>
+        <div class="b-vs">vs</div>
+        <div class="b-team tbd">Winner of Game 4</div>
+        <div class="b-note">Only if needed (if Game 2 winner loses Game 4)</div>
+      </div>
+
+    </div><!-- .bracket -->
+    </div><!-- .bracket-wrap -->
+
+    <!-- Flow legend -->
+    <div style="margin-top:20px;padding:12px 16px;background:var(--gray-light);border-radius:8px;font-size:.78rem;color:#555;line-height:1.8;">
+      <strong style="color:var(--green-dark);">How it works:</strong>
+      A team is eliminated after <strong>2 losses</strong>. &nbsp;·&nbsp;
+      <strong>Game 1</strong> winner moves to Winners Final (G2). Loser drops to Losers Bracket (G3). &nbsp;·&nbsp;
+      <strong>Game 2</strong> winner advances to G4; loser drops to G3. &nbsp;·&nbsp;
+      <strong>Game 3</strong> loser is eliminated. &nbsp;·&nbsp;
+      <strong>Game 4</strong>: if the Game 2 winner wins → they're champion. If the Game 3 winner wins → Game 5 decides it all.
+    </div>
+
+  </div>
+</div>
+</div>
 <!-- ══════════════════════════ LEAGUE STATS PAGE -->
 <div id="page-lstats" class="page">
 <div class="container">
@@ -2064,7 +2180,9 @@ function renderStandings(){
     tr.innerHTML=`
       <td style="text-align:left;padding-left:14px;font-weight:700;">
         ${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}
-        ${isLW?'<span style="background:var(--green-dark);color:var(--gold);font-family:Bebas Neue,sans-serif;border-radius:4px;padding:1px 6px;margin-right:4px;font-size:.9rem;">LW</span>':''}
+        ${isLW?'<img src="little-wombats-logo.png" alt="" style="height:22px;width:22px;object-fit:contain;vertical-align:middle;margin-right:4px;border-radius:50%;" onerror="this.style.display=\'none\'"><span style="background:var(--green-dark);color:var(--gold);font-family:Bebas Neue,sans-serif;border-radius:4px;padding:1px 6px;margin-right:4px;font-size:.9rem;">LW</span>':''}
+        ${r.name.toLowerCase().includes('neon')?'<img src="neon-nightmare-logo.png" alt="" style="height:22px;width:22px;object-fit:contain;vertical-align:middle;margin-right:4px;border-radius:50%;" onerror="this.style.display=\'none\'">':''}
+        ${r.name.toLowerCase().includes('golden')?'<img src="golden-sparks-logo.png" alt="" style="height:22px;width:22px;object-fit:contain;vertical-align:middle;margin-right:4px;border-radius:50%;" onerror="this.style.display=\'none\'">':''}
         ${r.name}
       </td>
       <td>${r.w}</td><td>${r.l}</td><td>${r.t}</td>
