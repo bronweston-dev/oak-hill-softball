@@ -2113,8 +2113,8 @@ function renderBracket(){
       if(gKey==='G2'){topScore=g.them;botScore=g.us;}
       else{topScore=g.us;botScore=g.them;}
     } else {
-      topScore=g.homeScore!=null?g.homeScore:(g.us!=null?g.us:null);
-      botScore=g.awayScore!=null?g.awayScore:(g.them!=null?g.them:null);
+      topScore=g.scoreA!=null?g.scoreA:(g.homeScore!=null?g.homeScore:null);
+      botScore=g.scoreB!=null?g.scoreB:(g.awayScore!=null?g.awayScore:null);
     }
     if(topS){
       topS.textContent=topScore!=null?topScore:'';
@@ -2146,8 +2146,8 @@ function renderBracket(){
   if(g5score){
     if(g5rec){
       const {type,g}=g5rec;
-      const a=type==='lw'?g.us:(g.homeScore??g.us);
-      const b=type==='lw'?g.them:(g.awayScore??g.them);
+      const a=type==='lw'?g.us:(g.scoreA??g.homeScore??null);
+      const b=type==='lw'?g.them:(g.scoreB??g.awayScore??null);
       g5score.textContent=`${a??'?'} – ${b??'?'}`;
       g5score.removeAttribute('font-style');
       g5score.setAttribute('fill','#7a6010');
