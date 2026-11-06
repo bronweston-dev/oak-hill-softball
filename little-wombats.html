@@ -2394,12 +2394,16 @@ function renderOpponents(){
     const playerCount=oppPlayerStats.filter(x=>x.oppGameId===g._id).length;
     const aName=tName(g.teamAId), bName=tName(g.teamBId);
     const tr=document.createElement('tr');
+    const bgVal=g.bracketGame||'';
+    const bgOpts=['','G1','G2','G3','G4','G5'].map(v=>`<option value="${v}"${bgVal===v?' selected':''}>${v||'—'}</option>`).join('');
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}</td>
       <td><span class="team-badge-cell">${aName}</span> vs <span class="team-badge-cell">${bName}</span></td>
       <td>${g.scoreA}–${g.scoreB}</td>
       <td>${playerCount} players</td>
-      <td><button class="edit-row" onclick="showOppBoxScore('${g._id}')">📋 Box Score</button>
-          <span class="delete-row" onclick="delOppGame('${g._id}')">🗑</span></td>`;
+      <td style="white-space:nowrap;">
+        <select style="font-size:.75rem;padding:2px 4px;border-radius:4px;border:1px solid #ccc;margin-right:4px;" onchange="patchOppBracketGame('${g._id}',this.value)">${bgOpts}</select>
+        <button class="edit-row" onclick="showOppBoxScore('${g._id}')">📋 Box Score</button>
+        <span class="delete-row" onclick="delOppGame('${g._id}')">🗑</span></td>`;
     body.appendChild(tr);
   });
   document.getElementById('noOppGames').style.display=oppGames.length?'none':'block';
@@ -2803,6 +2807,15 @@ window.delOppGame=async function(docId){
     await deleteDoc(doc(db,'lw_opp_games',docId));
     setSync('connected','Live — synced');
   }catch(e){setSync('error','Delete failed');}
+}
+
+window.patchOppBracketGame=async function(docId,val){
+  if(!requirePassword()) return;
+  setSync('syncing','Saving...');
+  try{
+    await updateDoc(doc(db,'lw_opp_games',docId),{bracketGame:val||null});
+    setSync('connected','Live — synced');
+  }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
 
 // ── ADD: OPPONENT PLAYER STATS ────────────────────────────────────────────
