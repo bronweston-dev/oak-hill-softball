@@ -2415,6 +2415,44 @@ function renderBracket(){
   gameResults.forEach(g=>{ if(g.bracketGame) bk[g.bracketGame]={type:'lw',g}; });
   oppGames.forEach(g=>{ if(g.bracketGame&&!bk[g.bracketGame]) bk[g.bracketGame]={type:'opp',g}; });
 
+  // Derive winner/loser team name from a completed bracket game record
+  function winnerOf(gKey){
+    const rec=bk[gKey]; if(!rec) return null;
+    const {type,g}=rec;
+    if(type==='lw'){
+      if(g.us==null||g.them==null) return null;
+      if(gKey==='G2'){ return g.us>g.them?'Little Wombats':'Neon Nightmare'; }
+      return g.us>g.them?'Little Wombats':g.opp;
+    } else {
+      if(g.scoreA==null||g.scoreB==null) return null;
+      return g.scoreA>g.scoreB?tName(g.teamAId):tName(g.teamBId);
+    }
+  }
+  function loserOf(gKey){
+    const rec=bk[gKey]; if(!rec) return null;
+    const {type,g}=rec;
+    if(type==='lw'){
+      if(g.us==null||g.them==null) return null;
+      if(gKey==='G2'){ return g.us>g.them?'Neon Nightmare':'Little Wombats'; }
+      return g.us>g.them?g.opp:'Little Wombats';
+    } else {
+      if(g.scoreA==null||g.scoreB==null) return null;
+      return g.scoreA>g.scoreB?tName(g.teamBId):tName(g.teamAId);
+    }
+  }
+  function setLabel(id, name, fallback){
+    const el=document.getElementById(id); if(!el) return;
+    if(name){ el.textContent=name; el.removeAttribute('font-style'); el.setAttribute('fill','#333'); el.setAttribute('font-weight','700'); }
+    else { el.textContent=fallback; el.setAttribute('font-style','italic'); el.setAttribute('fill','#999'); el.removeAttribute('font-weight'); }
+  }
+
+  // Propagate results into downstream slot labels
+  setLabel('bk-g2-bot-label', winnerOf('G1'), 'Winner of Game 1');
+  setLabel('bk-g3-top-label', loserOf('G1'),  'Loser of Game 1');
+  setLabel('bk-g3-bot-label', loserOf('G2'),  'Loser of Game 2');
+  setLabel('bk-g4-top-label', winnerOf('G2'), 'Winner of Game 2');
+  setLabel('bk-g4-bot-label', winnerOf('G3'), 'Winner of Game 3');
+
   function applyGame(gKey,topScoreId,botScoreId,clickGId){
     const rec=bk[gKey];
     const topS=document.getElementById(topScoreId);
