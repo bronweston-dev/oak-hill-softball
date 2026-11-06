@@ -666,7 +666,8 @@
         <text x="316" y="38" font-size="11" font-weight="700" fill="#4a006e">Neon Nightmare</text>
         <text x="316" y="51" font-size="9.5" fill="#555">(bye)</text>
         <text id="bk-g2-top-score" x="458" y="47" font-size="12" font-weight="700" fill="#4a006e" text-anchor="end"></text>
-        <rect x="280" y="70" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect id="bk-g2-bot-rect" x="280" y="70" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <image id="bk-g2-bot-logo" href="" x="284" y="73" width="26" height="26" clip-path="circle(13px at 13px 13px)" style="display:none"/>
         <text id="bk-g2-bot-label" x="290" y="91" font-size="10" fill="#999" font-style="italic">Winner of Game 1</text>
         <text id="bk-g2-bot-score" x="458" y="92" font-size="12" font-weight="700" fill="#555" text-anchor="end"></text>
       </g>
@@ -684,10 +685,12 @@
 
       <!-- ── GAME 3 ── Losers bracket (shifted right to x=550) -->
       <g id="bk-g3" style="cursor:pointer">
-        <rect x="550" y="255" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect id="bk-g3-top-rect" x="550" y="255" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <image id="bk-g3-top-logo" href="" x="554" y="258" width="26" height="26" clip-path="circle(13px at 13px 13px)" style="display:none"/>
         <text id="bk-g3-top-label" x="560" y="276" font-size="10" fill="#999" font-style="italic">Loser of Game 1</text>
         <text id="bk-g3-top-score" x="728" y="277" font-size="12" font-weight="700" fill="#555" text-anchor="end"></text>
-        <rect x="550" y="300" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect id="bk-g3-bot-rect" x="550" y="300" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <image id="bk-g3-bot-logo" href="" x="554" y="303" width="26" height="26" clip-path="circle(13px at 13px 13px)" style="display:none"/>
         <text id="bk-g3-bot-label" x="560" y="321" font-size="10" fill="#999" font-style="italic">Loser of Game 2</text>
         <text id="bk-g3-bot-score" x="728" y="322" font-size="12" font-weight="700" fill="#555" text-anchor="end"></text>
       </g>
@@ -710,10 +713,12 @@
 
       <!-- ── GAME 4 ── Losers final (shifted right to x=810) -->
       <g id="bk-g4" style="cursor:pointer">
-        <rect x="810" y="45" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect id="bk-g4-top-rect" x="810" y="45" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <image id="bk-g4-top-logo" href="" x="814" y="48" width="26" height="26" clip-path="circle(13px at 13px 13px)" style="display:none"/>
         <text id="bk-g4-top-label" x="820" y="66" font-size="10" fill="#999" font-style="italic">Winner of Game 2</text>
         <text id="bk-g4-top-score" x="988" y="67" font-size="12" font-weight="700" fill="#555" text-anchor="end"></text>
-        <rect x="810" y="280" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect id="bk-g4-bot-rect" x="810" y="280" width="190" height="34" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <image id="bk-g4-bot-logo" href="" x="814" y="283" width="26" height="26" clip-path="circle(13px at 13px 13px)" style="display:none"/>
         <text id="bk-g4-bot-label" x="820" y="301" font-size="10" fill="#999" font-style="italic">Winner of Game 3</text>
         <text id="bk-g4-bot-score" x="988" y="302" font-size="12" font-weight="700" fill="#555" text-anchor="end"></text>
       </g>
@@ -2416,12 +2421,22 @@ function renderBracket(){
   oppGames.forEach(g=>{ if(g.bracketGame&&!bk[g.bracketGame]) bk[g.bracketGame]={type:'opp',g}; });
 
   // Derive winner/loser team name from a completed bracket game record
+  // Known team appearance data
+  const TEAM_STYLES={
+    'Little Wombats': {logo:'little-wombats-logo.png', fill:'rgba(45,80,22,.1)', stroke:'#2d5016', textColor:'#2d5016'},
+    'Golden Sparks':  {logo:'golden-sparks-logo.png',  fill:'rgba(200,162,42,.1)', stroke:'#c8a22a', textColor:'#7a6010'},
+    'Neon Nightmare': {logo:'neon-nightmare-logo.png', fill:'rgba(80,0,120,.1)',   stroke:'#4a006e', textColor:'#4a006e'},
+  };
+  function teamStyle(name){
+    return TEAM_STYLES[name]||{logo:null, fill:'rgba(60,100,180,.1)', stroke:'#3c64b4', textColor:'#3c64b4'};
+  }
+
   function winnerOf(gKey){
     const rec=bk[gKey]; if(!rec) return null;
     const {type,g}=rec;
     if(type==='lw'){
       if(g.us==null||g.them==null) return null;
-      if(gKey==='G2'){ return g.us>g.them?'Little Wombats':'Neon Nightmare'; }
+      if(gKey==='G2') return g.us>g.them?'Little Wombats':'Neon Nightmare';
       return g.us>g.them?'Little Wombats':g.opp;
     } else {
       if(g.scoreA==null||g.scoreB==null) return null;
@@ -2433,25 +2448,56 @@ function renderBracket(){
     const {type,g}=rec;
     if(type==='lw'){
       if(g.us==null||g.them==null) return null;
-      if(gKey==='G2'){ return g.us>g.them?'Neon Nightmare':'Little Wombats'; }
+      if(gKey==='G2') return g.us>g.them?'Neon Nightmare':'Little Wombats';
       return g.us>g.them?g.opp:'Little Wombats';
     } else {
       if(g.scoreA==null||g.scoreB==null) return null;
       return g.scoreA>g.scoreB?tName(g.teamBId):tName(g.teamAId);
     }
   }
-  function setLabel(id, name, fallback){
-    const el=document.getElementById(id); if(!el) return;
-    if(name){ el.textContent=name; el.removeAttribute('font-style'); el.setAttribute('fill','#333'); el.setAttribute('font-weight','700'); }
-    else { el.textContent=fallback; el.setAttribute('font-style','italic'); el.setAttribute('fill','#999'); el.removeAttribute('font-weight'); }
+
+  // Apply a team name + branding into a placeholder slot
+  // rectId, logoId, labelId are SVG element IDs; labelX is text x when logo shown
+  function applySlot(rectId, logoId, labelId, labelX, name, fallbackText){
+    const rect=document.getElementById(rectId);
+    const logo=document.getElementById(logoId);
+    const label=document.getElementById(labelId);
+    if(name){
+      const s=teamStyle(name);
+      if(rect){ rect.setAttribute('fill',s.fill); rect.setAttribute('stroke',s.stroke); rect.removeAttribute('stroke-dasharray'); }
+      if(logo){
+        if(s.logo){ logo.setAttribute('href',s.logo); logo.style.display=''; }
+        else logo.style.display='none';
+      }
+      if(label){
+        label.textContent=name;
+        label.setAttribute('x', s.logo ? String(labelX) : String(labelX-32));
+        label.removeAttribute('font-style');
+        label.setAttribute('fill', s.textColor);
+        label.setAttribute('font-weight','700');
+        label.setAttribute('font-size','11');
+      }
+    } else {
+      if(rect){ rect.setAttribute('fill','#f4f4f4'); rect.setAttribute('stroke','#aaa'); rect.setAttribute('stroke-dasharray','4,3'); }
+      if(logo) logo.style.display='none';
+      if(label){
+        label.textContent=fallbackText;
+        label.setAttribute('x', String(labelX-32));
+        label.setAttribute('font-style','italic');
+        label.setAttribute('fill','#999');
+        label.setAttribute('font-size','10');
+        label.removeAttribute('font-weight');
+      }
+    }
   }
 
-  // Propagate results into downstream slot labels
-  setLabel('bk-g2-bot-label', winnerOf('G1'), 'Winner of Game 1');
-  setLabel('bk-g3-top-label', loserOf('G1'),  'Loser of Game 1');
-  setLabel('bk-g3-bot-label', loserOf('G2'),  'Loser of Game 2');
-  setLabel('bk-g4-top-label', winnerOf('G2'), 'Winner of Game 2');
-  setLabel('bk-g4-bot-label', winnerOf('G3'), 'Winner of Game 3');
+  // Propagate team branding into downstream slots
+  // labelX values match the original text x + 32 (to account for logo offset)
+  applySlot('bk-g2-bot-rect','bk-g2-bot-logo','bk-g2-bot-label', 322, winnerOf('G1'), 'Winner of Game 1');
+  applySlot('bk-g3-top-rect','bk-g3-top-logo','bk-g3-top-label', 592, loserOf('G1'),  'Loser of Game 1');
+  applySlot('bk-g3-bot-rect','bk-g3-bot-logo','bk-g3-bot-label', 592, loserOf('G2'),  'Loser of Game 2');
+  applySlot('bk-g4-top-rect','bk-g4-top-logo','bk-g4-top-label', 852, winnerOf('G2'), 'Winner of Game 2');
+  applySlot('bk-g4-bot-rect','bk-g4-bot-logo','bk-g4-bot-label', 852, winnerOf('G3'), 'Winner of Game 3');
 
   function applyGame(gKey,topScoreId,botScoreId,clickGId){
     const rec=bk[gKey];
