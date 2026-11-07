@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<!-- Little Wombats Public Stats | Fall 2026 | Oak Hill OHYSA | Read-Only -->
+<!-- Little Wombats Stats | Fall 2026 | Oak Hill OYSA -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oak Hill 6U Softball – League Stats</title>
+<title>Little Wombats – Oak Hill 6U Stats</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green:#4a6b1a; --green-dark:#2d5016; --green-light:#6a8f2a;
-    --gold:#c8a22a; --gold-dark:#a07818;
-    --white:#fff; --gray-light:#f5f7f0; --gray:#c8d4b8; --text:#1a2a0a;
-    --blue:#4a6b1a; --red:#c0392b;
-    --shadow:0 4px 24px rgba(45,80,22,0.18);
+    --green:#5bb8e8; --green-dark:#1a3a6b; --green-light:#82ccee;
+    --gold:#e8e832; --gold-dark:#c9c900;
+    --white:#fff; --gray-light:#f0f6ff; --gray:#c8d4e8; --text:#0a1a3a;
+    --blue:#5bb8e8; --red:#d63a5a;
+    --shadow:0 4px 24px rgba(26,58,107,0.18);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Roboto Condensed',sans-serif;background:var(--green-dark);background-image:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,0.015) 40px,rgba(255,255,255,0.015) 80px);color:var(--text);min-height:100vh;}
@@ -87,7 +87,7 @@
   thead th:hover{background:var(--green);}
   thead th.name-col{text-align:left;padding-left:14px;}
   tbody tr{border-bottom:1px solid var(--gray-light);transition:background .15s;cursor:pointer;}
-  tbody tr:hover{background:#f5f7f0;}
+  tbody tr:hover{background:#f0f6ff;}
   tbody td{padding:9px 8px;text-align:center;color:var(--text);}
   .name-cell{text-align:left;padding-left:14px;font-weight:700;}
   .player-num{display:inline-block;background:var(--green-dark);color:var(--gold);font-family:'Bebas Neue',sans-serif;border-radius:4px;padding:1px 6px;margin-right:6px;font-size:.95rem;}
@@ -144,7 +144,7 @@
   .linescore-cell.header{background:var(--green-dark);color:var(--gold);font-family:'Oswald',sans-serif;font-size:.75rem;letter-spacing:1px;}
   .linescore-cell.team-name{background:var(--gray-light);font-weight:700;font-family:'Oswald',sans-serif;font-size:.8rem;text-align:left;padding-left:10px;min-width:100px;flex:2;}
   .linescore-cell.total{background:var(--gray-light);font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;}
-  .linescore-cell.our-run{background:#f5f7f0;}
+  .linescore-cell.our-run{background:#f0f6ff;}
   .bs-table{width:100%;border-collapse:collapse;font-size:.85rem;}
   .bs-table th{background:var(--green-dark);color:var(--gold);font-family:'Oswald',sans-serif;font-size:.72rem;letter-spacing:1px;padding:8px 6px;text-align:center;text-transform:uppercase;}
   .bs-table th:first-child{text-align:left;padding-left:12px;}
@@ -199,7 +199,7 @@
   .log-table th:first-child{text-align:left;padding-left:10px;}
   .log-table td{padding:7px;text-align:center;border-bottom:1px solid var(--gray-light);}
   .log-table td:first-child{text-align:left;padding-left:10px;font-weight:700;}
-  .log-table tr:hover td{background:#f5f7f0;}
+  .log-table tr:hover td{background:#f0f6ff;}
 
   /* EDIT MODAL */
   .edit-modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,26,58,0.88);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
@@ -232,7 +232,7 @@
   .stat-grid-table th.player-col{text-align:left;padding-left:8px;min-width:90px;}
   .stat-grid-table td{padding:3px 2px;text-align:center;border-bottom:1px solid var(--gray-light);vertical-align:middle;}
   .stat-grid-table td.player-name-td{text-align:left;padding-left:6px;font-weight:700;font-size:.8rem;white-space:nowrap;}
-  .stat-grid-table tr:hover td{background:#f5f7f0;}
+  .stat-grid-table tr:hover td{background:#f0fff4;}
   .stat-grid-table input[type=number]{width:36px;padding:3px 1px;border:1px solid var(--gray);border-radius:3px;font-family:'Roboto Condensed',sans-serif;font-size:.82rem;text-align:center;background:var(--gray-light);}
   .stat-grid-table input[type=number]:focus{outline:none;border-color:var(--green);background:white;}
   .stat-grid-table input[type=text]{width:42px;padding:3px 1px;border:1px solid var(--gray);border-radius:3px;font-family:'Roboto Condensed',sans-serif;font-size:.82rem;text-align:center;background:var(--gray-light);}
@@ -261,24 +261,35 @@
   <span id="syncStatus">Connecting...</span>
 </div>
 
-
+<div class="back-bar">
+  <a class="back-link" href="index.html">← All Teams</a>
+</div>
 
 <header>
+  <img class="header-logo" src="little-wombats-logo.png" alt="Little Wombats" onerror="this.style.display='none'">
   <div class="header-text">
-    <h1>Oak Hill 6U Softball</h1>
-    <p>OHYSA · Fall 2026 · League Stats</p>
+    <h1>Little Wombats</h1>
+    <p>Oak Hill · 6U Softball</p>
+  </div>
+  <div class="header-season">
+    <div class="season-label">Fall 2026</div>
+    <div class="season-sub">Season Stats</div>
   </div>
 </header>
 
 <nav class="main-nav">
-  <button class="nav-btn active" onclick="showPage('boxscore')">📋 Box Scores</button>
+  <button class="nav-btn active" onclick="showPage('team')">🏆 Team</button>
+  <button class="nav-btn" onclick="showPage('players')">👧 Players</button>
+  <button class="nav-btn" onclick="showPage('boxscore')">📋 Box Scores</button>
+  <button class="nav-btn" onclick="showPage('opponents')">⚔️ Opponents</button>
   <button class="nav-btn" onclick="showPage('standings')">📊 Standings</button>
   <button class="nav-btn" onclick="showPage('lstats')">📈 League Stats</button>
   <button class="nav-btn" onclick="showPage('leaders')">🏅 League Leaders</button>
+  <button class="nav-btn" onclick="showPage('log')">⚾ Log Stats</button>
 </nav>
 
 <!-- ══════════════════════════ TEAM PAGE -->
-<div id="page-team" class="page">
+<div id="page-team" class="page active">
 <div class="container">
   <div class="section-title">Team Record</div>
   <div class="panel">
@@ -302,7 +313,7 @@
         <thead><tr>
           <th style="text-align:left;padding-left:12px;">Game</th>
           <th>Date / Opponent</th><th>Result</th><th>Score</th>
-          <th>H</th><th>PO</th><th>⭐ POTG</th><th></th>
+          <th>H</th><th>PO</th><th>⭐ POTG</th><th>📹 Video</th><th></th>
         </tr></thead>
         <tbody id="resultsBody"></tbody>
       </table>
@@ -373,7 +384,7 @@
 </div>
 
 <!-- ══════════════════════════ BOX SCORE PAGE -->
-<div id="page-boxscore" class="page active">
+<div id="page-boxscore" class="page">
 <div class="container">
   <div class="section-title">Box Scores</div>
   <div class="boxscore-select">
@@ -466,6 +477,19 @@
             <div class="inning-box"><label>Inn 4</label><input type="number" id="og-b4" min="0" value="0"></div>
             <div class="inning-box"><label>XI</label><input type="number" id="og-b5" min="0" value="0"></div>
           </div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <div class="form-group">
+          <label>Playoff Bracket Game</label>
+          <select id="og-bracketgame">
+            <option value="">— Not a playoff game —</option>
+            <option value="G1">Game 1 (11/3 · LW vs GS)</option>
+            <option value="G2">Game 2 (11/5 · NN vs Winner G1)</option>
+            <option value="G3">Game 3 (11/7 · Losers)</option>
+            <option value="G4">Game 4 (11/8 · Losers Final)</option>
+            <option value="G5">Game 5 (11/10 · Championship)</option>
+          </select>
         </div>
       </div>
       <button class="btn btn-primary" onclick="addOppGame()">+ Save Opponent Game</button>
@@ -605,6 +629,7 @@
     <style>
       .bk-wrap{overflow-x:auto;padding-bottom:8px;}
       .bk-svg{font-family:'Oswald',Arial,sans-serif;}
+      /* team name chips inside SVG handled via foreignObject or text */
     </style>
 
     <div class="bk-wrap">
@@ -628,6 +653,7 @@
       <text x="10" y="120" font-size="10" fill="#2d5016" font-weight="700">Game 1</text>
       <text x="58" y="120" font-size="9.5" fill="#777">Mon 11/3 · 5:45 PM</text>
 
+      <!-- bracket lines G1 → G2 -->
       <line x1="200" y1="42" x2="220" y2="42" stroke="#555" stroke-width="1.5"/>
       <line x1="200" y1="87" x2="220" y2="87" stroke="#555" stroke-width="1.5"/>
       <line x1="220" y1="42" x2="220" y2="87" stroke="#555" stroke-width="1.5"/>
@@ -706,7 +732,7 @@
       <text x="810" y="330" font-size="10" fill="#555" font-weight="700">Game 4</text>
       <text x="858" y="330" font-size="9.5" fill="#777">Sun 11/8 · 1:00 PM</text>
 
-      <!-- ── GAME 5 ── Championship -->
+      <!-- ── GAME 5 ── Championship (if necessary) -->
       <g id="bk-g5" style="cursor:pointer">
         <rect x="1050" y="155" width="150" height="55" rx="6" fill="rgba(200,162,42,.08)" stroke="#c8a22a" stroke-width="2" stroke-dasharray="6,3"/>
         <text x="1058" y="173" font-size="10" font-weight="700" fill="#7a6010">⭐ Game 5</text>
@@ -717,7 +743,9 @@
       <!-- dashed G4→G5 connector -->
       <line x1="1020" y1="180" x2="1050" y2="180" stroke="#c8a22a" stroke-width="1.5" stroke-dasharray="5,3"/>
 
+      <!-- ── footnote ── -->
       <text x="10" y="410" font-size="9" fill="#999" font-style="italic">* Game 5 only played if Game 3 winner defeats Game 2 winner in Game 4</text>
+
     </svg>
     </div>
 
@@ -734,6 +762,7 @@
   </div>
 </div>
 </div>
+
 <!-- ══════════════════════════ LEAGUE STATS PAGE -->
 <div id="page-lstats" class="page">
 <div class="container">
@@ -788,6 +817,166 @@
 </div>
 </div>
 
+<!-- ══════════════════════════ LOG STATS PAGE -->
+<div id="page-log" class="page">
+<div class="container">
+
+  <div class="section-title">Log Team Game Result</div>
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">📋 Add Game Result <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="form-row">
+        <div class="form-group"><label>Game #</label><input type="number" id="gr-num" min="1" placeholder="e.g. 1"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="gr-date"></div>
+        <div class="form-group"><label>Opponent</label><input type="text" id="gr-opp" placeholder="vs. Team"></div>
+        <div class="form-group">
+          <label>Home or Away?</label>
+          <select id="gr-homeaway">
+            <option value="away">Away (we bat first)</option>
+            <option value="home">Home (they bat first)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Our Score</label><input type="number" id="gr-us" min="0" value="0"></div>
+        <div class="form-group"><label>Their Score</label><input type="number" id="gr-them" min="0" value="0"></div>
+        <div class="form-group" style="grid-column:span 2"><label>YouTube Link (optional)</label><input type="url" id="gr-yturl" placeholder="https://youtube.com/watch?v=..."></div>
+      </div>
+      <div class="form-divider">Inning-by-Inning (Our Team)</div>
+      <div class="inning-grid">
+        <div class="inning-box"><label>Inn 1</label><input type="number" id="inn-1" min="0" value="0"></div>
+        <div class="inning-box"><label>Inn 2</label><input type="number" id="inn-2" min="0" value="0"></div>
+        <div class="inning-box"><label>Inn 3</label><input type="number" id="inn-3" min="0" value="0"></div>
+        <div class="inning-box"><label>Inn 4</label><input type="number" id="inn-4" min="0" value="0"></div>
+        <div class="inning-box"><label>Extra</label><input type="number" id="inn-5" min="0" value="0"></div>
+      </div>
+      <div class="form-divider">Inning-by-Inning (Opponent)</div>
+      <div class="inning-grid">
+        <div class="inning-box"><label>Inn 1</label><input type="number" id="opp-1" min="0" value="0"></div>
+        <div class="inning-box"><label>Inn 2</label><input type="number" id="opp-2" min="0" value="0"></div>
+        <div class="inning-box"><label>Inn 3</label><input type="number" id="opp-3" min="0" value="0"></div>
+        <div class="inning-box"><label>Inn 4</label><input type="number" id="opp-4" min="0" value="0"></div>
+        <div class="inning-box"><label>Extra</label><input type="number" id="opp-5" min="0" value="0"></div>
+      </div>
+      <div class="form-divider">⭐ Player of the Game</div>
+      <div class="form-row">
+        <div class="form-group" style="grid-column:span 3">
+          <label>Player(s) — hold Ctrl/Cmd for multiple</label>
+          <select id="gr-potg" multiple style="height:80px;background:white;" onchange="renderPotgDescs('gr-potg','gr-descs')"></select>
+        </div>
+        <div style="grid-column:span 3" id="gr-descs"></div>
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <div class="form-group">
+          <label>Playoff Bracket Game</label>
+          <select id="gr-bracketgame">
+            <option value="">— Not a playoff game —</option>
+            <option value="G1">Game 1 (11/3 · LW vs GS)</option>
+            <option value="G2">Game 2 (11/5 · NN vs Winner G1)</option>
+            <option value="G3">Game 3 (11/7 · Losers)</option>
+            <option value="G4">Game 4 (11/8 · Losers Final)</option>
+            <option value="G5">Game 5 (11/10 · Championship)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addGameResult()">+ Save Game Result</button>
+    </div>
+  </div>
+
+  <div class="section-title">Log Player Stats for a Game</div>
+
+  <!-- Game selector shared by all three grids -->
+  <div class="panel" style="margin-bottom:16px;">
+    <div class="panel-body" style="padding:14px 20px;">
+      <div id="ps-no-games-msg" style="display:none;background:#fff3cd;border:2px solid var(--gold-dark);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-family:'Oswald',sans-serif;letter-spacing:1px;color:var(--green-dark);">
+        ⚠️ No game results logged yet. Please log a Team Game Result first.
+      </div>
+      <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;">
+        <div class="form-group">
+          <label>Game #</label>
+          <select id="ps-gamenum" onchange="onGameSelect()" style="min-width:260px;"><option value="">-- Select Game --</option></select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="text" id="ps-date" readonly style="background:#e8e8e8;color:#555;width:110px;">
+        </div>
+        <div class="form-group">
+          <label>Opponent</label>
+          <input type="text" id="ps-opp" readonly style="background:#e8e8e8;color:#555;width:140px;">
+        </div>
+        <button class="btn btn-secondary" onclick="resetGrids()" style="align-self:end;">↺ All Players</button>
+        <div class="form-group" style="align-self:end;">
+          <select id="readd-player-sel" onchange="readdPlayer()" style="font-family:'Oswald',sans-serif;font-size:.82rem;padding:6px 8px;border:2px solid var(--gray);border-radius:6px;">
+            <option value="">+ Add player back</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTING GRID -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">🏏 Batting Stats <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="stat-grid-wrap">
+        <table class="stat-grid-table" id="bat-grid">
+          <thead><tr>
+            <th class="player-col">Player</th>
+            <th>Order</th>
+            <th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th>
+            <th style="min-width:120px;">🎬 Key Play URL</th>
+            <th>✕</th>
+          </tr></thead>
+          <tbody id="bat-grid-body"></tbody>
+        </table>
+      </div>
+      <div class="grid-save-bar">
+        <button class="btn btn-primary" onclick="saveBattingGrid()">💾 Save Batting</button>
+        <span class="grid-status" id="bat-grid-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIELDING GRID -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">🧤 Fielding Stats <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="stat-grid-wrap">
+        <table class="stat-grid-table" id="fld-grid">
+          <thead><tr>
+            <th class="player-col">Player</th>
+            <th>Pos</th><th>Inn</th><th>PO</th><th>A</th><th>+</th>
+          </tr></thead>
+          <tbody id="fld-grid-body"></tbody>
+        </table>
+      </div>
+      <div class="grid-save-bar">
+        <button class="btn btn-primary" onclick="saveFieldingGrid()">💾 Save Fielding</button>
+        <span class="grid-status" id="fld-grid-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PITCHING GRID -->
+  <div class="panel">
+    <div class="panel-header" onclick="togglePanel(this)">⚾ Pitching Stats <span style="font-size:.75rem;font-weight:400;color:rgba(255,255,255,.7);">(0 IP = did not pitch)</span> <span class="toggle-icon">▼</span></div>
+    <div class="panel-body">
+      <div class="stat-grid-wrap">
+        <table class="stat-grid-table" id="pit-grid">
+          <thead><tr>
+            <th class="player-col">Player</th>
+            <th>IP</th><th>ER</th><th>H</th><th>K</th><th>Team PO</th>
+          </tr></thead>
+          <tbody id="pit-grid-body"></tbody>
+        </table>
+      </div>
+      <div class="grid-save-bar">
+        <button class="btn btn-primary" onclick="savePitchingGrid()">💾 Save Pitching</button>
+        <span class="grid-status" id="pit-grid-status"></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
 
 <!-- PLAYER MODAL -->
 <div class="modal-overlay" id="playerModal" onclick="closeModalBg(event)">
@@ -867,8 +1056,118 @@
   </div>
 </div>
 
+<!-- EDIT GAME RESULT MODAL -->
+<div class="edit-modal-overlay" id="editResultModal" onclick="closeEditResultOnBg(event)">
+  <div class="edit-modal">
+    <div class="edit-modal-header"><h3 id="editResultTitle">Edit Game Result</h3><button class="modal-close" onclick="closeEditResult()">✕</button></div>
+    <div class="edit-modal-body">
+      <input type="hidden" id="er-docid">
+      <div class="form-row">
+        <div class="form-group"><label>Game #</label><input type="number" id="er-num" readonly style="background:#e8e8e8;"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="er-date"></div>
+        <div class="form-group"><label>Opponent</label><input type="text" id="er-opp"></div>
+        <div class="form-group">
+          <label>Home or Away?</label>
+          <select id="er-homeaway">
+            <option value="away">Away (we bat first)</option>
+            <option value="home">Home (they bat first)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Our Score</label><input type="number" id="er-us" min="0"></div>
+        <div class="form-group"><label>Their Score</label><input type="number" id="er-them" min="0"></div>
+        <div class="form-group" style="grid-column:span 2"><label>YouTube Link (optional)</label><input type="url" id="er-yturl" placeholder="https://youtube.com/watch?v=..."></div>
+      </div>
+      <div class="form-divider">Our Runs by Inning</div>
+      <div class="inning-grid">
+        <div class="inning-box"><label>Inn 1</label><input type="number" id="er-i1" min="0"></div>
+        <div class="inning-box"><label>Inn 2</label><input type="number" id="er-i2" min="0"></div>
+        <div class="inning-box"><label>Inn 3</label><input type="number" id="er-i3" min="0"></div>
+        <div class="inning-box"><label>Inn 4</label><input type="number" id="er-i4" min="0"></div>
+        <div class="inning-box"><label>Extra</label><input type="number" id="er-i5" min="0"></div>
+      </div>
+      <div class="form-divider">Opponent Runs by Inning</div>
+      <div class="inning-grid">
+        <div class="inning-box"><label>Inn 1</label><input type="number" id="er-o1" min="0"></div>
+        <div class="inning-box"><label>Inn 2</label><input type="number" id="er-o2" min="0"></div>
+        <div class="inning-box"><label>Inn 3</label><input type="number" id="er-o3" min="0"></div>
+        <div class="inning-box"><label>Inn 4</label><input type="number" id="er-o4" min="0"></div>
+        <div class="inning-box"><label>Extra</label><input type="number" id="er-o5" min="0"></div>
+      </div>
+      <div class="form-divider">⭐ Player of the Game</div>
+      <div class="form-row">
+        <div class="form-group" style="grid-column:span 3">
+          <label>Player(s)</label>
+          <select id="er-potg" multiple style="height:80px;background:white;" onchange="renderPotgDescs('er-potg','er-descs')"></select>
+        </div>
+        <div style="grid-column:span 3" id="er-descs"></div>
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <div class="form-group">
+          <label>Playoff Bracket Game</label>
+          <select id="er-bracketgame">
+            <option value="">— Not a playoff game —</option>
+            <option value="G1">Game 1 (11/3 · LW vs GS)</option>
+            <option value="G2">Game 2 (11/5 · NN vs Winner G1)</option>
+            <option value="G3">Game 3 (11/7 · Losers)</option>
+            <option value="G4">Game 4 (11/8 · Losers Final)</option>
+            <option value="G5">Game 5 (11/10 · Championship)</option>
+          </select>
+        </div>
+      </div>
+      <div class="edit-btn-row">
+        <button class="btn btn-primary" onclick="saveEditResult()">💾 Save Changes</button>
+        <button class="btn btn-secondary" onclick="closeEditResult()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div class="footer">OAK HILL 6U SOFTBALL · OHYSA · FALL 2026</div>
+<!-- EDIT PLAYER STATS MODAL -->
+<div class="edit-modal-overlay" id="editPlayerModal" onclick="closeEditPlayerOnBg(event)">
+  <div class="edit-modal">
+    <div class="edit-modal-header"><h3 id="editPlayerTitle">Edit Player Stats</h3><button class="modal-close" onclick="closeEditPlayer()">✕</button></div>
+    <div class="edit-modal-body">
+      <input type="hidden" id="ep-docid">
+      <div class="form-row">
+        <div class="form-group"><label>Game #</label><input type="number" id="ep-gamenum" readonly style="background:#e8e8e8;"></div>
+        <div class="form-group"><label>Bat Order</label><input type="number" id="ep-batorder" min="1" max="20"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="ep-date"></div>
+        <div class="form-group"><label>Opponent</label><input type="text" id="ep-opp"></div>
+      </div>
+      <div class="form-divider">🏏 Batting</div>
+      <div class="form-row">
+        <div class="form-group"><label>AB</label><input type="number" id="ep-ab" min="0"></div>
+        <div class="form-group"><label>R</label><input type="number" id="ep-r" min="0"></div>
+        <div class="form-group"><label>H</label><input type="number" id="ep-h" min="0"></div>
+        <div class="form-group"><label>2B</label><input type="number" id="ep-2b" min="0"></div>
+        <div class="form-group"><label>3B</label><input type="number" id="ep-3b" min="0"></div>
+        <div class="form-group"><label>HR</label><input type="number" id="ep-hr" min="0"></div>
+        <div class="form-group"><label>RBI</label><input type="number" id="ep-rbi" min="0"></div>
+        <div class="form-group"><label>SO</label><input type="number" id="ep-so" min="0"></div>
+      </div>
+      <div class="form-divider">🧤 Fielding</div>
+      <div class="form-row">
+        <div class="form-group"><label>Position</label><input type="text" id="ep-pos"></div>
+        <div class="form-group"><label>PO</label><input type="number" id="ep-po" min="0"></div>
+        <div class="form-group"><label>A</label><input type="number" id="ep-a" min="0"></div>
+      </div>
+      <div class="form-divider">⚾ Pitching</div>
+      <div class="form-row">
+        <div class="form-group"><label>IP</label><input type="number" id="ep-ip" min="0" step="0.1"></div>
+        <div class="form-group"><label>ER</label><input type="number" id="ep-er" min="0"></div>
+        <div class="form-group"><label>H Allowed</label><input type="number" id="ep-ph" min="0"></div>
+        <div class="form-group"><label>K</label><input type="number" id="ep-pk" min="0"></div>
+        <div class="form-group"><label>Team PO while pitching</label><input type="number" id="ep-ppo" min="0"></div>
+      </div>
+      <div class="edit-btn-row">
+        <button class="btn btn-primary" onclick="saveEditPlayer()">💾 Save Changes</button>
+        <button class="btn btn-secondary" onclick="closeEditPlayer()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">LITTLE WOMBATS · OAK HILL 6U SOFTBALL · FALL 2026</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -886,8 +1185,15 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 // ── PASSWORD ──────────────────────────────────────────────────────────────
-// Read-only site — no password needed
-function requirePassword(){ return false; }
+const SITE_PASSWORD = 'OHYSA';
+let _pwUnlocked = false;
+function requirePassword(){
+  if(_pwUnlocked) return true;
+  const entry = prompt('Enter password to continue:');
+  if(entry === SITE_PASSWORD){ _pwUnlocked = true; return true; }
+  if(entry !== null) alert('Incorrect password.');
+  return false;
+}
 
 // ── PLAYERS ───────────────────────────────────────────────────────────────
 const PLAYERS = [
@@ -1116,7 +1422,7 @@ function populateSelects(){
       const chip=document.createElement('span');
       chip.className='opp-chip';
       const leagueLabel=t.isLeague===false?'<span style="font-size:.7rem;background:#888;color:white;padding:1px 5px;border-radius:3px;margin-left:4px;">non-league</span>':'<span style="font-size:.7rem;background:var(--green-dark);color:var(--gold);padding:1px 5px;border-radius:3px;margin-left:4px;">league</span>';
-      chip.innerHTML=`${t.name}${leagueLabel}`;
+      chip.innerHTML=`${t.name}${leagueLabel} <button onclick="delOppTeam('${t._id}')">✕</button>`;
       tlist.appendChild(chip);
     });
   }
@@ -1799,8 +2105,9 @@ function renderTeamStats(){
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date} · vs ${g.opp}</td>
       <td><span class="${rcls}">${res}</span></td><td>${g.us}–${g.them}</td>
       <td>${hits}</td><td>${po}</td>${potgCell}
-      
-`;
+      <td>${g.ytUrl?`<a href="${g.ytUrl}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;background:#ff0000;color:white;font-family:'Oswald',sans-serif;font-size:.72rem;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-decoration:none;font-weight:700;">▶ Watch</a>`:'<span style="color:#aaa;font-size:.8rem;">—</span>'}</td>
+      <td><button class="edit-row" onclick="event.stopPropagation();openEditResult('${g._id}')">✏️ Edit</button>
+          <span class="delete-row" onclick="event.stopPropagation();delResult('${g._id}')">🗑</span></td>`;
     body.appendChild(tr);
   });
   document.getElementById('noResults').style.display=gameResults.length?'none':'block';
@@ -1906,10 +2213,11 @@ window.showBoxScore=function(num){
 
   // ── LW players ──────────────────────────────────────────────────────────
   const batRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
-    const avg=gs.ab>0?f3(gs.h/gs.ab):'.---';
-    return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
+    const avg=gs.ab>0?f3(gs.h/gs.ab):'.---'; const potgGm=g.potgIds&&g.potgIds.includes(p.id);
+    return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}${potgGm?' ⭐':''}</td>
       <td>${gs.batOrder||''}</td><td>${gs.ab}</td><td>${gs.r}</td><td>${gs.h}</td><td>${gs.d}</td>
-      <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td></tr>`; }).join('');
+      <td>${gs.t}</td><td>${gs.hr}</td><td>${gs.rbi}</td><td>${gs.so}</td><td>${avg}</td>
+      <td>${gs.ytPlay?`<a href="${gs.ytPlay}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;background:#ff0000;color:white;font-family:'Oswald',sans-serif;font-size:.65rem;letter-spacing:1px;padding:2px 6px;border-radius:3px;text-decoration:none;font-weight:700;">▶</a>`:'—'}</td></tr>`; }).join('');
 
   const fldRows=lineup.map(p=>{ const gs=gPlayers.find(x=>x.pid===p.id); if(!gs) return '';
     return `<tr><td onclick="openModal(${p.id})" style="cursor:pointer"><span class="player-num">${p.num}</span>${p.first}</td>
@@ -1956,11 +2264,15 @@ window.showBoxScore=function(num){
   const oppPitRows = oppSorted.map(oppPitRow).filter(Boolean).join('');
 
   // ── Section headers with team name dividers ───────────────────────────────
-  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="11" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
+  function teamDivider(name){ return `<tr style="background:var(--green-dark);"><td colspan="12" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerFld(name){ return `<tr style="background:var(--green-dark);"><td colspan="5" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
   function teamDividerPit(name){ return `<tr style="background:var(--green-dark);"><td colspan="7" style="text-align:left;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">${name}</td></tr>`; }
 
-
+  const potgIds_bs=g.potgIds||[], potgDescs_bs=g.potgDescs||{};
+  const potgSection=potgIds_bs.length?`<div class="potg-section"><div class="potg-title">⭐ Player of the Game</div>
+    <div class="potg-chips">${potgIds_bs.map(id=>`<div class="potg-chip">⭐ ${pName(id)}</div>`).join('')}</div>
+    ${potgIds_bs.map(id=>`<div style="margin-top:10px"><div style="font-family:'Oswald',sans-serif;font-size:.8rem;letter-spacing:1.5px;color:var(--green-dark);margin-bottom:4px">⭐ ${pName(id)}</div><div class="potg-desc">${potgDescs_bs[id]||'No description.'}</div></div>`).join('')}
+    </div>`:'';
 
   const hasBatStats = lineup.length||oppBatRows;
   const hasFldStats = lineup.length;
@@ -1975,7 +2287,7 @@ window.showBoxScore=function(num){
     </div>
     <div class="bs-section"><div class="bs-section-title">Batting</div>
       ${hasBatStats?`<div class="table-wrap"><table class="bs-table"><thead><tr>
-        <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th>
+        <th style="text-align:left;padding-left:12px">Player</th><th>#</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>SO</th><th>AVG</th><th>🎬</th>
       </tr></thead><tbody>
         ${lineup.length?teamDivider('Little Wombats')+batRows:''}
         ${oppBatRows?teamDivider(g.opp)+oppBatRows:''}
@@ -1995,6 +2307,7 @@ window.showBoxScore=function(num){
         ${pitchers.length?teamDividerPit('Little Wombats')+pitRows:''}
         ${oppPitRows?teamDividerPit(g.opp)+oppPitRows:''}
       </tbody></table></div></div>`:''}
+    ${potgSection}
   </div>`;
 }
 
@@ -2086,10 +2399,16 @@ function renderOpponents(){
     const playerCount=oppPlayerStats.filter(x=>x.oppGameId===g._id).length;
     const aName=tName(g.teamAId), bName=tName(g.teamBId);
     const tr=document.createElement('tr');
+    const bgVal=g.bracketGame||'';
+    const bgOpts=['','G1','G2','G3','G4','G5'].map(v=>`<option value="${v}"${bgVal===v?' selected':''}>${v||'—'}</option>`).join('');
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}</td>
       <td><span class="team-badge-cell">${aName}</span> vs <span class="team-badge-cell">${bName}</span></td>
       <td>${g.scoreA}–${g.scoreB}</td>
-      <td>${playerCount} players</td>`;
+      <td>${playerCount} players</td>
+      <td style="white-space:nowrap;">
+        <select style="font-size:.75rem;padding:2px 4px;border-radius:4px;border:1px solid #ccc;margin-right:4px;" onchange="patchOppBracketGame('${g._id}',this.value)">${bgOpts}</select>
+        <button class="edit-row" onclick="showOppBoxScore('${g._id}')">📋 Box Score</button>
+        <span class="delete-row" onclick="delOppGame('${g._id}')">🗑</span></td>`;
     body.appendChild(tr);
   });
   document.getElementById('noOppGames').style.display=oppGames.length?'none':'block';
@@ -2101,6 +2420,8 @@ function renderBracket(){
   gameResults.forEach(g=>{ if(g.bracketGame) bk[g.bracketGame]={type:'lw',g}; });
   oppGames.forEach(g=>{ if(g.bracketGame&&!bk[g.bracketGame]) bk[g.bracketGame]={type:'opp',g}; });
 
+  // Derive winner/loser team name from a completed bracket game record
+  // Known team appearance data
   const TEAM_STYLES={
     'Little Wombats': {logo:'little-wombats-logo.png', fill:'rgba(45,80,22,.1)', stroke:'#2d5016', textColor:'#2d5016'},
     'Golden Sparks':  {logo:'golden-sparks-logo.png',  fill:'rgba(200,162,42,.1)', stroke:'#c8a22a', textColor:'#7a6010'},
@@ -2109,6 +2430,7 @@ function renderBracket(){
   function teamStyle(name){
     return TEAM_STYLES[name]||{logo:null, fill:'rgba(60,100,180,.1)', stroke:'#3c64b4', textColor:'#3c64b4'};
   }
+
   function winnerOf(gKey){
     const rec=bk[gKey]; if(!rec) return null;
     const {type,g}=rec;
@@ -2133,6 +2455,9 @@ function renderBracket(){
       return g.scoreA>g.scoreB?tName(g.teamBId):tName(g.teamAId);
     }
   }
+
+  // Apply a team name + branding into a placeholder slot
+  // rectId, logoId, labelId are SVG element IDs; labelX is text x when logo shown
   function applySlot(rectId, logoId, labelId, labelX, name, fallbackText){
     const rect=document.getElementById(rectId);
     const logo=document.getElementById(logoId);
@@ -2165,6 +2490,9 @@ function renderBracket(){
       }
     }
   }
+
+  // Propagate team branding into downstream slots
+  // labelX values match the original text x + 32 (to account for logo offset)
   applySlot('bk-g2-bot-rect','bk-g2-bot-logo','bk-g2-bot-label', 322, winnerOf('G1'), 'Winner of Game 1');
   applySlot('bk-g3-top-rect','bk-g3-top-logo','bk-g3-top-label', 592, loserOf('G1'),  'Loser of Game 1');
   applySlot('bk-g3-bot-rect','bk-g3-bot-logo','bk-g3-bot-label', 592, loserOf('G2'),  'Loser of Game 2');
@@ -2185,9 +2513,11 @@ function renderBracket(){
     const {type,g}=rec;
     let topScore,botScore;
     if(type==='lw'){
+      // G2: LW is the bottom slot (Winner G1), NN is top
       if(gKey==='G2'){topScore=g.them;botScore=g.us;}
       else{topScore=g.us;botScore=g.them;}
     } else {
+      // opp games store scores as scoreA/scoreB; for G2 NN is always the top slot
       if(gKey==='G2'){
         const nnIsA = tName(g.teamAId)==='Neon Nightmare';
         topScore = nnIsA ? g.scoreA : g.scoreB;
@@ -2211,8 +2541,10 @@ function renderBracket(){
     }
     if(clickG){
       clickG.style.cursor='pointer';
+      clickG.setAttribute('title','Click to view box score');
       if(type==='lw') clickG.onclick=()=>showBoxScore(g.gameNum);
       else clickG.onclick=()=>showOppBoxScore(g._id);
+      clickG.querySelectorAll('rect:not([stroke-dasharray])').forEach(r=>r.setAttribute('stroke-width','2.5'));
     }
   }
 
@@ -2221,6 +2553,7 @@ function renderBracket(){
   applyGame('G3','bk-g3-top-score','bk-g3-bot-score','bk-g3');
   applyGame('G4','bk-g4-top-score','bk-g4-bot-score','bk-g4');
 
+  // G5 special: single score string
   const g5rec=bk['G5'];
   const g5score=document.getElementById('bk-g5-score');
   const g5g=document.getElementById('bk-g5');
@@ -2323,7 +2656,6 @@ function renderStandings(){
       rec.h+=s.h||0; rec.ab+=s.ab||0; rec.rbi+=s.rbi||0; rec.d+=s.d||0; rec.t2+=s.t||0; rec.hr+=s.hr||0;
     });
   });
-
 
   // Only show league teams in standings — must be LW or a known team with isLeague not false
   const rows = Object.values(teamRecords).filter(r=>{
@@ -2475,10 +2807,12 @@ window.addGameResult=async function(){
   const potgDescs={}; potgIds.forEach(id=>{const el=document.getElementById('gr-potg-desc-'+id);if(el)potgDescs[id]=el.value.trim();});
   const ytUrl=document.getElementById('gr-yturl').value.trim();
   const homeaway=document.getElementById('gr-homeaway').value;
+  const bracketGame=document.getElementById('gr-bracketgame').value||null;
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_game_results'),{gameNum,date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl,homeaway});
+    await addDoc(collection(db,'lw_game_results'),{gameNum,date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl,homeaway,bracketGame});
     document.getElementById('gr-descs').innerHTML='';
+    document.getElementById('gr-bracketgame').value='';
     ['gr-opp','gr-yturl'].forEach(id=>document.getElementById(id).value='');
     ['gr-us','gr-them','gr-num'].forEach(id=>document.getElementById(id).value=0);
     [1,2,3,4,5].forEach(i=>{document.getElementById(`inn-${i}`).value=0;document.getElementById(`opp-${i}`).value=0;});
@@ -2541,13 +2875,15 @@ window.addOppGame=async function(){
   const scoreB=+document.getElementById('og-score-b').value||0;
   const inningsA=[1,2,3,4,5].map(i=>+document.getElementById(`og-a${i}`).value||0);
   const inningsB=[1,2,3,4,5].map(i=>+document.getElementById(`og-b${i}`).value||0);
+  const bracketGame=document.getElementById('og-bracketgame').value||null;
   setSync('syncing','Saving...');
   try{
-    await addDoc(collection(db,'lw_opp_games'),{gameNum,teamAId,teamBId,date,scoreA,scoreB,inningsA,inningsB});
+    await addDoc(collection(db,'lw_opp_games'),{gameNum,teamAId,teamBId,date,scoreA,scoreB,inningsA,inningsB,bracketGame});
     ['og-score-a','og-score-b','og-num'].forEach(id=>document.getElementById(id).value=0);
     [1,2,3,4,5].forEach(i=>{document.getElementById(`og-a${i}`).value=0;document.getElementById(`og-b${i}`).value=0;});
     document.getElementById('og-team-a').value='';
     document.getElementById('og-team-b').value='';
+    document.getElementById('og-bracketgame').value='';
     setSync('connected','Live — synced'); alert(`Opponent Game #${gameNum} saved!`);
   }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
@@ -2561,6 +2897,15 @@ window.delOppGame=async function(docId){
     await deleteDoc(doc(db,'lw_opp_games',docId));
     setSync('connected','Live — synced');
   }catch(e){setSync('error','Delete failed');}
+}
+
+window.patchOppBracketGame=async function(docId,val){
+  if(!requirePassword()) return;
+  setSync('syncing','Saving...');
+  try{
+    await updateDoc(doc(db,'lw_opp_games',docId),{bracketGame:val||null});
+    setSync('connected','Live — synced');
+  }catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
 
 // ── ADD: OPPONENT PLAYER STATS ────────────────────────────────────────────
@@ -2687,10 +3032,13 @@ window.buildOppGrids=function(){
 
   // Always rebuild oppGridRows fresh for the selected game+team
   if(existing.length>0){
-    // Pre-fill from existing saved stats, sorted by batting order
-    oppGridRows=existing
-      .sort((a,b)=>(a.batOrder||99)-(b.batOrder||99))
-      .map(x=>({num:x.playerNum||0,name:x.playerName||'',batOrder:x.batOrder||99}));
+    // Pre-fill from existing saved stats — deduplicate by player name (keep most recent)
+    const seen={};
+    existing.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(x=>{
+      const key=x.playerName.toLowerCase();
+      if(!seen[key]) seen[key]={num:x.playerNum||0,name:x.playerName||'',batOrder:x.batOrder||99};
+    });
+    oppGridRows=Object.values(seen).sort((a,b)=>(a.batOrder||99)-(b.batOrder||99));
   } else {
     // Pre-fill from registered roster
     // For LW games teamVal is 'opp:TeamName' — find team by name instead
@@ -2825,9 +3173,12 @@ async function saveOppGrid(section){
         return t?t.name.toLowerCase().replace(/\s+/g,'_'):ctx.teamId;
       })();
       const playerId=`${teamNameSlug}_${row.name.toLowerCase().replace(/\s+/g,'_')}`
-      // Check for existing record
-      const existing=oppPlayerStats.find(x=>x.playerId===playerId&&
-        ((ctx.lwGameId&&x.lwGameId===ctx.lwGameId)||(ctx.oppGameId&&x.oppGameId===ctx.oppGameId)));
+      // Check for existing record — match by normalized playerId to handle old format records
+      const existing=oppPlayerStats.find(x=>{
+        const normX=normalizePlayerId(x);
+        const gameMatch=(ctx.lwGameId&&x.lwGameId===ctx.lwGameId)||(ctx.oppGameId&&x.oppGameId===ctx.oppGameId);
+        return gameMatch&&(normX===playerId||x.playerId===playerId);
+      });
       const rec={
         oppGameId:ctx.oppGameId||null, lwGameId:ctx.lwGameId||null,
         lwGameNum:ctx.lwGameNum, playerId, playerName:row.name, playerNum:row.num,
@@ -2871,7 +3222,8 @@ window.openEditResult=function(docId){
   [1,2,3,4,5].forEach(i=>{document.getElementById(`er-i${i}`).value=inn[i-1]||0;document.getElementById(`er-o${i}`).value=oppInn[i-1]||0;});
   Array.from(potgSel.options).forEach(o=>{o.selected=(g.potgIds||[]).includes(parseInt(o.value));});
   renderPotgDescs('er-potg','er-descs',g.potgDescs||{},g.potgDesc||'');
-  // read-only
+  document.getElementById('er-bracketgame').value=g.bracketGame||'';
+  document.getElementById('editResultModal').classList.add('active');
 }
 window.saveEditResult=async function(){
   const docId=document.getElementById('er-docid').value;
@@ -2883,11 +3235,12 @@ window.saveEditResult=async function(){
   const potgDescs={}; potgIds.forEach(id=>{const el=document.getElementById('er-potg-desc-'+id);if(el)potgDescs[id]=el.value.trim();});
   const ytUrl=document.getElementById('er-yturl').value.trim();
   const homeaway=document.getElementById('er-homeaway').value;
+  const bracketGame=document.getElementById('er-bracketgame').value||null;
   setSync('syncing','Saving...');
-  try{await updateDoc(doc(db,'lw_game_results',docId),{date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl,homeaway});setSync('connected','Live — synced');closeEditResult();}
+  try{await updateDoc(doc(db,'lw_game_results',docId),{date,opp,us,them,innings,oppInnings,potgIds,potgDescs,ytUrl,homeaway,bracketGame});setSync('connected','Live — synced');closeEditResult();}
   catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
-window.closeEditResult=()=>// read-only
+window.closeEditResult=()=>document.getElementById('editResultModal').classList.remove('active');
 window.closeEditResultOnBg=e=>{if(e.target===document.getElementById('editResultModal'))closeEditResult();};
 
 // ── EDIT PLAYER STATS ─────────────────────────────────────────────────────
@@ -2910,7 +3263,7 @@ window.openEditPlayer=function(docId){
   document.getElementById('ep-ip').value=g.ip; document.getElementById('ep-er').value=g.er;
   document.getElementById('ep-ph').value=g.ph;
   document.getElementById('ep-pk').value=g.pk; document.getElementById('ep-ppo').value=g.ppo||0;
-  // read-only
+  document.getElementById('editPlayerModal').classList.add('active');
 }
 window.saveEditPlayer=async function(){
   const docId=document.getElementById('ep-docid').value;
@@ -2931,7 +3284,7 @@ window.saveEditPlayer=async function(){
   try{await updateDoc(doc(db,'lw_player_stats',docId),rec);setSync('connected','Live — synced');closeEditPlayer();}
   catch(e){setSync('error','Save failed');alert('Error: '+e.message);}
 }
-window.closeEditPlayer=()=>// read-only
+window.closeEditPlayer=()=>document.getElementById('editPlayerModal').classList.remove('active');
 window.closeEditPlayerOnBg=e=>{if(e.target===document.getElementById('editPlayerModal'))closeEditPlayer();};
 
 // ── OPPONENT PLAYER MODAL ─────────────────────────────────────────────────
@@ -3057,7 +3410,10 @@ function renderModal(pid){
   document.getElementById('mCardPit').innerHTML=[['G',ps2.g],['IP',ps2.ip.toFixed(1)],['ER',ps2.er],['H',ps2.ph],['K',ps2.pk],['Team PO',ps2.ppo],['DO/IP',doip2],['ERA',f2(ps2.era)]]
     .map(([l,v])=>`<div class="card-stat p"><div class="val">${v}</div><div class="lbl">${l}</div></div>`).join('');
 
-  const gs=playerStats.filter(g=>g.pid===pid).sort((a,b)=>a.gameNum-b.gameNum);
+  const gs=playerStats.filter(g=>g.pid===pid).sort((a,b)=>{
+    if(a.date&&b.date) return a.date.localeCompare(b.date);
+    return a.gameNum-b.gameNum;
+  });
   const bBody=document.getElementById('mBatLog'); bBody.innerHTML='';
   gs.forEach(g=>{
     const avg=g.ab>0?f3(g.h/g.ab):'.---';
@@ -3069,7 +3425,8 @@ function renderModal(pid){
       <td>${g.ab}</td><td>${g.r}</td><td>${g.h}</td><td>${g.d}</td><td>${g.t}</td><td>${g.hr}</td>
       <td>${g.rbi}</td><td>${g.so}</td><td>${avg}</td>
       <td>${potg?`<button class="potg-badge" onclick="showBoxScore(${g.gameNum})">⭐</button>`:''}</td>
-`;
+      <td><button class="edit-row" onclick="openEditPlayer('${g._id}')">✏️</button>
+          <span class="delete-row" onclick="delPlayerStat('${g._id}')">🗑</span></td>`;
     bBody.appendChild(tr);
   });
   document.getElementById('mNoBat').style.display=gs.length?'none':'block';
@@ -3079,7 +3436,8 @@ function renderModal(pid){
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}·${g.opp}</td>
       <td>${g.pos||'—'}</td><td>${g.po}</td><td>${g.a}</td><td>${g.po+g.a}</td>
-`;
+      <td><button class="edit-row" onclick="openEditPlayer('${g._id}')">✏️</button>
+          <span class="delete-row" onclick="delPlayerStat('${g._id}')">🗑</span></td>`;
     fBody.appendChild(tr);
   });
   document.getElementById('mNoFld').style.display=gs.length?'none':'block';
@@ -3092,7 +3450,8 @@ function renderModal(pid){
     tr.innerHTML=`<td><strong>G${g.gameNum}</strong></td><td>${g.date}·${g.opp}</td>
       <td>${g.ip.toFixed(1)}</td><td>${g.er}</td><td>${g.ph}</td><td>${g.pk}</td>
       <td>${g.ppo||0}</td><td>${gdoip}</td><td>${g.ip>0?f2((g.er/g.ip)*3):'—'}</td>
-`;
+      <td><button class="edit-row" onclick="openEditPlayer('${g._id}')">✏️</button>
+          <span class="delete-row" onclick="delPlayerStat('${g._id}')">🗑</span></td>`;
     pBody.appendChild(tr);
   });
   document.getElementById('mNoPit').style.display=pitched.length?'none':'block';
@@ -3125,7 +3484,7 @@ window.renderPotgDescs=function(selectId,containerId,existingDescs,fallback){
 window.showPage=function(name,gameNum){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['boxscore','standings','lstats','leaders'][i]===name);
+    b.classList.toggle('active',['team','players','boxscore','opponents','standings','lstats','leaders','log'][i]===name);
   });
   document.getElementById('page-'+name).classList.add('active');
   if(name==='boxscore'&&gameNum) setTimeout(()=>showBoxScore(gameNum),50);
