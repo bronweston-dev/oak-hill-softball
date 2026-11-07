@@ -2188,8 +2188,14 @@ function renderBracket(){
       if(gKey==='G2'){topScore=g.them;botScore=g.us;}
       else{topScore=g.us;botScore=g.them;}
     } else {
-      topScore=g.scoreA!=null?g.scoreA:(g.homeScore!=null?g.homeScore:null);
-      botScore=g.scoreB!=null?g.scoreB:(g.awayScore!=null?g.awayScore:null);
+      if(gKey==='G2'){
+        const nnIsA = tName(g.teamAId)==='Neon Nightmare';
+        topScore = nnIsA ? g.scoreA : g.scoreB;
+        botScore = nnIsA ? g.scoreB : g.scoreA;
+      } else {
+        topScore=g.scoreA!=null?g.scoreA:(g.homeScore!=null?g.homeScore:null);
+        botScore=g.scoreB!=null?g.scoreB:(g.awayScore!=null?g.awayScore:null);
+      }
     }
     if(topS){
       topS.textContent=topScore!=null?topScore:'';
