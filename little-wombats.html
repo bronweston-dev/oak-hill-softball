@@ -2517,11 +2517,16 @@ function renderBracket(){
       if(gKey==='G2'){topScore=g.them;botScore=g.us;}
       else{topScore=g.us;botScore=g.them;}
     } else {
-      // opp games store scores as scoreA/scoreB; for G2 NN is always the top slot
-      if(gKey==='G2'){
-        const nnIsA = tName(g.teamAId)==='Neon Nightmare';
-        topScore = nnIsA ? g.scoreA : g.scoreB;
-        botScore = nnIsA ? g.scoreB : g.scoreA;
+      // opp games: scoreA/scoreB order may not match bracket top/bottom slot
+      // Determine who belongs in the top slot, then assign accordingly
+      let topTeam=null;
+      if(gKey==='G2') topTeam='Neon Nightmare';       // NN is hardcoded top
+      else if(gKey==='G4') topTeam=winnerOf('G2');    // G4 top = Winner of G2
+      else if(gKey==='G3') topTeam=loserOf('G1');     // G3 top = Loser of G1
+      if(topTeam){
+        const aIsTop = tName(g.teamAId)===topTeam;
+        topScore = aIsTop ? g.scoreA : g.scoreB;
+        botScore = aIsTop ? g.scoreB : g.scoreA;
       } else {
         topScore=g.scoreA!=null?g.scoreA:(g.homeScore!=null?g.homeScore:null);
         botScore=g.scoreB!=null?g.scoreB:(g.awayScore!=null?g.awayScore:null);
